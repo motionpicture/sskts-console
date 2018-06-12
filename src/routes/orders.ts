@@ -34,11 +34,13 @@ ordersRouter.get(
                 sellerId: movieTheaters[0].id,
                 // customerMembershipNumber?: string;
                 // orderNumber: '118-12345',
-                orderStatus: sskts.factory.orderStatus.OrderDelivered,
-                orderDateFrom: (req.query.orderDateRange !== undefined)
-                    ? req.query.orderDateRange.split(' - ')[0]
+                // orderStatus: sskts.factory.orderStatus.OrderDelivered,
+                orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
+                    ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
                     : moment().add(-1, 'day').toDate(),
-                orderDateThrough: (req.query.orderDateRange !== undefined) ? req.query.orderDateRange.split(' - ')[0] : new Date(),
+                orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
+                    ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
+                    : new Date(),
                 ...req.query
             };
 

@@ -37,9 +37,12 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
         const searchConditions = Object.assign({ sellerId: movieTheaters[0].id, 
             // customerMembershipNumber?: string;
             // orderNumber: '118-12345',
-            orderStatus: sskts.factory.orderStatus.OrderDelivered, orderDateFrom: (req.query.orderDateRange !== undefined)
-                ? req.query.orderDateRange.split(' - ')[0]
-                : moment().add(-1, 'day').toDate(), orderDateThrough: (req.query.orderDateRange !== undefined) ? req.query.orderDateRange.split(' - ')[0] : new Date() }, req.query);
+            // orderStatus: sskts.factory.orderStatus.OrderDelivered,
+            orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
+                ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
+                : moment().add(-1, 'day').toDate(), orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
+                ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
+                : new Date() }, req.query);
         debug('searching orders...', searchConditions);
         const orders = yield orderService.search(searchConditions);
         debug(orders.length, 'orders found.', orders);

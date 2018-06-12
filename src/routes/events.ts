@@ -32,8 +32,12 @@ eventsRouter.get(
 
             const searchConditions: sskts.factory.event.individualScreeningEvent.ISearchConditions = {
                 superEventLocationIdentifiers: movieTheaters.map((m) => m.identifier),
-                startFrom: (req.query.startRange !== undefined) ? req.query.startRange.split(' - ')[0] : new Date(),
-                startThrough: (req.query.startRange !== undefined) ? req.query.startRange.split(' - ')[1] : moment().add(1, 'day').toDate(),
+                startFrom: (req.query.startRange !== undefined && req.query.startRange !== '')
+                    ? moment(req.query.startRange.split(' - ')[0]).toDate()
+                    : new Date(),
+                startThrough: (req.query.startRange !== undefined && req.query.startRange !== '')
+                    ? moment(req.query.startRange.split(' - ')[1]).toDate()
+                    : moment().add(1, 'day').toDate(),
                 ...req.query
             };
 

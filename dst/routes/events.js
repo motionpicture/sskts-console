@@ -34,7 +34,11 @@ eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this
             auth: req.user.authClient
         });
         const movieTheaters = yield organizationService.searchMovieTheaters({});
-        const searchConditions = Object.assign({ superEventLocationIdentifiers: movieTheaters.map((m) => m.identifier), startFrom: (req.query.startRange !== undefined) ? req.query.startRange.split(' - ')[0] : new Date(), startThrough: (req.query.startRange !== undefined) ? req.query.startRange.split(' - ')[1] : moment().add(1, 'day').toDate() }, req.query);
+        const searchConditions = Object.assign({ superEventLocationIdentifiers: movieTheaters.map((m) => m.identifier), startFrom: (req.query.startRange !== undefined && req.query.startRange !== '')
+                ? moment(req.query.startRange.split(' - ')[0]).toDate()
+                : new Date(), startThrough: (req.query.startRange !== undefined && req.query.startRange !== '')
+                ? moment(req.query.startRange.split(' - ')[1]).toDate()
+                : moment().add(1, 'day').toDate() }, req.query);
         debug('searching events...', searchConditions);
         const events = yield eventService.searchIndividualScreeningEvent(searchConditions);
         debug(events.length, 'events found.', events);
