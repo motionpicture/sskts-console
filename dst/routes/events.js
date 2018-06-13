@@ -12,11 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * イベントルーター
  */
 const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
-const sskts = require("@motionpicture/sskts-domain");
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
-// import redisClient from '../redis';
 const debug = createDebug('sskts-console:routes:events');
 const eventsRouter = express.Router();
 /**
@@ -85,40 +83,23 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
             branchCode: event.superEvent.location.branchCode
         });
         const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
-        const transactionRepo = new sskts.repository.Transaction(sskts.mongoose.connection);
-        debug('searching transaction by event...');
-        const transactions = yield transactionRepo.transactionModel.find({
-            typeOf: sskts.factory.transactionType.PlaceOrder,
-            status: sskts.factory.transactionStatusType.Confirmed,
-            'result.order.acceptedOffers.itemOffered.reservationFor.identifier': {
-                $exists: true,
-                $eq: event.identifier
-            }
-        }).sort('endDate').exec().then((docs) => docs.map((doc) => doc.toObject()));
-        debug(transactions.length, 'transactions found.');
         debug('searching orders by event...');
         const reservationStartDate = moment(`${event.coaInfo.rsvStartDate} 00:00:00+09:00`, 'YYYYMMDD HH:mm:ssZ').toDate();
         const orders = yield orderService.search({
-            orderNumbers: (transactions.length > 0)
-                ? transactions.map((t) => t.result.order.orderNumber)
-                : [''],
+            // orderNumbers: (transactions.length > 0)
+            //     ? transactions.map((t) => (<ssktsapi.factory.transaction.placeOrder.IResult>t.result).order.orderNumber)
+            //     : [''],
             orderDateFrom: reservationStartDate,
-            orderDateThrough: new Date()
+            orderDateThrough: new Date(),
+            reservedEventIdentifiers: [event.identifier]
         });
         debug(orders.length, 'orders found.');
-        const seatReservationAuthorizeActions = transactions.map((transaction) => {
-            return transaction.object.authorizeActions
-                .filter((a) => a.actionStatus === sskts.factory.actionStatusType.CompletedActionStatus)
-                .find((a) => a.object.typeOf === sskts.factory.action.authorize.offer.seatReservation.ObjectType.SeatReservation);
-        });
         res.render('events/individualScreeningEvent/show', {
             moment: moment,
             movieTheater: movieTheater,
             screeningRoom: screeningRoom,
             movieTheaters: movieTheaters,
             event: event,
-            transactions: transactions,
-            seatReservationAuthorizeActions: seatReservationAuthorizeActions,
             orders: orders
         });
     }

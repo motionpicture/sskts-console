@@ -2,12 +2,9 @@
  * イベントルーター
  */
 import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
-import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
 import * as moment from 'moment';
-
-// import redisClient from '../redis';
 
 const debug = createDebug('sskts-console:routes:events');
 const eventsRouter = express.Router();
@@ -30,7 +27,7 @@ eventsRouter.get(
             });
             const movieTheaters = await organizationService.searchMovieTheaters({});
 
-            const searchConditions: sskts.factory.event.individualScreeningEvent.ISearchConditions = {
+            const searchConditions: ssktsapi.factory.event.individualScreeningEvent.ISearchConditions = {
                 superEventLocationIdentifiers: movieTheaters.map((m) => m.identifier),
                 startFrom: (req.query.startRange !== undefined && req.query.startRange !== '')
                     ? moment(req.query.startRange.split(' - ')[0]).toDate()
@@ -92,34 +89,17 @@ eventsRouter.get(
             });
             const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
 
-            const transactionRepo = new sskts.repository.Transaction(sskts.mongoose.connection);
-            debug('searching transaction by event...');
-            const transactions = await transactionRepo.transactionModel.find({
-                typeOf: sskts.factory.transactionType.PlaceOrder,
-                status: sskts.factory.transactionStatusType.Confirmed,
-                'result.order.acceptedOffers.itemOffered.reservationFor.identifier': {
-                    $exists: true,
-                    $eq: event.identifier
-                }
-            }).sort('endDate').exec().then((docs) => docs.map((doc) => <sskts.factory.transaction.placeOrder.ITransaction>doc.toObject()));
-            debug(transactions.length, 'transactions found.');
-
             debug('searching orders by event...');
             const reservationStartDate = moment(`${event.coaInfo.rsvStartDate} 00:00:00+09:00`, 'YYYYMMDD HH:mm:ssZ').toDate();
             const orders = await orderService.search({
-                orderNumbers: (transactions.length > 0)
-                    ? transactions.map((t) => (<sskts.factory.transaction.placeOrder.IResult>t.result).order.orderNumber)
-                    : [''],
+                // orderNumbers: (transactions.length > 0)
+                //     ? transactions.map((t) => (<ssktsapi.factory.transaction.placeOrder.IResult>t.result).order.orderNumber)
+                //     : [''],
                 orderDateFrom: reservationStartDate,
-                orderDateThrough: new Date()
+                orderDateThrough: new Date(),
+                reservedEventIdentifiers: [event.identifier]
             });
             debug(orders.length, 'orders found.');
-
-            const seatReservationAuthorizeActions = transactions.map((transaction) => {
-                return transaction.object.authorizeActions
-                    .filter((a) => a.actionStatus === sskts.factory.actionStatusType.CompletedActionStatus)
-                    .find((a) => a.object.typeOf === sskts.factory.action.authorize.offer.seatReservation.ObjectType.SeatReservation);
-            });
 
             res.render('events/individualScreeningEvent/show', {
                 moment: moment,
@@ -127,8 +107,6 @@ eventsRouter.get(
                 screeningRoom: screeningRoom,
                 movieTheaters: movieTheaters,
                 event: event,
-                transactions: transactions,
-                seatReservationAuthorizeActions: seatReservationAuthorizeActions,
                 orders: orders
             });
         } catch (error) {

@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * 注文ルーター
  */
 const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
-const sskts = require("@motionpicture/sskts-domain");
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
@@ -35,10 +34,10 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
         });
         const movieTheaters = yield organizationService.searchMovieTheaters({});
         const orderStatusChoices = [
-            sskts.factory.orderStatus.OrderDelivered,
-            sskts.factory.orderStatus.OrderPickupAvailable,
-            sskts.factory.orderStatus.OrderProcessing,
-            sskts.factory.orderStatus.OrderReturned
+            ssktsapi.factory.orderStatus.OrderDelivered,
+            ssktsapi.factory.orderStatus.OrderPickupAvailable,
+            ssktsapi.factory.orderStatus.OrderProcessing,
+            ssktsapi.factory.orderStatus.OrderReturned
         ];
         const searchConditions = {
             sellerIds: (req.query.sellerIds !== undefined)
@@ -58,7 +57,10 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
                 : moment().add(-1, 'day').toDate(),
             orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
-                : new Date()
+                : new Date(),
+            confirmationNumbers: (req.query.confirmationNumbers !== undefined && req.query.confirmationNumbers !== '')
+                ? req.query.confirmationNumbers.split(',').map((v) => v.trim())
+                : []
         };
         debug('searching orders...', searchConditions);
         const orders = yield orderService.search(searchConditions);
@@ -78,64 +80,9 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
 /**
  * 注文詳細
  */
-ordersRouter.get('/:orderNumber', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+ordersRouter.get('/:orderNumber', (__, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        debug('req.query:', req.query);
-        const eventService = new ssktsapi.service.Event({
-            endpoint: process.env.API_ENDPOINT,
-            auth: req.user.authClient
-        });
-        const organizationService = new ssktsapi.service.Organization({
-            endpoint: process.env.API_ENDPOINT,
-            auth: req.user.authClient
-        });
-        const placeService = new ssktsapi.service.Place({
-            endpoint: process.env.API_ENDPOINT,
-            auth: req.user.authClient
-        });
-        const movieTheaters = yield organizationService.searchMovieTheaters({});
-        debug('searching orders...');
-        const event = yield eventService.findIndividualScreeningEvent({
-            identifier: req.params.identifier
-        });
-        debug('orders found.', event);
-        // イベント開催の劇場取得
-        const movieTheater = yield placeService.findMovieTheater({
-            branchCode: event.superEvent.location.branchCode
-        });
-        const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
-        const transactionRepo = new sskts.repository.Transaction(sskts.mongoose.connection);
-        debug('searching transaction by event...');
-        const transactions = yield transactionRepo.transactionModel.find({
-            typeOf: sskts.factory.transactionType.PlaceOrder,
-            status: sskts.factory.transactionStatusType.Confirmed,
-            'result.order.acceptedOffers.itemOffered.reservationFor.identifier': {
-                $exists: true,
-                $eq: event.identifier
-            }
-        }).sort('endDate').exec().then((docs) => docs.map((doc) => doc.toObject()));
-        debug(transactions.length, 'transactions found.');
-        const orderRepo = new sskts.repository.Order(sskts.mongoose.connection);
-        debug('searching orders by event...');
-        const orders = yield orderRepo.orderModel.find({
-            orderNumber: { $in: transactions.map((t) => t.result.order.orderNumber) }
-        }).sort('orderDate').exec().then((docs) => docs.map((doc) => doc.toObject()));
-        debug(orders.length, 'orders found.');
-        const seatReservationAuthorizeActions = transactions.map((transaction) => {
-            return transaction.object.authorizeActions
-                .filter((a) => a.actionStatus === sskts.factory.actionStatusType.CompletedActionStatus)
-                .find((a) => a.object.typeOf === sskts.factory.action.authorize.offer.seatReservation.ObjectType.SeatReservation);
-        });
-        res.render('orders/individualScreeningEvent/show', {
-            moment: moment,
-            movieTheater: movieTheater,
-            screeningRoom: screeningRoom,
-            movieTheaters: movieTheaters,
-            event: event,
-            transactions: transactions,
-            seatReservationAuthorizeActions: seatReservationAuthorizeActions,
-            orders: orders
-        });
+        res.render('orders/show', {});
     }
     catch (error) {
         next(error);

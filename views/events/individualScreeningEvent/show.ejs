@@ -228,7 +228,7 @@
     $(function () {
         var event = JSON.parse('<%- JSON.stringify(event) %>');
         var screeningRoom = JSON.parse('<%- JSON.stringify(screeningRoom) %>');
-        var seatReservationAuthorizeActions = JSON.parse('<%- JSON.stringify(seatReservationAuthorizeActions) %>');
+        var orders = JSON.parse('<%- JSON.stringify(orders) %>');
 
         // 全座席数は
         var numberOfSeats = screeningRoom.containsPlace[0].containsPlace.length;
@@ -241,9 +241,9 @@
         /**
          * ラインチャート作成
          */
-        var data = seatReservationAuthorizeActions.reduce(
+        var data = orders.reduce(
             (a, b) => {
-                numberOfSeats -= b.object.offers.length;
+                numberOfSeats -= b.acceptedOffers.length;
                 // 予約開始からの時間
                 const diff = moment(b.endDate).diff(moment(reservationStartDate), 'hours', true);
                 a.push({
@@ -260,7 +260,7 @@
             labels: [],
             datasets: [
                 {
-                    label: 'seatReservationAuthorizeAction',
+                    label: 'Orders',
                     backgroundColor: 'rgba(0, 123, 255, 0.9)',
                     data: data
                 },
