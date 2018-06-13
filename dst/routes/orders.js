@@ -34,15 +34,32 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
             auth: req.user.authClient
         });
         const movieTheaters = yield organizationService.searchMovieTheaters({});
-        const searchConditions = Object.assign({ sellerId: movieTheaters[0].id, 
-            // customerMembershipNumber?: string;
-            // orderNumber: '118-12345',
-            // orderStatus: sskts.factory.orderStatus.OrderDelivered,
+        const orderStatusChoices = [
+            sskts.factory.orderStatus.OrderDelivered,
+            sskts.factory.orderStatus.OrderPickupAvailable,
+            sskts.factory.orderStatus.OrderProcessing,
+            sskts.factory.orderStatus.OrderReturned
+        ];
+        const searchConditions = {
+            sellerIds: (req.query.sellerIds !== undefined)
+                ? req.query.sellerIds
+                : movieTheaters.map((m) => m.id),
+            customerMembershipNumbers: (req.query.customerMembershipNumbers !== undefined && req.query.customerMembershipNumbers !== '')
+                ? req.query.customerMembershipNumbers.split(',').map((v) => v.trim())
+                : [],
+            orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
+                ? req.query.orderNumbers.split(',').map((v) => v.trim())
+                : [],
+            orderStatuses: (req.query.orderStatuses !== undefined)
+                ? req.query.orderStatuses
+                : orderStatusChoices,
             orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
-                : moment().add(-1, 'day').toDate(), orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
+                : moment().add(-1, 'day').toDate(),
+            orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
-                : new Date() }, req.query);
+                : new Date()
+        };
         debug('searching orders...', searchConditions);
         const orders = yield orderService.search(searchConditions);
         debug(orders.length, 'orders found.', orders);
@@ -50,7 +67,8 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
             moment: moment,
             movieTheaters: movieTheaters,
             searchConditions: searchConditions,
-            orders: orders
+            orders: orders,
+            orderStatusChoices: orderStatusChoices
         });
     }
     catch (error) {

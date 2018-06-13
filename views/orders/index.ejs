@@ -29,43 +29,68 @@
             <!-- left column -->
             <div class="col-md-12">
                 <!-- general form elements -->
-                <div class="card card-primary">
+                <div class="card card-default">
                     <!-- <div class="card-header">
-                        <h3 class="card-title">Quick Example</h3>
+                        <h3 class="card-title">Select2</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
                     </div> -->
-                    <!-- /.card-header -->
-                    <!-- form start -->
                     <form role="form" method="get">
                         <div class="card-body">
-                            <!-- <div class="form-group">
-                                <label for="name">イベント名</label>
-                                <input type="text" class="form-control" id="name" name="name" placeholder="イベント名" value="<%= searchConditions.name %>">
-                            </div> -->
-                            <div class="form-group">
-                                <label>販売者</label>
-                                <select multiple class="form-control" name="sellerId">
-                                    <% movieTheaters.forEach(function (movieTheater) { %>
-                                        <% var selected = searchConditions.sellerId === movieTheater.id; %>
-                                            <option value="<%= movieTheater.id %>" <% if (selected) { %> selected
-                                                <% } %>>
-                                                    <%= movieTheater.name.ja %>
-                                            </option>
-                                            <% }) %>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>注文日時</label>
-
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="fa fa-calendar"></i>
-                                        </span>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="customerMembershipNumbers">購入者会員番号</label>
+                                        <input type="text" class="form-control" id="customerMembershipNumbers" name="customerMembershipNumbers" placeholder="購入者会員番号"
+                                            value="<%= searchConditions.customerMembershipNumbers.join(',') %>">
                                     </div>
-                                    <input type="text" class="form-control" name="orderDateRange" id="reservation" value="<%= searchConditions.orderDateRange %>">
+                                    <div class="form-group">
+                                        <label>販売者</label>
+                                        <select multiple class="form-control" name="sellerIds[]">
+                                            <% movieTheaters.forEach(function (movieTheater) { %>
+                                                <% var selected = searchConditions.sellerIds.indexOf( movieTheater.id) >= 0; %>
+                                                    <option value="<%= movieTheater.id %>" <% if (selected) { %> selected
+                                                        <% } %>>
+                                                            <%= movieTheater.name.ja %>
+                                                    </option>
+                                                    <% }) %>
+                                        </select>
+                                    </div>
                                 </div>
-                                <!-- /.input group -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="orderNumbers">注文番号</label>
+                                        <input type="text" class="form-control" id="orderNumbers" name="orderNumbers" placeholder="注文番号" value="<%= searchConditions.orderNumbers.join(',') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>注文日時</label>
+
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control" name="orderDateRange" id="orderDateRange" value="<%= moment(searchConditions.orderDateFrom).format('YYYY-MM-DDT00:00:00Z') %> - <%= moment(searchConditions.orderDateThrough).format('YYYY-MM-DDT00:00:00Z') %>">
+                                        </div>
+                                        <!-- /.input group -->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>注文ステータス</label>
+                                        <select multiple class="form-control" name="orderStatuses[]">
+                                            <% orderStatusChoices.forEach(function (orderStatus) { %>
+                                                <% var selected = searchConditions.orderStatuses.indexOf(orderStatus) >= 0; %>
+                                                    <option value="<%= orderStatus %>" <% if (selected) { %> selected
+                                                        <% } %>>
+                                                            <%= orderStatus %>
+                                                    </option>
+                                                    <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -123,14 +148,37 @@
                                         <td>
                                             <ul class="list-unstyled">
                                                 <li>
-                                                    <%- JSON.stringify(order.customer, null, '    ').replace(/ /g, '&nbsp;').replace(/\n/g, '<br>') %>
+                                                    <span class="badge badge-info">
+                                                        <%= order.customer.typeOf %>
+                                                    </span>
                                                 </li>
+                                                <% if (order.customer.memberOf !== undefined) { %>
+                                                    <li>
+                                                        <span class="badge badge-warning">
+                                                            <%= order.customer.memberOf.membershipNumber %>
+                                                        </span>
+                                                    </li>
+                                                    <% } %>
+                                                        <li>
+                                                            <%= order.customer.name %>
+                                                        </li>
+                                                        <li>
+                                                            <%= order.customer.email %>
+                                                        </li>
+                                                        <li>
+                                                            <%= order.customer.telephone %>
+                                                        </li>
                                             </ul>
                                         </td>
                                         <td>
                                             <ul class="list-unstyled">
                                                 <li>
-                                                    <%- JSON.stringify(order.seller, null, '    ').replace(/ /g, '&nbsp;').replace(/\n/g, '<br>') %>
+                                                    <span class="badge badge-info">
+                                                        <%= order.seller.typeOf %>
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <%= order.seller.name %>
                                                 </li>
                                             </ul>
                                         </td>
@@ -144,7 +192,7 @@
                                         <td>
                                             <ul class="list-unstyled">
                                                 <li>
-                                                    <%- JSON.stringify(order.paymentMethods, null, '    ').replace(/ /g, '&nbsp;').replace(/\n/g, '<br>') %>
+                                                    <%- order.paymentMethods.map((p)=>p.paymentMethod).join(',') %>
                                                 </li>
                                             </ul>
                                         </td>
@@ -200,10 +248,10 @@
         });
 
         //Date range picker
-        $('#reservation').daterangepicker({
+        $('#orderDateRange').daterangepicker({
             timePicker: false,
             // timePickerIncrement: 30,
-            format: 'YYYY-MM-DDT00:00:00+0900'
+            format: 'YYYY-MM-DDT00:00:00Z'
         })
     });
 </script>

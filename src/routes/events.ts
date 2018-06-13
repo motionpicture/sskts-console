@@ -70,6 +70,10 @@ eventsRouter.get(
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
             const placeService = new ssktsapi.service.Place({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
@@ -100,11 +104,15 @@ eventsRouter.get(
             }).sort('endDate').exec().then((docs) => docs.map((doc) => <sskts.factory.transaction.placeOrder.ITransaction>doc.toObject()));
             debug(transactions.length, 'transactions found.');
 
-            const orderRepo = new sskts.repository.Order(sskts.mongoose.connection);
             debug('searching orders by event...');
-            const orders = await orderRepo.orderModel.find({
-                orderNumber: { $in: transactions.map((t) => (<sskts.factory.transaction.placeOrder.IResult>t.result).order.orderNumber) }
-            }).sort('orderDate').exec().then((docs) => docs.map((doc) => doc.toObject()));
+            const reservationStartDate = moment(`${event.coaInfo.rsvStartDate} 00:00:00+09:00`, 'YYYYMMDD HH:mm:ssZ').toDate();
+            const orders = await orderService.search({
+                orderNumbers: (transactions.length > 0)
+                    ? transactions.map((t) => (<sskts.factory.transaction.placeOrder.IResult>t.result).order.orderNumber)
+                    : [''],
+                orderDateFrom: reservationStartDate,
+                orderDateThrough: new Date()
+            });
             debug(orders.length, 'orders found.');
 
             const seatReservationAuthorizeActions = transactions.map((transaction) => {

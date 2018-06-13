@@ -30,18 +30,31 @@ ordersRouter.get(
             });
             const movieTheaters = await organizationService.searchMovieTheaters({});
 
-            const searchConditions: sskts.factory.order.ISearchConditions = {
-                sellerId: movieTheaters[0].id,
-                // customerMembershipNumber?: string;
-                // orderNumber: '118-12345',
-                // orderStatus: sskts.factory.orderStatus.OrderDelivered,
+            const orderStatusChoices = [
+                sskts.factory.orderStatus.OrderDelivered,
+                sskts.factory.orderStatus.OrderPickupAvailable,
+                sskts.factory.orderStatus.OrderProcessing,
+                sskts.factory.orderStatus.OrderReturned
+            ];
+            const searchConditions: ssktsapi.factory.order.ISearchConditions = {
+                sellerIds: (req.query.sellerIds !== undefined)
+                    ? req.query.sellerIds
+                    : movieTheaters.map((m) => m.id),
+                customerMembershipNumbers: (req.query.customerMembershipNumbers !== undefined && req.query.customerMembershipNumbers !== '')
+                    ? (<string>req.query.customerMembershipNumbers).split(',').map((v) => v.trim())
+                    : [],
+                orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
+                    ? (<string>req.query.orderNumbers).split(',').map((v) => v.trim())
+                    : [],
+                orderStatuses: (req.query.orderStatuses !== undefined)
+                    ? req.query.orderStatuses
+                    : orderStatusChoices,
                 orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                     ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
                     : moment().add(-1, 'day').toDate(),
                 orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                     ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
-                    : new Date(),
-                ...req.query
+                    : new Date()
             };
 
             debug('searching orders...', searchConditions);
@@ -51,7 +64,8 @@ ordersRouter.get(
                 moment: moment,
                 movieTheaters: movieTheaters,
                 searchConditions: searchConditions,
-                orders: orders
+                orders: orders,
+                orderStatusChoices: orderStatusChoices
             });
         } catch (error) {
             next(error);
