@@ -245,7 +245,7 @@
             (a, b) => {
                 numberOfSeats -= b.acceptedOffers.length;
                 // 予約開始からの時間
-                const diff = moment(b.endDate).diff(moment(reservationStartDate), 'hours', true);
+                const diff = moment(b.orderDate).diff(moment(reservationStartDate), 'hours', true);
                 a.push({
                     x: diff,
                     y: numberOfSeats,
@@ -261,7 +261,7 @@
             datasets: [
                 {
                     label: 'Orders',
-                    backgroundColor: 'rgba(0, 123, 255, 0.9)',
+                    // backgroundColor: 'rgba(0, 123, 255, 0.9)',
                     data: data
                 },
             ]
@@ -311,7 +311,7 @@
             legend: {
                 position: 'bottom',
                 labels: {
-                    fontColor: '#fff',
+                    // fontColor: '#fff',
                 },
             },
             scales: {
@@ -322,7 +322,7 @@
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: '経過時間(hours)',
+                            labelString: '販売開始からの経過時間(hours)',
                         },
                         gridLines: {
                             display: true,
