@@ -26,9 +26,9 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-4 connectedSortable">
                 <% movieTheaters.forEach(function(movieTheater){ %>
-                    <div class="card">
+                    <div class="card bg-dark">
                         <div class="card-header no-border">
                             <div class="d-flex justify-content-between">
                                 <h3 class="card-title">
@@ -69,10 +69,10 @@
                     <!-- /.card -->
                     <% }) %>
             </div>
-            <!-- /.col-md-6 -->
-            <div class="col-lg-6">
+            <!-- /.col-md-4 -->
 
-                <div class="card">
+            <div class="col-lg-4 connectedSortable">
+                <div class="card bg-dark">
                     <div class="card-header no-border">
                         <div class="d-flex justify-content-between">
                             <h3 class="card-title">
@@ -112,7 +112,7 @@
                 </div>
                 <!-- /.card -->
             </div>
-            <!-- /.col-md-6 -->
+            <!-- /.col-md-4 -->
         </div>
         <!-- /.row -->
     </div>
@@ -145,8 +145,7 @@
                     y: telemetry.result.transactions.numberOfUnderway
                 };
             });
-            var $visitorsChart = $('#transactions-in-progress-chart-' + movieTheater.id);
-            var visitorsChart = new Chart($visitorsChart, {
+            var visitorsChart = new Chart($('#transactions-in-progress-chart-' + movieTheater.id), {
                 type: 'line',
                 data: {
                     // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
@@ -154,42 +153,34 @@
                         {
                             data: data,
                             backgroundColor: 'transparent',
-                            borderColor: '#007bff',
-                            pointBorderColor: '#007bff',
-                            pointBackgroundColor: '#007bff',
+                            borderColor: '#DAA8F5',
+                            borderWidth: 1,
+                            pointRadius: 2,
+                            pointBorderColor: '#DAA8F5',
+                            pointBackgroundColor: '#DAA8F5',
                             fill: false
-                            // pointHoverBackgroundColor: '#007bff',
-                            // pointHoverBorderColor    : '#007bff'
                         },
                     ]
                 },
                 options: {
                     pointDot: true,
                     maintainAspectRatio: false,
-                    // tooltips: {
-                    //     mode: mode,
-                    //     intersect: intersect
-                    // },
-                    // hover: {
-                    //     mode: mode,
-                    //     intersect: intersect
-                    // },
                     legend: {
                         display: false
                     },
                     scales: {
                         yAxes: [{
-                            // display: false,
+                            display: true,
                             gridLines: {
                                 display: true,
-                                lineWidth: '4px',
-                                color: 'rgba(0, 0, 0, .2)',
-                                zeroLineColor: 'transparent'
+                                lineWidth: 1,
+                                color: '#555c62',
+                                zeroLineColor: '#555c62',
                             },
-                            ticks: $.extend({
+                            ticks: {
                                 beginAtZero: true,
-                                // suggestedMax: 200
-                            }, ticksStyle)
+                                fontColor: '#a1a6a9'
+                            }
                         }],
                         xAxes: [{
                             type: 'linear',
@@ -197,7 +188,9 @@
                             gridLines: {
                                 display: false
                             },
-                            ticks: ticksStyle
+                            ticks: {
+                                fontColor: '#a1a6a9'
+                            }
                         }]
                     }
                 }
@@ -219,42 +212,34 @@
                     {
                         data: data,
                         backgroundColor: 'transparent',
-                        borderColor: '#007bff',
-                        pointBorderColor: '#007bff',
-                        pointBackgroundColor: '#007bff',
+                        borderColor: '#DAA8F5',
+                        borderWidth: 1,
+                        pointRadius: 2,
+                        pointBorderColor: '#DAA8F5',
+                        pointBackgroundColor: '#DAA8F5',
                         fill: false
-                        // pointHoverBackgroundColor: '#007bff',
-                        // pointHoverBorderColor    : '#007bff'
                     },
                 ]
             },
             options: {
                 pointDot: true,
                 maintainAspectRatio: false,
-                // tooltips: {
-                //     mode: mode,
-                //     intersect: intersect
-                // },
-                // hover: {
-                //     mode: mode,
-                //     intersect: intersect
-                // },
                 legend: {
                     display: false
                 },
                 scales: {
                     yAxes: [{
-                        // display: false,
+                        display: true,
                         gridLines: {
                             display: true,
-                            lineWidth: '4px',
-                            color: 'rgba(0, 0, 0, .2)',
-                            zeroLineColor: 'transparent'
+                            lineWidth: 1,
+                            color: '#555c62',
+                            zeroLineColor: '#555c62',
                         },
-                        ticks: $.extend({
+                        ticks: {
                             beginAtZero: true,
-                            // suggestedMax: 200
-                        }, ticksStyle)
+                            fontColor: '#a1a6a9'
+                        }
                     }],
                     xAxes: [{
                         type: 'linear',
@@ -262,7 +247,9 @@
                         gridLines: {
                             display: false
                         },
-                        ticks: ticksStyle
+                        ticks: {
+                            fontColor: '#a1a6a9'
+                        }
                     }]
                 }
             }
