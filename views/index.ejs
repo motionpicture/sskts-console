@@ -99,30 +99,20 @@
 
         movieTheaters.forEach(function (movieTheater) {
             var telemetriesBySellerId = sellerTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
+            var data = telemetriesBySellerId.map(function (telemetry, index) {
+                return {
+                    x: index,
+                    y: telemetry.result.transactions.numberOfUnderway
+                };
+            });
             var $visitorsChart = $('#transactions-in-progress-chart-' + movieTheater.id);
             var visitorsChart = new Chart($visitorsChart, {
+                type: 'line',
                 data: {
-                    labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
+                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
                     datasets: [
-                        // {
-                        //     type: 'line',
-                        //     data: globalTelemetries.map(function (telemetry) {
-                        //         return (telemetry.result.tasks !== undefined) ? telemetry.result.tasks.numberOfUnexecuted : 0
-                        //     }),
-                        //     // data: [100, 120, 170, 167, 180, 177, 160],
-                        //     backgroundColor: 'transparent',
-                        //     borderColor: '#007bff',
-                        //     pointBorderColor: '#007bff',
-                        //     pointBackgroundColor: '#007bff',
-                        //     fill: false
-                        //     // pointHoverBackgroundColor: '#007bff',
-                        //     // pointHoverBorderColor    : '#007bff'
-                        // },
                         {
-                            type: 'line',
-                            data: telemetriesBySellerId.map(function (telemetry) {
-                                return telemetry.result.transactions.numberOfUnderway
-                            }),
+                            data: data,
                             backgroundColor: 'transparent',
                             borderColor: '#007bff',
                             pointBorderColor: '#007bff',
@@ -134,15 +124,16 @@
                     ]
                 },
                 options: {
+                    pointDot: true,
                     maintainAspectRatio: false,
-                    tooltips: {
-                        mode: mode,
-                        intersect: intersect
-                    },
-                    hover: {
-                        mode: mode,
-                        intersect: intersect
-                    },
+                    // tooltips: {
+                    //     mode: mode,
+                    //     intersect: intersect
+                    // },
+                    // hover: {
+                    //     mode: mode,
+                    //     intersect: intersect
+                    // },
                     legend: {
                         display: false
                     },
@@ -161,6 +152,7 @@
                             }, ticksStyle)
                         }],
                         xAxes: [{
+                            type: 'linear',
                             display: true,
                             gridLines: {
                                 display: false
