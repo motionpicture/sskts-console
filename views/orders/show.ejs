@@ -205,7 +205,7 @@
                                     <tr>
                                         <th>Discount:</th>
                                         <td>
-                                            <%= order.discounts.reduce((a, b)=>{a+b.discount},0)%>
+                                            <%= order.discounts.reduce((a, b)=>a+b.discount,0) %>
                                                 <%= (order.discounts.length > 0) ? order.discounts[0].discountCurrency : 'JPY' %>
                                         </td>
                                     </tr>
