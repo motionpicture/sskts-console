@@ -126,6 +126,7 @@
                                         <span class="text-muted">確認番号</span>
                                     </th>
                                     <th>orderDate</th>
+                                    <th>orderStatus</th>
                                     <th>customer</th>
                                     <th>seller</th>
                                     <th>price</th>
@@ -154,6 +155,15 @@
                                             <ul class="list-unstyled">
                                                 <li>
                                                     <%= moment(order.orderDate).format('YY-MM-DD hh:mm:ss') %>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <span class="badge badge-danger">
+                                                        <%= order.orderStatus %>
+                                                    </span>
                                                 </li>
                                             </ul>
                                         </td>
@@ -225,6 +235,7 @@
                                         <span class="text-muted">確認番号</span>
                                     </th>
                                     <th>orderDate</th>
+                                    <th>orderStatus</th>
                                     <th>customer</th>
                                     <th>seller</th>
                                     <th>price</th>
