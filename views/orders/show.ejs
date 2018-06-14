@@ -92,7 +92,7 @@
                                     <b>Payment Due:</b> 2/22/2014 -->
                                     <br>
                                     <b>Payment Method ID:</b>
-                                    <%= order.paymentMethods[0].paymentMethodId %>
+                                    <%= (order.paymentMethods.length > 0) ? order.paymentMethods[0].paymentMethodId : '' %>
                         </div>
                         <!-- /.col -->
                     </div>
