@@ -23,11 +23,11 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
         const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
         const numberOfAggregationUnit = 720; // 集計単位数
         // tslint:disable-next-line:no-magic-numbers
-        const dateNow = moment();
-        const dateNowByUnitTime = moment.unix(dateNow.unix() - (dateNow.unix() % telemetryUnitTimeInSeconds));
+        let dateNow = moment();
+        let dateNowByUnitTime = moment.unix(dateNow.unix() - (dateNow.unix() % telemetryUnitTimeInSeconds));
         // 基本的に、集計は別のジョブでやっておいて、この報告ジョブでは取得して表示するだけのイメージ
         // tslint:disable-next-line:no-magic-numbers
-        const measuredFrom = moment(dateNowByUnitTime).add(numberOfAggregationUnit * -telemetryUnitTimeInSeconds, 'seconds');
+        let measuredFrom = moment(dateNowByUnitTime).add(numberOfAggregationUnit * -telemetryUnitTimeInSeconds, 'seconds');
         debug('reporting telemetries measuredFrom - dateTo...', measuredFrom, dateNowByUnitTime);
         const organizationRepo = new sskts.repository.Organization(sskts.mongoose.connection);
         const telemetryRepo = new sskts.repository.Telemetry(sskts.mongoose.connection);
@@ -42,18 +42,28 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
             measuredThrough: dateNowByUnitTime.toDate()
         })({ telemetry: telemetryRepo });
         debug('sellerTelemetries length:', sellerTelemetries.length);
-        // await reportNumberOfTasksUnexecuted(globalTelemetries);
-        // 販売者ごとにレポート送信
-        yield Promise.all(movieTheaters.map((movieTheater) => __awaiter(this, void 0, void 0, function* () {
-            debug('reporting...seller:', movieTheater.id);
-            // const telemetriesBySellerId = sellerTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
-            // await reportNumberOfTransactionsUnderway(movieTheater.name.ja, telemetriesBySellerId);
-        })));
+        // フローデーターを検索
+        // tslint:disable-next-line:no-magic-numbers
+        dateNow = moment().add(-30, 'minutes');
+        dateNowByUnitTime = moment.unix(dateNow.unix() - (dateNow.unix() % telemetryUnitTimeInSeconds));
+        measuredFrom = moment(dateNowByUnitTime).add(numberOfAggregationUnit * -telemetryUnitTimeInSeconds, 'seconds');
+        const globalFlowTelemetries = yield sskts.service.report.telemetry.searchGlobalFlow({
+            measuredFrom: measuredFrom.toDate(),
+            measuredThrough: dateNowByUnitTime.toDate()
+        })({ telemetry: telemetryRepo });
+        debug(globalTelemetries.length, 'globalFlowTelemetries found.');
+        const sellerFlowTelemetries = yield sskts.service.report.telemetry.searchSellerFlow({
+            measuredFrom: measuredFrom.toDate(),
+            measuredThrough: dateNowByUnitTime.toDate()
+        })({ telemetry: telemetryRepo });
+        debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
         res.render('index', {
             message: 'Welcome to SSKTS Console!',
             movieTheaters: movieTheaters,
             globalTelemetries: globalTelemetries,
-            sellerTelemetries: sellerTelemetries
+            sellerTelemetries: sellerTelemetries,
+            globalFlowTelemetries: globalFlowTelemetries,
+            sellerFlowTelemetries: sellerFlowTelemetries
         });
     }
     catch (error) {

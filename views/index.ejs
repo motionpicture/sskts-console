@@ -72,6 +72,56 @@
             <!-- /.col-md-4 -->
 
             <div class="col-lg-4 connectedSortable">
+                <% movieTheaters.forEach(function(movieTheater){ %>
+                    <div class="card bg-dark">
+                        <div class="card-header no-border">
+                            <div class="d-flex justify-content-between">
+                                <h3 class="card-title">
+                                    <%= movieTheater.name.ja %> 分ごとの取引数</h3>
+                                <!-- <a href="javascript:void(0);">View Report</a> -->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-4">
+                                <canvas id="number-of-transactions-by-statuses-chart-<%= movieTheater.id %>" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                    <% }) %>
+
+                        <% movieTheaters.forEach(function(movieTheater){ %>
+                            <div class="card bg-dark">
+
+                                <div class="card-header no-border">
+                                    <div class="d-flex justify-content-between">
+                                        <h3 class="card-title">
+                                            <%= movieTheater.name.ja %> 分ごとの平均取引金額</h3>
+                                        <!-- <a href="javascript:void(0);">View Report</a> -->
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="position-relative mb-4">
+                                        <canvas id="amount-average-chart-<%= movieTheater.id %>" height="200"></canvas>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-end">
+                                        <!-- <span class="mr-2">
+                                    <i class="fa fa-square text-primary"></i> This Week
+                                </span>
+    
+                                <span>
+                                    <i class="fa fa-square text-gray"></i> Last Week
+                                </span> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card -->
+                            <% }) %>
+            </div>
+            <!-- /.col-md-4 -->
+
+            <div class="col-lg-4 connectedSortable">
                 <div class="card bg-dark">
                     <div class="card-header no-border">
                         <div class="d-flex justify-content-between">
@@ -128,6 +178,8 @@
         var movieTheaters = JSON.parse('<%- JSON.stringify(movieTheaters) %>');
         var globalTelemetries = JSON.parse('<%- JSON.stringify(globalTelemetries) %>');
         var sellerTelemetries = JSON.parse('<%- JSON.stringify(sellerTelemetries) %>');
+        var globalFlowTelemetries = JSON.parse('<%- JSON.stringify(globalFlowTelemetries) %>');
+        var sellerFlowTelemetries = JSON.parse('<%- JSON.stringify(sellerFlowTelemetries) %>');
 
         var ticksStyle = {
             fontColor: '#495057',
@@ -141,7 +193,7 @@
             var telemetriesBySellerId = sellerTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
             var data = telemetriesBySellerId.map(function (telemetry, index) {
                 return {
-                    x: index,
+                    x: telemetry.result.measuredAt,
                     y: telemetry.result.transactions.numberOfUnderway
                 };
             });
@@ -183,7 +235,174 @@
                             }
                         }],
                         xAxes: [{
-                            type: 'linear',
+                            time: {
+                                unit: 'hour'
+                            },
+                            type: 'time',
+                            display: true,
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                fontColor: '#a1a6a9'
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        // フローデータチャート
+        movieTheaters.forEach(function (movieTheater) {
+            var telemetriesBySellerId = sellerFlowTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
+            var data = telemetriesBySellerId.map(function (telemetry, index) {
+                return {
+                    x: telemetry.result.measuredFrom,
+                    y: telemetry.result.transactions.averageAmount
+                };
+            });
+            var visitorsChart = new Chart($('#amount-average-chart-' + movieTheater.id), {
+                type: 'line',
+                data: {
+                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
+                    datasets: [
+                        {
+                            data: data,
+                            backgroundColor: 'transparent',
+                            borderColor: '#DAA8F5',
+                            borderWidth: 1,
+                            pointRadius: 2,
+                            pointBorderColor: '#DAA8F5',
+                            pointBackgroundColor: '#DAA8F5',
+                            fill: false
+                        },
+                    ]
+                },
+                options: {
+                    pointDot: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            gridLines: {
+                                display: true,
+                                lineWidth: 1,
+                                color: '#555c62',
+                                zeroLineColor: '#555c62',
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: '#a1a6a9'
+                            }
+                        }],
+                        xAxes: [{
+                            time: {
+                                unit: 'hour'
+                            },
+                            type: 'time',
+                            display: true,
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                fontColor: '#a1a6a9'
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        // 分あたりの取引数チャート
+        movieTheaters.forEach(function (movieTheater) {
+            var telemetriesBySellerId = sellerFlowTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
+            var dataStarted = telemetriesBySellerId.map(function (telemetry, index) {
+                return {
+                    x: telemetry.result.measuredFrom,
+                    y: telemetry.result.transactions.numberOfStarted
+                };
+            });
+            var dataConfirmed = telemetriesBySellerId.map(function (telemetry, index) {
+                return {
+                    x: telemetry.result.measuredFrom,
+                    y: telemetry.result.transactions.numberOfConfirmed
+                };
+            });
+            var dataExpired = telemetriesBySellerId.map(function (telemetry, index) {
+                return {
+                    x: telemetry.result.measuredFrom,
+                    y: telemetry.result.transactions.numberOfExpired
+                };
+            });
+            var visitorsChart = new Chart($('#number-of-transactions-by-statuses-chart-' + movieTheater.id), {
+                type: 'line',
+                data: {
+                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
+                    datasets: [
+                        {
+                            data: dataStarted,
+                            backgroundColor: 'transparent',
+                            borderColor: '#79F67D',
+                            borderWidth: 1,
+                            pointRadius: 2,
+                            pointBorderColor: '#79F67D',
+                            pointBackgroundColor: '#79F67D',
+                            fill: false,
+                            label: '開始',
+                        },
+                        {
+                            data: dataConfirmed,
+                            backgroundColor: 'transparent',
+                            borderColor: '#79CCF5',
+                            borderWidth: 1,
+                            pointRadius: 2,
+                            pointBorderColor: '#79CCF5',
+                            pointBackgroundColor: '#79CCF5',
+                            fill: false,
+                            label: '成立',
+                        },
+                        {
+                            data: dataExpired,
+                            backgroundColor: 'transparent',
+                            borderColor: '#E96C6C',
+                            borderWidth: 1,
+                            pointRadius: 2,
+                            pointBorderColor: '#E96C6C',
+                            pointBackgroundColor: '#E96C6C',
+                            fill: false,
+                            label: '離脱',
+                        },
+                    ]
+                },
+                options: {
+                    pointDot: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            gridLines: {
+                                display: true,
+                                lineWidth: 1,
+                                color: '#555c62',
+                                zeroLineColor: '#555c62',
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: '#a1a6a9'
+                            }
+                        }],
+                        xAxes: [{
+                            time: {
+                                unit: 'hour'
+                            },
+                            type: 'time',
                             display: true,
                             gridLines: {
                                 display: false
@@ -200,7 +419,7 @@
         // タスクキューチャート
         var data = globalTelemetries.map(function (telemetry, index) {
             return {
-                x: index,
+                x: telemetry.result.measuredAt,
                 y: telemetry.result.tasks.numberOfUnexecuted
             };
         });
@@ -242,7 +461,10 @@
                         }
                     }],
                     xAxes: [{
-                        type: 'linear',
+                        time: {
+                            unit: 'hour'
+                        },
+                        type: 'time',
                         display: true,
                         gridLines: {
                             display: false
