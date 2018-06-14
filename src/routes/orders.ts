@@ -79,9 +79,25 @@ ordersRouter.get(
  */
 ordersRouter.get(
     '/:orderNumber',
-    async (__, res, next) => {
+    async (req, res, next) => {
         try {
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const orders = await orderService.search({
+                orderNumbers: [req.params.orderNumber],
+                orderDateFrom: moment('2017-04-20T00:00:00+09:00').toDate(),
+                orderDateThrough: new Date()
+            });
+            const order = orders.shift();
+            if (order === undefined) {
+                throw new ssktsapi.factory.errors.NotFound('Order');
+            }
+
             res.render('orders/show', {
+                moment: moment,
+                order: order
             });
         } catch (error) {
             next(error);

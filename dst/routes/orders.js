@@ -80,9 +80,25 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
 /**
  * 注文詳細
  */
-ordersRouter.get('/:orderNumber', (__, res, next) => __awaiter(this, void 0, void 0, function* () {
+ordersRouter.get('/:orderNumber', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        res.render('orders/show', {});
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const orders = yield orderService.search({
+            orderNumbers: [req.params.orderNumber],
+            orderDateFrom: moment('2017-04-20T00:00:00+09:00').toDate(),
+            orderDateThrough: new Date()
+        });
+        const order = orders.shift();
+        if (order === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('Order');
+        }
+        res.render('orders/show', {
+            moment: moment,
+            order: order
+        });
     }
     catch (error) {
         next(error);
