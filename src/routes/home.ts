@@ -1,6 +1,7 @@
 /**
  * ホームルーター
  */
+import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
@@ -11,9 +12,8 @@ const homeRouter = express.Router();
 
 homeRouter.get(
     '/',
-    async (_, res, next) => {
+    async (req, res, next) => {
         try {
-
             // 集計単位数分の集計を行う
             const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
             const numberOfAggregationUnit = 720; // 集計単位数
@@ -59,8 +59,29 @@ homeRouter.get(
             })({ telemetry: telemetryRepo });
             debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
 
+            // 直近の実売上データを
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const orders = await orderService.search({
+                // tslint:disable-next-line:no-magic-numbers
+                orderDateFrom: moment().add(-3, 'days').toDate(),
+                orderDateThrough: moment().toDate()
+            });
+            // const madeThrough = moment();
+            // // tslint:disable-next-line:no-magic-numbers
+            // const madeFrom = moment(madeThrough).add(-3, 'days');
+            // const gmoNotificationRepo = new sskts.repository.GMONotification(sskts.mongoose.connection);
+            // const gmoNotifications = await gmoNotificationRepo.searchSales({
+            //     tranDateFrom: madeFrom.toDate(),
+            //     tranDateThrough: madeThrough.toDate()
+            // });
+            // debug('gmoNotifications:', gmoNotifications.length);
+
             res.render('index', {
                 message: 'Welcome to SSKTS Console!',
+                orders: orders,
                 movieTheaters: movieTheaters,
                 globalTelemetries: globalTelemetries,
                 sellerTelemetries: sellerTelemetries,

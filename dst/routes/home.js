@@ -11,13 +11,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * ホームルーター
  */
+const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const sskts = require("@motionpicture/sskts-domain");
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
 const debug = createDebug('sskts-console:routes:home');
 const homeRouter = express.Router();
-homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+homeRouter.get('/', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         // 集計単位数分の集計を行う
         const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
@@ -57,8 +58,28 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
             measuredThrough: dateNowByUnitTime.toDate()
         })({ telemetry: telemetryRepo });
         debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
+        // 直近の実売上データを
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const orders = yield orderService.search({
+            // tslint:disable-next-line:no-magic-numbers
+            orderDateFrom: moment().add(-3, 'days').toDate(),
+            orderDateThrough: moment().toDate()
+        });
+        // const madeThrough = moment();
+        // // tslint:disable-next-line:no-magic-numbers
+        // const madeFrom = moment(madeThrough).add(-3, 'days');
+        // const gmoNotificationRepo = new sskts.repository.GMONotification(sskts.mongoose.connection);
+        // const gmoNotifications = await gmoNotificationRepo.searchSales({
+        //     tranDateFrom: madeFrom.toDate(),
+        //     tranDateThrough: madeThrough.toDate()
+        // });
+        // debug('gmoNotifications:', gmoNotifications.length);
         res.render('index', {
             message: 'Welcome to SSKTS Console!',
+            orders: orders,
             movieTheaters: movieTheaters,
             globalTelemetries: globalTelemetries,
             sellerTelemetries: sellerTelemetries,
