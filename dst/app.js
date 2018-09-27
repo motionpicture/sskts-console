@@ -43,6 +43,7 @@ app.use(express.static(`${__dirname}/../public`));
 app.use('/node_modules', express.static(`${__dirname}/../node_modules`));
 sskts.mongoose.connect(process.env.MONGOLAB_URI, mongooseConnectionOptions_1.default)
     .then(() => { debug('MongoDB connected.'); })
+    // tslint:disable-next-line:no-console
     .catch(console.error);
 // routers
 const router_1 = require("./routes/router");
