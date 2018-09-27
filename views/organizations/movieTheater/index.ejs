@@ -1,0 +1,182 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">劇場検索</h1>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active">劇場検索</li>
+                </ol>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <!-- <div class="card-header">
+                        <h3 class="card-title">Quick Example</h3>
+                    </div> -->
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="get">
+                        <div class="card-body">
+                            <!-- <div class="form-group">
+                                <label for="accountNumber">口座番号</label>
+                                <input type="text" class="form-control" id="accountNumber" name="accountNumber" placeholder="口座番号" value="<%= query.accountNumber %>">
+                            </div> -->
+                            <!-- <div class="form-group">
+                                <label for="name">名義</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="名義" value="<%= query.name %>">
+                            </div> -->
+                            <!-- <div class="form-group">
+                                <label>Select</label>
+                                <select class="form-control">
+                                    <option>option 1</option>
+                                    <option>option 2</option>
+                                    <option>option 3</option>
+                                    <option>option 4</option>
+                                    <option>option 5</option>
+                                </select>
+                            </div> -->
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer clearfix">
+                            <button type="button" class="btn btn-primary" onclick="location.href='/organizations/movieTheater/new'">
+                                <i class="fa fa-plus"></i> 劇場追加</button>
+                            <button type="submit" class="btn btn-secondary float-right">検索</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+
+            </div>
+            <!--/.col (left) -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">劇場検索結果</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive">
+                        <table id="movieTheaters-table" class="table table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>枝番号</th>
+                                    <th>詳細</th>
+                                    <th>決済情報</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% movieTheaters.forEach(function(movieTheater){ %>
+                                    <tr>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <%= movieTheater.id %>
+                                                </li>
+                                                <li>
+                                                    <%= movieTheater.identifier %>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <%= movieTheater.location.branchCode %>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <%= movieTheater.name.ja %>
+                                                </li>
+                                                <li>
+                                                    <%= movieTheater.name.en %>
+                                                </li>
+                                                <li>
+                                                    <%= movieTheater.telephone %>
+                                                </li>
+                                                <li>
+                                                    <%= movieTheater.url %>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <%= (movieTheater.gmoInfo) ? JSON.stringify(movieTheater.gmoInfo) : '' %>
+                                                </li>
+                                                <% if (Array.isArray(movieTheater.paymentAccepted)) { %>
+                                                    <% movieTheater.paymentAccepted.forEach(function(paymentAccepted){ %>
+                                                        <li>
+                                                            <%= JSON.stringify(paymentAccepted) %>
+                                                        </li>
+                                                        <% }) %>
+                                                            <% } %>
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <a href="/organizations/movieTheater/<%= movieTheater.id %>">編集</a>
+                                                </li>
+                                            </ul>
+
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>枝番号</th>
+                                    <th>詳細</th>
+                                    <th>決済情報</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<!-- DataTables -->
+<link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
+
+<!-- page script -->
+<script>
+    $(function () {
+        $("#movieTheaters-table").DataTable({
+            "order": [[1, 'asc']], // デフォルトは枝番号昇順
+            "ordering": true
+        });
+    });
+</script>

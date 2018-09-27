@@ -1,0 +1,142 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">
+                    口座番号[
+                    <%= accountNumber %>]の転送アクション検索</h1>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/accounts?accountNumber=<%= accountNumber %>">口座番号[
+                            <%= accountNumber %>]</a>
+                    </li>
+                    <li class="breadcrumb-item active">転送アクション検索</li>
+                </ol>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">口座検索結果</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive">
+                        <table id="actions-table" class="table table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>出入</th>
+                                    <th>アクションタイプ</th>
+                                    <th>完了日時</th>
+                                    <th>ステータス</th>
+                                    <th>取引</th>
+                                    <th>from</th>
+                                    <th>to</th>
+                                    <th>金額</th>
+                                    <th>説明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% actions.forEach(function(action){ %>
+                                    <tr>
+                                        <td>
+                                            <%= (action.fromLocation.accountNumber === accountNumber) ? '出' : '入' %>
+                                        </td>
+                                        <td>
+                                            <%= action.typeOf %>
+                                                <br>
+                                                <%= action.id %>
+                                        </td>
+                                        <td>
+                                            <%= action.endDate %>
+                                        </td>
+                                        <td>
+                                            <%= action.actionStatus %>
+                                        </td>
+                                        <td>
+                                            <%= action.purpose.typeOf %>
+                                                <br>
+                                                <%= action.purpose.id %>
+                                        </td>
+                                        <td>
+                                            <%= action.fromLocation.name %>
+                                                <br>
+                                                <%= action.fromLocation.accountNumber %>
+                                        </td>
+                                        <td>
+                                            <%= action.toLocation.name %>
+                                                <br>
+                                                <%= action.toLocation.accountNumber %>
+                                        </td>
+                                        <td>
+                                            <%= action.amount %>
+                                        </td>
+                                        <td>
+                                            <%= action.description %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>出入</th>
+                                    <th>アクションタイプ</th>
+                                    <th>完了日時</th>
+                                    <th>ステータス</th>
+                                    <th>取引</th>
+                                    <th>from</th>
+                                    <th>to</th>
+                                    <th>金額</th>
+                                    <th>説明</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<!-- DataTables -->
+<link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
+
+<!-- page script -->
+<script>
+    $(function () {
+        // $("#actions-table").DataTable();
+        $('#actions-table').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "order": [[2, 'desc']], // デフォルトは完了日時降順
+            "ordering": true,
+            "info": true,
+            "autoWidth": true
+        });
+    });
+</script>
