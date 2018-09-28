@@ -11,10 +11,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * イベントルーター
  */
-const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
+const ssktsapi = require("../ssktsapi");
 const debug = createDebug('sskts-console:routes:events');
 const eventsRouter = express.Router();
 /**

@@ -21,7 +21,7 @@ app.use(middlewares.basicAuth({
     name: process.env.BASIC_AUTH_NAME,
     pass: process.env.BASIC_AUTH_PASS
     // unauthorizedHandler: (__, res, next) => {
-    //     res.setHeader('WWW-Authenticate', 'Basic realm="sskts-api Authentication"');
+    //     res.setHeader('WWW-Authenticate', 'Basic realm="sskts-console Authentication"');
     //     next(new Error());
     // }
 }));

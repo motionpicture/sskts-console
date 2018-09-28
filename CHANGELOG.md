@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- 入場制限コンテンツを追加。
+
 ### Changed
+
+- ダッシュボードを調整。
+- 注文検索結果を調整。
+- 入場制限コンテンツを追加。
 
 ### Deprecated
 

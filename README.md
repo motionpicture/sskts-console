@@ -1,5 +1,3 @@
-<img src="https://motionpicture.jp/images/common/logo_01.svg" alt="motionpicture" title="motionpicture" align="right" height="56" width="98"/>
-
 # SSKTS Console Web Application
 
 ## Table of contents
@@ -36,3 +34,4 @@
 | `PECORINO_API_CLIENT_ID`           | true     |                 |                        |
 | `PECORINO_API_CLIENT_SECRET`       | true     |                 |                        |
 | `COGNITO_USER_POOL_ID`             | true     |                 |                        |
+| `WAITER_ENDPOINT`                  | true     |                 | WAITER Endpoint        |

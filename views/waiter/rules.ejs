@@ -1,0 +1,154 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">入場制限規則</h1>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active">入場制限規則</li>
+                </ol>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-default">
+                    <!-- <div class="card-header">
+                        <h3 class="card-title">Select2</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div> -->
+                    <form role="form" method="get">
+                    </form>
+                </div>
+                <!-- /.card -->
+
+            </div>
+            <!--/.col (left) -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">検索結果</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive">
+                        <table id="rules-table" class="table table-bordered table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>スコープ</th>
+                                    <th>許可証数集計単位(秒)</th>
+                                    <th>許可証数閾値</th>
+                                    <th>サービス休止期間</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>スコープ</th>
+                                    <th>許可証数集計単位(秒)</th>
+                                    <th>許可証数閾値</th>
+                                    <th>サービス休止期間</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<!-- DataTables -->
+<link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
+
+<!-- daterange picker -->
+<link rel="stylesheet" href="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker-bs3.css">
+
+<script src="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker.js"></script>
+
+<!-- page script -->
+<script>
+    $(function () {
+        $("#rules-table").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/waiter/rules',
+                data: function (d) {
+                    d.limit = d.length;
+                    d.page = (d.start / d.length) + 1;
+                    // d.name = d.search.value;
+                    d.format = 'datatable';
+                }
+            },
+            searching: false,
+            order: [[1, 'asc']],
+            ordering: false,
+            columns: [
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<ul class="list-unstyled">'
+                            + '<li>' + data.scope + '</li>'
+                            + '</ul>';
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<ul class="list-unstyled">'
+                            + '<li>' + data.aggregationUnitInSeconds + '</li>'
+                            + '</ul>';
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<ul class="list-unstyled">'
+                            + '<li>' + data.threshold + '</li>'
+                            + '</ul>';
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        var html = '<ul class="list-unstyled">';
+                        data.unavailableHoursSpecifications.forEach(function (specification) {
+                            html += '<li>' + specification.startDate + ' - ' + specification.endDate + '</li>'
+                        });
+                        html += '</ul>';
+                        return html;
+                    }
+                }
+            ]
+        });
+    });
+</script>

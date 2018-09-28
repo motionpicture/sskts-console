@@ -9,24 +9,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
- * 取引ルーター
+ * Waiterルーター
  */
-const createDebug = require("debug");
+// import * as createDebug from 'debug';
 const express = require("express");
-// import * as moment from 'moment';
+const moment = require("moment");
+const request = require("request-promise-native");
 // import * as ssktsapi from '../ssktsapi';
-const debug = createDebug('sskts-console:routes:account');
-const transactionsRouter = express.Router();
-/**
- * 取引検索
- */
-transactionsRouter.get('/', (req, _, next) => __awaiter(this, void 0, void 0, function* () {
+const waiterRouter = express.Router();
+waiterRouter.get('/rules', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        debug('searching transactions...', req.query);
-        throw new Error('Not implemented');
+        if (req.query.format === 'datatable') {
+            const rules = yield request.get(`${process.env.WAITER_ENDPOINT}/rules`, { json: true }).promise();
+            res.json({
+                draw: req.query.draw,
+                recordsTotal: rules.length,
+                recordsFiltered: rules.length,
+                data: rules
+            });
+        }
+        else {
+            res.render('waiter/rules', {
+                moment: moment
+            });
+        }
     }
     catch (error) {
         next(error);
     }
 }));
-exports.default = transactionsRouter;
+exports.default = waiterRouter;

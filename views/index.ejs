@@ -25,117 +25,115 @@
 <!-- Main content -->
 <div class="content">
     <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
         <div class="row">
-            <div class="col-lg-4 connectedSortable">
-                <% movieTheaters.forEach(function(movieTheater){ %>
-                    <div class="card bg-dark">
-                        <div class="card-header no-border">
-                            <div class="d-flex justify-content-between">
-                                <h3 class="card-title">
-                                    <%= movieTheater.name.ja %>進行中取引数遷移</h3>
-                                <!-- <a href="javascript:void(0);">View Report</a> -->
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <p class="d-flex flex-column">
-                                    <span class="text-bold text-lg">???</span>
-                                    <span>Transactions Over Time</span>
-                                </p>
-                                <p class="ml-auto d-flex flex-column text-right">
-                                    <!-- <span class="text-success">
-                                    <i class="fa fa-arrow-up"></i> 12.5%
-                                </span> -->
-                                    <span class="text-muted">Since last 12 hours</span>
-                                </p>
-                            </div>
-                            <!-- /.d-flex -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3 id="newOrderCount"></h3>
 
-                            <div class="position-relative mb-4">
-                                <canvas id="transactions-in-progress-chart-<%= movieTheater.id %>" height="200"></canvas>
-                            </div>
-
-                            <div class="d-flex flex-row justify-content-end">
-                                <!-- <span class="mr-2">
-                                <i class="fa fa-square text-primary"></i> This Week
-                            </span>
-
-                            <span>
-                                <i class="fa fa-square text-gray"></i> Last Week
-                            </span> -->
-                            </div>
-                        </div>
+                        <p>新規注文</p>
                     </div>
-                    <!-- /.card -->
-                    <% }) %>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="/orders" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
             </div>
-            <!-- /.col-md-4 -->
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3 id="exitRate">0</h3>
 
-            <div class="col-lg-4 connectedSortable">
-                <% movieTheaters.forEach(function(movieTheater){ %>
-                    <div class="card bg-dark">
-                        <div class="card-header no-border">
-                            <div class="d-flex justify-content-between">
-                                <h3 class="card-title">
-                                    <%= movieTheater.name.ja %> 分ごとの取引数</h3>
-                                <!-- <a href="javascript:void(0);">View Report</a> -->
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <p class="d-flex flex-column">
-                                    <span class="text-bold text-lg">???</span>
-                                    <span>Transactions Over Time</span>
-                                </p>
-                                <p class="ml-auto d-flex flex-column text-right">
-                                    <!-- <span class="text-success">
-                                        <i class="fa fa-arrow-up"></i> 12.5%
-                                    </span> -->
-                                    <span class="text-muted">Since last 12 hours</span>
-                                </p>
-                            </div>
-                            <!-- /.d-flex -->
-
-                            <div class="position-relative mb-4">
-                                <canvas id="number-of-transactions-by-statuses-chart-<%= movieTheater.id %>" height="200"></canvas>
-                            </div>
-                        </div>
+                        <p>離脱率</p>
                     </div>
-                    <!-- /.card -->
-                    <% }) %>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3 id="newUserCount">0</h3>
 
-                        <% movieTheaters.forEach(function(movieTheater){ %>
-                            <div class="card bg-dark">
+                        <p>ユーザー登録</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3 id="newTransactionCount">0</h3>
 
-                                <div class="card-header no-border">
-                                    <div class="d-flex justify-content-between">
-                                        <h3 class="card-title">
-                                            <%= movieTheater.name.ja %> 分ごとの平均取引金額</h3>
-                                        <!-- <a href="javascript:void(0);">View Report</a> -->
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="position-relative mb-4">
-                                        <canvas id="amount-average-chart-<%= movieTheater.id %>" height="200"></canvas>
-                                    </div>
+                        <p>取引数</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-pie-graph"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
 
-                                    <div class="d-flex flex-row justify-content-end">
-                                        <!-- <span class="mr-2">
-                                    <i class="fa fa-square text-primary"></i> This Week
-                                </span>
-    
-                                <span>
-                                    <i class="fa fa-square text-gray"></i> Last Week
-                                </span> -->
-                                    </div>
+        <!-- Main row -->
+        <div class="row">
+            <input type="hidden" name="waiterEndpoint" value="<%= process.env.WAITER_ENDPOINT %>">
+            <!-- Left col -->
+            <section class="col-lg-7 connectedSortable">
+                <!-- solid sales graph -->
+                <div class="card bg-dark-gradient" id="visitors">
+                    <div class="card-header no-border">
+                        <h3 class="card-title">
+                            取引訪問者数
+                        </h3>
+
+                        <div class="card-tools">
+                            <div class="btn-group">
+                                <button type="button" class="btn bg-dark btn-tool dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-wrench"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                    <a target="_blank" href="/waiter/rules" class="dropdown-item">入場制限設定を見る</a>
                                 </div>
                             </div>
-                            <!-- /.card -->
-                            <% }) %>
-            </div>
-            <!-- /.col-md-4 -->
+                            <button type="button" class="btn bg-dark btn-sm" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn bg-dark btn-sm" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart" id="visitorsChart" style="height: 250px;"></div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer bg-transparent">
+                    </div>
+                    <!-- /.card-footer -->
+                </div>
+                <!-- /.card -->
 
-            <div class="col-lg-4 connectedSortable">
+            </section>
+            <!-- /.Left col -->
+
+            <!-- right col (We are only adding the ID to make the widgets sortable)-->
+            <section class="col-lg-5 connectedSortable">
                 <div class="card bg-dark">
                     <div class="card-header no-border">
                         <div class="d-flex justify-content-between">
@@ -193,7 +191,7 @@
                                 <!-- <span class="text-success">
                                             <i class="fa fa-arrow-up"></i> 12.5%
                                         </span> -->
-                                <span class="text-muted">Since last 3 days</span>
+                                <span class="text-muted">Since last 24 hours</span>
                             </p>
                         </div>
                         <!-- /.d-flex -->
@@ -214,10 +212,10 @@
                     </div>
                 </div>
                 <!-- /.card -->
-            </div>
-            <!-- /.col-md-4 -->
+            </section>
+            <!-- right col -->
         </div>
-        <!-- /.row -->
+        <!-- /.row (main row) -->
     </div>
     <!-- /.container-fluid -->
 </div>
@@ -225,6 +223,7 @@
 
 <!-- ChartJS 1.0.1 -->
 <script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
+<script src="/js/dashboard.js"></script>
 <!-- page script -->
 <script>
     $(function () {
@@ -242,233 +241,6 @@
 
         var mode = 'index';
         var intersect = true;
-
-        movieTheaters.forEach(function (movieTheater) {
-            var telemetriesBySellerId = sellerTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
-            var data = telemetriesBySellerId.map(function (telemetry, index) {
-                return {
-                    x: telemetry.result.measuredAt,
-                    y: telemetry.result.transactions.numberOfUnderway
-                };
-            });
-            var visitorsChart = new Chart($('#transactions-in-progress-chart-' + movieTheater.id), {
-                type: 'line',
-                data: {
-                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
-                    datasets: [
-                        {
-                            data: data,
-                            backgroundColor: 'transparent',
-                            borderColor: '#DAA8F5',
-                            borderWidth: 1,
-                            pointRadius: 2,
-                            pointBorderColor: '#DAA8F5',
-                            pointBackgroundColor: '#DAA8F5',
-                            fill: false
-                        },
-                    ]
-                },
-                options: {
-                    pointDot: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        yAxes: [{
-                            display: true,
-                            gridLines: {
-                                display: true,
-                                lineWidth: 1,
-                                color: '#555c62',
-                                zeroLineColor: '#555c62',
-                            },
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: '#a1a6a9'
-                            }
-                        }],
-                        xAxes: [{
-                            time: {
-                                unit: 'hour'
-                            },
-                            type: 'time',
-                            display: true,
-                            gridLines: {
-                                display: false
-                            },
-                            ticks: {
-                                fontColor: '#a1a6a9'
-                            }
-                        }]
-                    }
-                }
-            });
-        });
-
-        // フローデータチャート
-        movieTheaters.forEach(function (movieTheater) {
-            var telemetriesBySellerId = sellerFlowTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
-            var data = telemetriesBySellerId.map(function (telemetry, index) {
-                return {
-                    x: telemetry.result.measuredFrom,
-                    y: telemetry.result.transactions.averageAmount
-                };
-            });
-            var visitorsChart = new Chart($('#amount-average-chart-' + movieTheater.id), {
-                type: 'line',
-                data: {
-                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
-                    datasets: [
-                        {
-                            data: data,
-                            backgroundColor: 'transparent',
-                            borderColor: '#DAA8F5',
-                            borderWidth: 1,
-                            pointRadius: 2,
-                            pointBorderColor: '#DAA8F5',
-                            pointBackgroundColor: '#DAA8F5',
-                            fill: false
-                        },
-                    ]
-                },
-                options: {
-                    pointDot: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        yAxes: [{
-                            display: true,
-                            gridLines: {
-                                display: true,
-                                lineWidth: 1,
-                                color: '#555c62',
-                                zeroLineColor: '#555c62',
-                            },
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: '#a1a6a9'
-                            }
-                        }],
-                        xAxes: [{
-                            time: {
-                                unit: 'hour'
-                            },
-                            type: 'time',
-                            display: true,
-                            gridLines: {
-                                display: false
-                            },
-                            ticks: {
-                                fontColor: '#a1a6a9'
-                            }
-                        }]
-                    }
-                }
-            });
-        });
-
-        // 分あたりの取引数チャート
-        movieTheaters.forEach(function (movieTheater) {
-            var telemetriesBySellerId = sellerFlowTelemetries.filter((telemetry) => telemetry.object.sellerId === movieTheater.id);
-            var dataStarted = telemetriesBySellerId.map(function (telemetry, index) {
-                return {
-                    x: telemetry.result.measuredFrom,
-                    y: telemetry.result.transactions.numberOfStarted
-                };
-            });
-            var dataConfirmed = telemetriesBySellerId.map(function (telemetry, index) {
-                return {
-                    x: telemetry.result.measuredFrom,
-                    y: telemetry.result.transactions.numberOfConfirmed
-                };
-            });
-            var dataExpired = telemetriesBySellerId.map(function (telemetry, index) {
-                return {
-                    x: telemetry.result.measuredFrom,
-                    y: telemetry.result.transactions.numberOfExpired
-                };
-            });
-            var visitorsChart = new Chart($('#number-of-transactions-by-statuses-chart-' + movieTheater.id), {
-                type: 'line',
-                data: {
-                    // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
-                    datasets: [
-                        {
-                            data: dataStarted,
-                            backgroundColor: 'transparent',
-                            borderColor: '#79F67D',
-                            borderWidth: 1,
-                            pointRadius: 2,
-                            pointBorderColor: '#79F67D',
-                            pointBackgroundColor: '#79F67D',
-                            fill: false,
-                            label: '開始',
-                        },
-                        {
-                            data: dataConfirmed,
-                            backgroundColor: 'transparent',
-                            borderColor: '#79CCF5',
-                            borderWidth: 1,
-                            pointRadius: 2,
-                            pointBorderColor: '#79CCF5',
-                            pointBackgroundColor: '#79CCF5',
-                            fill: false,
-                            label: '成立',
-                        },
-                        {
-                            data: dataExpired,
-                            backgroundColor: 'transparent',
-                            borderColor: '#E96C6C',
-                            borderWidth: 1,
-                            pointRadius: 2,
-                            pointBorderColor: '#E96C6C',
-                            pointBackgroundColor: '#E96C6C',
-                            fill: false,
-                            label: '離脱',
-                        },
-                    ]
-                },
-                options: {
-                    pointDot: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        display: true,
-                        position: 'bottom'
-                    },
-                    scales: {
-                        yAxes: [{
-                            display: true,
-                            gridLines: {
-                                display: true,
-                                lineWidth: 1,
-                                color: '#555c62',
-                                zeroLineColor: '#555c62',
-                            },
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: '#a1a6a9'
-                            }
-                        }],
-                        xAxes: [{
-                            time: {
-                                unit: 'hour'
-                            },
-                            type: 'time',
-                            display: true,
-                            gridLines: {
-                                display: false
-                            },
-                            ticks: {
-                                fontColor: '#a1a6a9'
-                            }
-                        }]
-                    }
-                }
-            });
-        });
 
         // タスクキューチャート
         var data = globalTelemetries.map(function (telemetry, index) {

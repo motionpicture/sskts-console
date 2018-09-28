@@ -1,10 +1,11 @@
 /**
  * 注文ルーター
  */
-import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 import * as createDebug from 'debug';
 import * as express from 'express';
 import * as moment from 'moment';
+
+import * as ssktsapi from '../ssktsapi';
 
 // import redisClient from '../redis';
 

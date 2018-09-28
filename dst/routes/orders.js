@@ -11,10 +11,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 注文ルーター
  */
-const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
+const ssktsapi = require("../ssktsapi");
 // import redisClient from '../redis';
 const debug = createDebug('sskts-console:routes:orders');
 const ordersRouter = express.Router();

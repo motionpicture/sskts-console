@@ -1,7 +1,6 @@
 /**
  * 口座ルーター
  */
-// import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 // import * as createDebug from 'debug';
 import * as express from 'express';
 

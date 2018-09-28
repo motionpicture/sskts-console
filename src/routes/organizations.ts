@@ -1,10 +1,11 @@
 /**
  * 組織ルーター
  */
-import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
+
+import * as ssktsapi from '../ssktsapi';
 
 import redisClient from '../redis';
 

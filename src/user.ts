@@ -1,18 +1,17 @@
-import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 import * as createDebug from 'debug';
 import * as jwt from 'jsonwebtoken';
+
+import * as ssktsapi from './ssktsapi';
 
 const debug = createDebug('sskts-console:user');
 
 /**
  * ユーザー設定インターフェース
- * @export
  */
 export interface IConfigurations {
     host: string;
     session: Express.Session;
 }
-
 export interface IProfile {
     sub: string;
     iss: string;
@@ -22,7 +21,6 @@ export interface IProfile {
     family_name: string;
     email: string;
 }
-
 /**
  * リクエストユーザー
  */

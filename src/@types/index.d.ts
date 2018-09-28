@@ -1,7 +1,5 @@
 /**
- * middlewares/authenticationにて、expressのrequestオブジェクトにAPIユーザー情報を追加している。
- * ユーザーの型をここで定義しています。
- * @ignore
+ * アプリケーション固有の型定義
  */
 import * as express from 'express';
 

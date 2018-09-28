@@ -11,10 +11,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 組織ルーター
  */
-const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const sskts = require("@motionpicture/sskts-domain");
 const createDebug = require("debug");
 const express = require("express");
+const ssktsapi = require("../ssktsapi");
 const redis_1 = require("../redis");
 const debug = createDebug('sskts-console:routes:organizations');
 const organizationsRouter = express.Router();
