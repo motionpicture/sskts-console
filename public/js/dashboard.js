@@ -770,11 +770,11 @@ function countNewTransaction(cb) {
     });
 }
 function initializeVisitorsChart() {
-    waiterDatasets = waiterRules.map(function (rule, index) {
+    var colorChoices = ['#efefef', '#79f67d', '#e96c6c', '#79ccf5'];
+    waiterDatasets = waiterRules.map(function (rule) {
         return {
             scope: rule.scope,
             data: [],
-            // color: colorChoices[index],
             numberOfIssuedPassports: 0,
         };
     });
@@ -790,13 +790,17 @@ function initializeVisitorsChart() {
         labels: waiterRules.map(function (rule) {
             return rule.scope
         }),
-        lineColors: ['#efefef'],
+        lineColors: waiterRules.map(function(rule,index){
+            return colorChoices[index % waiterRules.length];
+        }),
         lineWidth: 2,
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
         pointSize: 4,
-        pointStrokeColors: ['#efefef'],
+        pointStrokeColors: waiterRules.map(function(rule,index){
+            return colorChoices[index % waiterRules.length];
+        }),
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
         gridTextSize: 10
@@ -808,8 +812,11 @@ function updateWaiterChart() {
             y: moment(d.x).toISOString()
         };
         waiterRules.forEach(function (rule, ruleIndex) {
-            if (waiterDatasets[ruleIndex][index] !== undefined) {
-                data[rule.scope] = waiterDatasets[ruleIndex][index].y
+            var dataset4scope = waiterDatasets.find(function (dataset) {
+                return dataset.scope === rule.scope;
+            });
+            if (dataset4scope !== undefined) {
+                data[rule.scope] = dataset4scope.data[index].y
             } else {
                 data[rule.scope] = 0;
             }
