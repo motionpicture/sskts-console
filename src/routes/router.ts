@@ -12,6 +12,7 @@ import eventsRouter from './events';
 import homeRouter from './home';
 import ordersRouter from './orders';
 import organizationsRouter from './organizations';
+import pecorinoRouter from './pecorino';
 import transactionsRouter from './transactions';
 import waiterRouter from './waiter';
 
@@ -32,6 +33,7 @@ router.use('/dashboard', dashboardRouter);
 router.use('/events', eventsRouter);
 router.use('/orders', ordersRouter);
 router.use('/organizations', organizationsRouter);
+router.use('/pecorino', pecorinoRouter);
 router.use('/transactions', transactionsRouter);
 router.use('/waiter', waiterRouter);
 
