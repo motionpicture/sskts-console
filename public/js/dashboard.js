@@ -490,7 +490,7 @@ function searchNumPlaceOrder(params, cb) {
 function searchOrders(cb) {
     page += 1;
     $.getJSON(
-        '/dashboard/orders',
+        '/dashboard/latestOrders',
         {
             limit: limit,
             page: page,
@@ -498,15 +498,10 @@ function searchOrders(cb) {
             orderDateThrough: moment().toISOString()
         }
     ).done(function (data) {
-        searchedAllOrders = (data.data.length < limit);
-        $.each(data.data, function (_, order) {
+        $.each(data, function (_, order) {
             orders.push(order);
         });
-        if (!searchedAllOrders) {
-            searchOrders(cb);
-        } else {
-            cb();
-        }
+        cb();
     }).fail(function () {
         alert('注文履歴を取得できませんでした')
     });
@@ -790,16 +785,16 @@ function initializeVisitorsChart() {
         labels: waiterRules.map(function (rule) {
             return rule.scope
         }),
-        lineColors: waiterRules.map(function(rule,index){
-            return colorChoices[index % waiterRules.length];
+        lineColors: waiterRules.map(function (_, index) {
+            return colorChoices[index % colorChoices.length];
         }),
         lineWidth: 2,
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
         pointSize: 4,
-        pointStrokeColors: waiterRules.map(function(rule,index){
-            return colorChoices[index % waiterRules.length];
+        pointStrokeColors: waiterRules.map(function (_, index) {
+            return colorChoices[index % colorChoices.length];
         }),
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
@@ -807,11 +802,11 @@ function initializeVisitorsChart() {
     });
 }
 function updateWaiterChart() {
-    numVisitorsChart.setData(waiterDatasets[0].data.map(function (d, index) {
+    var datas = waiterDatasets[0].data.map(function (d, index) {
         var data = {
             y: moment(d.x).toISOString()
         };
-        waiterRules.forEach(function (rule, ruleIndex) {
+        waiterRules.forEach(function (rule) {
             var dataset4scope = waiterDatasets.find(function (dataset) {
                 return dataset.scope === rule.scope;
             });
@@ -823,7 +818,8 @@ function updateWaiterChart() {
         });
 
         return data;
-    }));
+    });
+    numVisitorsChart.setData(datas);
 }
 function startMonitoringWaiter() {
     initializeVisitorsChart();

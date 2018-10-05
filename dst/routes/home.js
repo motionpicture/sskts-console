@@ -15,10 +15,9 @@ const sskts = require("@motionpicture/sskts-domain");
 // import * as createDebug from 'debug';
 const express = require("express");
 const moment = require("moment");
-const ssktsapi = require("../ssktsapi");
 // const debug = createDebug('sskts-console:routes:home');
 const homeRouter = express.Router();
-homeRouter.get('/', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         // 集計単位数分の集計を行う
         const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
@@ -56,20 +55,9 @@ homeRouter.get('/', (req, res, next) => __awaiter(this, void 0, void 0, function
         //     measuredThrough: dateNowByUnitTime.toDate()
         // })({ telemetry: telemetryRepo });
         // debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
-        // 直近の実売上データを
-        const orderService = new ssktsapi.service.Order({
-            endpoint: process.env.API_ENDPOINT,
-            auth: req.user.authClient
-        });
-        const orders = yield orderService.search({
-            // tslint:disable-next-line:no-magic-numbers
-            orderDateFrom: moment().add(-1, 'days').toDate(),
-            orderDateThrough: moment().toDate()
-        });
-        // const orders: any[] = [];
         res.render('index', {
             message: 'Welcome to SSKTS Console!',
-            orders: orders,
+            orders: [],
             movieTheaters: movieTheaters,
             globalTelemetries: globalTelemetries,
             sellerTelemetries: [],

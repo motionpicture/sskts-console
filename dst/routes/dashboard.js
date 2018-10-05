@@ -68,4 +68,22 @@ dashboardRouter.get('/countNewTransaction', (_, res, next) => __awaiter(this, vo
         next(error);
     }
 }));
+dashboardRouter.get('/latestOrders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        // 直近の実売上データを
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const orders = yield orderService.search({
+            // tslint:disable-next-line:no-magic-numbers
+            orderDateFrom: moment().add(-1, 'days').toDate(),
+            orderDateThrough: moment().toDate()
+        });
+        res.json(orders);
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 exports.default = dashboardRouter;

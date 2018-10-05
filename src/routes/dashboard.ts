@@ -68,4 +68,24 @@ dashboardRouter.get(
         }
     }
 );
+dashboardRouter.get(
+    '/latestOrders',
+    async (req, res, next) => {
+        try {
+            // 直近の実売上データを
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const orders = await orderService.search({
+                // tslint:disable-next-line:no-magic-numbers
+                orderDateFrom: moment().add(-1, 'days').toDate(),
+                orderDateThrough: moment().toDate()
+            });
+            res.json(orders);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 export default dashboardRouter;

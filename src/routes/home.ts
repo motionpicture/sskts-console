@@ -6,14 +6,11 @@ import * as sskts from '@motionpicture/sskts-domain';
 import * as express from 'express';
 import * as moment from 'moment';
 
-import * as ssktsapi from '../ssktsapi';
-
 // const debug = createDebug('sskts-console:routes:home');
 const homeRouter = express.Router();
-
 homeRouter.get(
     '/',
-    async (req, res, next) => {
+    async (_, res, next) => {
         try {
             // 集計単位数分の集計を行う
             const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
@@ -58,21 +55,9 @@ homeRouter.get(
             // })({ telemetry: telemetryRepo });
             // debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
 
-            // 直近の実売上データを
-            const orderService = new ssktsapi.service.Order({
-                endpoint: <string>process.env.API_ENDPOINT,
-                auth: req.user.authClient
-            });
-            const orders = await orderService.search({
-                // tslint:disable-next-line:no-magic-numbers
-                orderDateFrom: moment().add(-1, 'days').toDate(),
-                orderDateThrough: moment().toDate()
-            });
-            // const orders: any[] = [];
-
             res.render('index', {
                 message: 'Welcome to SSKTS Console!',
-                orders: orders,
+                orders: [],
                 movieTheaters: movieTheaters,
                 globalTelemetries: globalTelemetries,
                 sellerTelemetries: [],
@@ -82,6 +67,6 @@ homeRouter.get(
         } catch (error) {
             next(error);
         }
-    });
-
+    }
+);
 export default homeRouter;
