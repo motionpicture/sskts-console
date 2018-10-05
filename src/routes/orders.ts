@@ -53,7 +53,7 @@ ordersRouter.get(
                     : moment().add(-1, 'day').toDate(),
                 orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                     ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
-                    : new Date(),
+                    : moment().add(1, 'day').toDate(),
                 confirmationNumbers: (req.query.confirmationNumbers !== undefined && req.query.confirmationNumbers !== '')
                     ? (<string>req.query.confirmationNumbers).split(',').map((v) => v.trim())
                     : []

@@ -166,8 +166,8 @@ $(function () {
 
     // Fix for charts under tabs
     $('.box ul.nav a').on('shown.bs.tab', function () {
-        area.redraw()
-        donut.redraw()
+        // area.redraw()
+        // donut.redraw()
         // line.redraw()
     })
 
@@ -730,7 +730,7 @@ function countNewTransaction(cb) {
     });
 }
 function initializeVisitorsChart() {
-    var colorChoices = ['#efefef', '#79f67d', '#e96c6c', '#79ccf5'];
+    var colorChoices = ['#daa8f5','#3399FF','#fad684', '#79f67d', '#79ccf5', '#e96c6c','#efefef'];
     waiterDatasets = waiterRules.map(function (rule) {
         return {
             scope: rule.scope,
