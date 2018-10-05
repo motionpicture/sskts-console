@@ -23,7 +23,12 @@ function searchOrders(cb) {
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
                 + '<td>' + order.orderDate + '</td>'
-                + '<td>' + order.acceptedOffers.map((o) => o.itemOffered.reservedTicket.ticketedSeat.seatNumber).join(',') + '</td>'
+                + '<td>' + order.acceptedOffers.map(function (o) { 
+                    if (o.itemOffered.reservedTicket !== undefined) {
+                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber                         
+                    }
+                    return o.itemOffered.typeOf;
+                }).join(',') + '</td>'
                 + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo("#orders tbody");
         });

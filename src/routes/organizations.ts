@@ -210,7 +210,7 @@ organizationsRouter.get(
                 // limit: req.query.limit,
                 // page: req.query.page,
                 // sort: { orderDate: ssktsapi.factory.sortType.Descending },
-                orderDateFrom: moment().add(-1, 'months').toDate(),
+                orderDateFrom: moment().add(-1, 'week').toDate(),
                 orderDateThrough: new Date(),
                 sellerIds: [req.params.id]
             });
