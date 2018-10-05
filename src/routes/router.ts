@@ -13,7 +13,9 @@ import homeRouter from './home';
 import ordersRouter from './orders';
 import organizationsRouter from './organizations';
 import pecorinoRouter from './pecorino';
+import tasksRouter from './tasks';
 import transactionsRouter from './transactions';
+import userPoolsRouter from './userPools';
 import waiterRouter from './waiter';
 
 const router = express.Router();
@@ -34,7 +36,9 @@ router.use('/events', eventsRouter);
 router.use('/orders', ordersRouter);
 router.use('/organizations', organizationsRouter);
 router.use('/pecorino', pecorinoRouter);
+router.use('/tasks', tasksRouter);
 router.use('/transactions', transactionsRouter);
+router.use('/userPools', userPoolsRouter);
 router.use('/waiter', waiterRouter);
 
 export default router;

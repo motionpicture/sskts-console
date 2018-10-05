@@ -4,14 +4,14 @@
 import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
+import * as moment from 'moment';
 
 import * as ssktsapi from '../ssktsapi';
 
 import redisClient from '../redis';
 
-const debug = createDebug('sskts-console:routes:organizations');
+const debug = createDebug('cinerino-console:routes');
 const organizationsRouter = express.Router();
-
 const pecorinoAuthClient = new sskts.pecorinoapi.auth.ClientCredentials({
     domain: <string>process.env.PECORINO_AUTHORIZE_SERVER_DOMAIN,
     clientId: <string>process.env.PECORINO_API_CLIENT_ID,
@@ -19,9 +19,8 @@ const pecorinoAuthClient = new sskts.pecorinoapi.auth.ClientCredentials({
     scopes: [],
     state: ''
 });
-
 /**
- * 劇場検索
+ * 販売者検索
  */
 organizationsRouter.get(
     '/movieTheater',
@@ -31,22 +30,28 @@ organizationsRouter.get(
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-
-            debug('searching movie theaters...', req.query);
-            const movieTheaters = await organizationService.searchMovieTheaters({
-            });
-            debug('movie theaters found.', movieTheaters);
-            res.render('organizations/movieTheater/index', {
-                query: req.query,
-                movieTheaters: movieTheaters
-            });
+            if (req.query.format === 'datatable') {
+                debug('searching movie theaters...', req.query);
+                const movieTheaters = await organizationService.searchMovieTheaters({});
+                debug('movie theaters found.', movieTheaters);
+                res.json({
+                    draw: req.query.draw,
+                    recordsTotal: movieTheaters.length,
+                    recordsFiltered: movieTheaters.length,
+                    data: movieTheaters
+                });
+            } else {
+                res.render('organizations/movieTheater/index', {
+                    searchConditions: req.query
+                });
+            }
         } catch (error) {
             next(error);
         }
-    });
-
+    }
+);
 /**
- * 劇場追加
+ * 販売者追加
  */
 organizationsRouter.all(
     '/movieTheater/new',
@@ -112,15 +117,16 @@ organizationsRouter.all(
             }
 
             res.render('organizations/movieTheater/new', {
-                message: message
+                message: message,
+                PaymentMethodType: ssktsapi.factory.paymentMethodType
             });
         } catch (error) {
             next(error);
         }
-    });
-
+    }
+);
 /**
- * 劇場編集
+ * 販売者編集
  */
 organizationsRouter.all(
     '/movieTheater/:id',
@@ -181,11 +187,40 @@ organizationsRouter.all(
 
             res.render('organizations/movieTheater/edit', {
                 message: message,
-                movieTheater: movieTheater
+                movieTheater: movieTheater,
+                PaymentMethodType: ssktsapi.factory.paymentMethodType
             });
         } catch (error) {
             next(error);
         }
-    });
-
+    }
+);
+/**
+ * 劇場の注文検索
+ */
+organizationsRouter.get(
+    '/movieTheater/:id/orders',
+    async (req, res, next) => {
+        try {
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const orders = await orderService.search({
+                // limit: req.query.limit,
+                // page: req.query.page,
+                // sort: { orderDate: ssktsapi.factory.sortType.Descending },
+                orderDateFrom: moment().add(-1, 'months').toDate(),
+                orderDateThrough: new Date(),
+                sellerIds: [req.params.id]
+            });
+            res.json({
+                totalCount: orders.length,
+                data: orders
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 export default organizationsRouter;

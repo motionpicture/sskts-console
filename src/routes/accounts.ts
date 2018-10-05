@@ -4,7 +4,7 @@
 // import * as createDebug from 'debug';
 import * as express from 'express';
 
-// const debug = createDebug('sskts-console:routes:account');
+// const debug = createDebug('cinerino-console:routes:account');
 const accountsRouter = express.Router();
 
 /**

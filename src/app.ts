@@ -16,14 +16,14 @@ import session from './middlewares/session';
 
 import mongooseConnectionOptions from './mongooseConnectionOptions';
 
-const debug = createDebug('sskts-console:*');
+const debug = createDebug('cinerino-console:*');
 const app = express();
 
 app.use(middlewares.basicAuth({ // ベーシック認証
     name: process.env.BASIC_AUTH_NAME,
     pass: process.env.BASIC_AUTH_PASS
     // unauthorizedHandler: (__, res, next) => {
-    //     res.setHeader('WWW-Authenticate', 'Basic realm="sskts-console Authentication"');
+    //     res.setHeader('WWW-Authenticate', 'Basic realm="cinerino-console Authentication"');
     //     next(new Error());
     // }
 }));

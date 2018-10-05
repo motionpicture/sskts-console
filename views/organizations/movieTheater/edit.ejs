@@ -3,8 +3,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">劇場編集[
-                    <%= movieTheater.name.ja %>]</h1>
+                <h1 class="m-0 text-dark">販売者詳細</h1>
             </div>
             <!-- /.col -->
             <div class="col-sm-6">
@@ -13,9 +12,9 @@
                         <a href="/">Home</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="/organizations/movieTheater">劇場検索</a>
+                        <a href="/organizations/movieTheater">販売者検索</a>
                     </li>
-                    <li class="breadcrumb-item active">劇場編集</li>
+                    <li class="breadcrumb-item active">販売者詳細</li>
                 </ol>
             </div>
             <!-- /.col -->
@@ -29,96 +28,180 @@
 <!-- Main content -->
 <section class="content">
     <div class="container-fluid">
+
+        <% if (messages.message) { %>
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5>
+                <i class="icon fa fa-check"></i> Congraturations!</h5>
+            <%= messages.message %>
+        </div>
+        <% } %>
+
+        <% if (message) { %>
+        <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <%- message.replace(/\n/g, '<br>') %>
+        </div>
+        <% } %>
+
         <div class="row">
-            <!-- left column -->
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-primary">
-                    <!-- <div class="card-header">
-                        <h3 class="card-title">Quick Example</h3>
-                    </div> -->
-                    <!-- /.card-header -->
+            <div class="col-md-3">
 
-                    <!-- form start -->
-                    <form role="form" method="post">
-                        <div class="card-body">
-                            <% if (messages.message) { %>
-                            <div class="alert alert-success alert-dismissible">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                <h5>
-                                    <i class="icon fa fa-check"></i> Congraturations!</h5>
-                                <%= messages.message %>
-                            </div>
-                            <% } %>
+                <!-- Profile Image -->
+                <div class="card card-dark card-outline">
+                    <div class="card-body box-profile">
+                        <!-- <div class="text-center">
+                                    <img class="profile-user-img img-fluid img-circle" src="../../dist/img/user4-128x128.jpg"
+                                        alt="User profile picture">
+                                </div> -->
 
-                            <% if (message) { %>
-                            <div class="alert alert-warning alert-dismissible">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                <%= message %>
-                            </div>
-                            <% } %>
+                        <h3 class="profile-username text-center">
+                            <%= movieTheater.name.ja %>
+                        </h3>
 
-                            <div class="form-group">
-                                <label for="name.ja">名前</label>
-                                <input type="text" class="form-control" id="name.ja" name="name.ja" placeholder="名前"
-                                    value="<%= movieTheater.name.ja %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="name.en">名前(英)</label>
-                                <input type="text" class="form-control" id="name.en" name="name.en" placeholder="名前"
-                                    value="<%= movieTheater.name.en %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="telephone">電話番号</label>
-                                <input type="text" class="form-control" id="telephone" name="telephone" placeholder="電話番号"
-                                    value="<%= movieTheater.telephone %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="gmoInfo.siteId">GMOサイトID</label>
-                                <input type="text" class="form-control" id="gmoInfo.siteId" disabled placeholder="GMOサイトID"
-                                    value="<%= process.env.GMO_SITE_ID %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="gmoInfo.shopId">GMOショップID</label>
-                                <input type="text" class="form-control" id="gmoInfo.shopId" name="gmoInfo.shopId"
-                                    placeholder="GMOショップID" value="<%= movieTheater.gmoInfo.shopId %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="gmoInfo.shopPass">GMOショップPASS</label>
-                                <input type="text" class="form-control" id="gmoInfo.shopPass" name="gmoInfo.shopPass"
-                                    placeholder="GMOショップPASS" value="<%= movieTheater.gmoInfo.shopPass %>">
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="pecorinoPaymentAccepted" name="pecorinoPaymentAccepted"
-                                    <%=( movieTheater.pecorinoPaymentAccepted==='on' ) ? 'checked' : '' %>>
-                                <label class="form-check-label" for="pecorinoPaymentAccepted">ポイント決済を許可(許可するとPecorino口座が開設されます)</label>
-                            </div>
-                        </div>
-                        <!-- /.card-body -->
+                        <p class="text-muted text-center">
+                            <%= movieTheater.name.en %>
+                        </p>
 
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">更新</button>
-                        </div>
-                    </form>
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Orders</b> <a class="float-right" id="orderCount"></a>
+                            </li>
+                        </ul>
+
+                        <!-- <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a> -->
+                    </div>
+                    <!-- /.card-body -->
                 </div>
                 <!-- /.card -->
 
+                <!-- About Me Box -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">About</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <strong><i class="fa fa-map-marker mr-1"></i> Location</strong>
+
+                        <p class="text-muted">
+                            <%= movieTheater.location.branchCode %>
+                            <%= movieTheater.location.name.ja %>
+                        </p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-phone mr-1"></i> Telephone</strong>
+
+                        <p class="text-muted">
+                            <%= movieTheater.telephone %>
+                        </p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-link mr-1"></i> url</strong>
+
+                        <p class="text-muted">
+                            <a target="_blank" href="<%= movieTheater.url %>">
+                                <%= movieTheater.url %>
+                            </a>
+                        </p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-shopping-cart mr-1"></i> 対応決済方法</strong>
+
+                        <p class="text-muted">
+                            <%= movieTheater.paymentAccepted.map((payment)=>payment.paymentMethodType).join(', ') %>
+                        </p>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
             </div>
-            <!--/.col (left) -->
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#orders" data-toggle="tab">注文履歴</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#others" data-toggle="tab">その他の操作</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="orders">
+                                <div class="table-responsive">
+                                    <table class="table m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order Number</th>
+                                                <th>Order Date</th>
+                                                <th>Item</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.table-responsive -->
+                            </div>
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(movieTheater, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="settings">
+                                <!-- form start -->
+                                <form role="form" method="post">
+                                    <div class="card-body">
+                                        <%- include('./form', {movieTheater: movieTheater, PaymentMethodType: PaymentMethodType}) %>
+                                    </div>
+                                    <!-- /.card-body -->
+
+                                    <div class="card-footer">
+                                        <button type="submit" class="btn btn-primary">更新</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="others">
+                                <!-- general form elements -->
+                                <div class="card card-dark">
+                                    <!-- <div class="card-header">
+                                        <h3 class="card-title">その他の操作</h3>
+                                    </div> -->
+                                    <!-- /.card-header -->
+
+                                    <div class="card-body">
+                                        <button type="button" class="delete btn btn-danger">削除する</button>
+                                    </div>
+                                    <!-- /.card-body -->
+                                    <!-- <div class="card-footer">
+                                        </div> -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
         </div>
         <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
+    </div><!-- /.container-fluid -->
 </section>
 <!-- /.content -->
 
-<!-- page script -->
-<script>
-
-
-
-
-
-
-
-</script>
+<script src="/js/organizations/movieTheater/edit.js"></script>

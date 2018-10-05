@@ -2,6 +2,8 @@
  * ダッシュボードを表現するためのjs
  **/
 var WAITER_ENDPOINT = $('input[name="waiterEndpoint"]').val();
+var TELEMETRY_API_ENDPOINT = $('input[name="telemetryEndpoint"]').val();
+var PROJECT_ID = $('input[name="projectId"]').val();
 var waiterDatasets = [];
 var waiterRules = [];
 
@@ -10,6 +12,9 @@ var searchedAllOrders = false;
 var limit = 100;
 var page = 0;
 var numVisitorsChart;
+
+var initialChartStartDate = moment().subtract(29, 'days');
+var initialChartEndDate = moment();
 
 $(function () {
     'use strict'
@@ -44,31 +49,11 @@ $(function () {
             'This Month': [moment().startOf('month'), moment().endOf('month')],
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
+        startDate: initialChartStartDate,
+        endDate: initialChartEndDate
     }, function (start, end) {
         console.log('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-        searchSalesAmount(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createSalesAmountChart
-        );
-        searchSalesAmountByClient(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createSalesAmountByClientChart
-        );
-        searchSalesAmountByPaymentMethod(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createSalesAmountByPaymentMethodChart
-        );
+        updateSalesAmountChart();
     });
 
     $('#numOrderItems .daterange').daterangepicker({
@@ -80,31 +65,11 @@ $(function () {
             'This Month': [moment().startOf('month'), moment().endOf('month')],
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
+        startDate: initialChartStartDate,
+        endDate: initialChartEndDate
     }, function (start, end) {
-        console.log('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-        searchNumOrderItems(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createNumOrderItemsChart
-        );
-        searchNumOrderItemsByClient(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createNumOrderItemsByClientChart
-        );
-        searchNumOrderItemsByPaymentMethod(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
-            createNumOrderItemsByPaymentMethodChart
-        );
+        console.log('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        updateNumOrderItemsChart();
     });
 
     $('#numPlaceOrder .daterange').daterangepicker({
@@ -116,33 +81,29 @@ $(function () {
             'This Month': [moment().startOf('month'), moment().endOf('month')],
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
+        startDate: initialChartStartDate,
+        endDate: initialChartEndDate
     }, function (start, end) {
         console.log('You chose: ' + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
         searchNumPlaceOrder(
-            {
-                measureFrom: start.toDate(),
-                measureThrough: end.toDate()
-            },
             createNumPlaceOrderChart
         );
     });
 
     // jvectormap data
-    var visitorsData = {
-        'US': 398, //USA
-        'SA': 400, //Saudi Arabia
-        'CA': 1000, //Canada
-        'DE': 500, //Germany
-        'FR': 760, //France
-        'CN': 300, //China
-        'AU': 700, //Australia
-        'BR': 600, //Brazil
-        'IN': 800, //India
-        'GB': 320, //Great Britain
-        'RU': 3000 //Russia
-    }
+    // var visitorsData = {
+    //     'US': 398, //USA
+    //     'SA': 400, //Saudi Arabia
+    //     'CA': 1000, //Canada
+    //     'DE': 500, //Germany
+    //     'FR': 760, //France
+    //     'CN': 300, //China
+    //     'AU': 700, //Australia
+    //     'BR': 600, //Brazil
+    //     'IN': 800, //India
+    //     'GB': 320, //Great Britain
+    //     'RU': 3000 //Russia
+    // }
     // World map by jvectormap
     // $('#world-map').vectorMap({
     //     map: 'world_mill_en',
@@ -203,43 +164,6 @@ $(function () {
     //     height: '250px'
     // })
 
-    /* Morris.js Charts */
-    // Sales chart
-    // var area = new Morris.Area({
-    //     element: 'revenue-chart',
-    //     resize: true,
-    //     data: [
-    //         { y: '2011 Q1', item1: 2666, item2: 2666 },
-    //         { y: '2011 Q2', item1: 2778, item2: 2294 },
-    //         { y: '2011 Q3', item1: 4912, item2: 1969 },
-    //         { y: '2011 Q4', item1: 3767, item2: 3597 },
-    //         { y: '2012 Q1', item1: 6810, item2: 1914 },
-    //         { y: '2012 Q2', item1: 5670, item2: 4293 },
-    //         { y: '2012 Q3', item1: 4820, item2: 3795 },
-    //         { y: '2012 Q4', item1: 15073, item2: 5967 },
-    //         { y: '2013 Q1', item1: 10687, item2: 4460 },
-    //         { y: '2013 Q2', item1: 8432, item2: 5713 }
-    //     ],
-    //     xkey: 'y',
-    //     ykeys: ['item1', 'item2'],
-    //     labels: ['Item 1', 'Item 2'],
-    //     lineColors: ['#495057', '#007cff'],
-    //     hideHover: 'auto'
-    // })
-
-    // Donut Chart
-    // var donut = new Morris.Donut({
-    //     element: 'sales-chart',
-    //     resize: true,
-    //     colors: ['#007bff', '#dc3545', '#28a745'],
-    //     data: [
-    //         { label: 'Download Sales', value: 12 },
-    //         { label: 'In-Store Sales', value: 30 },
-    //         { label: 'Mail-Order Sales', value: 20 }
-    //     ],
-    //     hideHover: 'auto'
-    // })
-
     // Fix for charts under tabs
     $('.box ul.nav a').on('shown.bs.tab', function () {
         area.redraw()
@@ -250,68 +174,18 @@ $(function () {
     /* jQueryKnob */
     $('#salesAmount .knob.byClient').knob();
     $('#salesAmount .knob.byPaymentMethod').knob();
+    $('#salesAmount .knob.bySeller').knob();
     $('#numOrderItems .knob.byClient').knob();
     $('#numOrderItems .knob.byPaymentMethod').knob();
+    $('#numOrderItems .knob.bySeller').knob();
 
-    countNewOrder(function () {
-    });
-    aggregateExitRate(function () {
-    });
-    countNewUser(function () {
-    });
-    countNewTransaction(function () {
-    });
-    // searchSalesAmount(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createSalesAmountChart
-    // );
-    // searchSalesAmountByClient(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createSalesAmountByClientChart
-    // );
-    // searchSalesAmountByPaymentMethod(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createSalesAmountByPaymentMethodChart
-    // );
-    // searchNumOrderItems(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createNumOrderItemsChart
-    // );
-    // searchNumOrderItemsByClient(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createNumOrderItemsByClientChart
-    // );
-    // searchNumOrderItemsByPaymentMethod(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createNumOrderItemsByPaymentMethodChart
-    // );
-    // searchNumPlaceOrder(
-    //     {
-    //         measureFrom: moment().subtract(29, 'days').toDate(),
-    //         measureThrough: moment().toDate()
-    //     },
-    //     createNumPlaceOrderChart
-    // );
-    // searchLatestOrders(function () {
-    // });
+    updateCharts();
+    setInterval(
+        function () {
+            updateCharts();
+        },
+        60000
+    );
 
     $.getJSON(
         WAITER_ENDPOINT + '/rules',
@@ -322,175 +196,207 @@ $(function () {
     }).fail(function () {
     });
 });
-function searchSalesAmount(params, cb) {
+function updateCharts() {
+    countNewOrder(function () {
+    });
+    aggregateExitRate(function () {
+    });
+    countNewUser(function () {
+    });
+    countNewTransaction(function () {
+    });
+    updateSalesAmountChart();
+    updateNumOrderItemsChart();
+    searchLatestOrders(function () {
+    });
+}
+function updateSalesAmountChart() {
+    searchSalesAmount(
+        createSalesAmountChart
+    );
+    searchSalesAmountByClient(
+        createSalesAmountByClientChart
+    );
+    searchSalesAmountByPaymentMethod(
+        createSalesAmountByPaymentMethodChart
+    );
+    searchSalesAmountBySeller(
+        createSalesAmountBySellerChart
+    );
+}
+function updateNumOrderItemsChart() {
+    searchNumOrderItems(
+        createNumOrderItemsChart
+    );
+    searchNumOrderItemsByClient(
+        createNumOrderItemsByClientChart
+    );
+    searchNumOrderItemsByPaymentMethod(
+        createNumOrderItemsByPaymentMethodChart
+    );
+    searchNumOrderItemsBySeller(
+        createNumOrderItemsBySellerChart
+    );
+    searchNumPlaceOrder(
+        createNumPlaceOrderChart
+    );
+}
+function searchSalesAmount(cb) {
     $('#salesAmount .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/SalesAmount',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/SalesAmount',
+        // '/dashboard/telemetry/SalesAmount',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#salesAmount .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#salesAmount .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('売上集計を取得できませんでした')
+        console.error('売上集計を取得できませんでした')
     }).always(function () {
         $('#salesAmount .overlay').hide();
     });
 }
-function searchSalesAmountByClient(params, cb) {
+function searchSalesAmountByClient(cb) {
     $('#salesAmount .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/SalesAmountByClient',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/SalesAmountByClient',
+        // '/dashboard/telemetry/SalesAmountByClient',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#salesAmount .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#salesAmount .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('売上集計を取得できませんでした')
+        console.error('売上集計を取得できませんでした')
     }).always(function () {
         $('#salesAmount .overlay').hide();
     });
 }
-function searchSalesAmountByPaymentMethod(params, cb) {
+function searchSalesAmountByPaymentMethod(cb) {
     $('#salesAmount .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/SalesAmountByPaymentMethod',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/SalesAmountByPaymentMethod',
+        // '/dashboard/telemetry/SalesAmountByPaymentMethod',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#salesAmount .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#salesAmount .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('売上集計を取得できませんでした')
+        console.error('売上集計を取得できませんでした')
     }).always(function () {
         $('#salesAmount .overlay').hide();
     });
 }
-function searchNumOrderItems(params, cb) {
-    $('#numOrderItems .overlay').show();
+function searchSalesAmountBySeller(cb) {
+    $('#salesAmount .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/NumOrderItems',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/SalesAmountBySeller',
+        // '/dashboard/telemetry/SalesAmountBySeller',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#salesAmount .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#salesAmount .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('注文アイテム数集計を取得できませんでした')
+        console.error('売上集計を取得できませんでした')
     }).always(function () {
-        $('#numOrderItems .overlay').hide();
+        $('#salesAmount .overlay').hide();
     });
 }
-function searchNumOrderItemsByClient(params, cb) {
+function searchNumOrderItems(cb) {
     $('#numOrderItems .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/NumOrderItemsByClient',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/NumOrderItems',
+        // '/dashboard/telemetry/NumOrderItems',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#numOrderItems .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#numOrderItems .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('注文アイテム数集計を取得できませんでした')
+        console.error('注文アイテム数集計を取得できませんでした')
     }).always(function () {
         $('#numOrderItems .overlay').hide();
     });
 }
-function searchNumOrderItemsByPaymentMethod(params, cb) {
+function searchNumOrderItemsByClient(cb) {
     $('#numOrderItems .overlay').show();
     $.getJSON(
-        '/dashboard/telemetry/NumOrderItemsByPaymentMethod',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/NumOrderItemsByClient',
+        // '/dashboard/telemetry/NumOrderItemsByClient',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#numOrderItems .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#numOrderItems .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
         cb(data);
     }).fail(function () {
-        alert('注文アイテム数集計を取得できませんでした')
+        console.error('注文アイテム数集計を取得できませんでした')
     }).always(function () {
         $('#numOrderItems .overlay').hide();
     });
 }
-function searchNumPlaceOrder(params, cb) {
+function searchNumOrderItemsByPaymentMethod(cb) {
+    $('#numOrderItems .overlay').show();
+    $.getJSON(
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/NumOrderItemsByPaymentMethod',
+        // '/dashboard/telemetry/NumOrderItemsByPaymentMethod',
+        {
+            measureFrom: $('#numOrderItems .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#numOrderItems .daterange').data('daterangepicker').endDate.toISOString()
+        }
+    ).done(function (data) {
+        cb(data);
+    }).fail(function () {
+        console.error('注文アイテム数集計を取得できませんでした')
+    }).always(function () {
+        $('#numOrderItems .overlay').hide();
+    });
+}
+function searchNumOrderItemsBySeller(cb) {
+    $('#numOrderItems .overlay').show();
+    $.getJSON(
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/NumOrderItemsBySeller',
+        // '/dashboard/telemetry/NumOrderItemsBySeller',
+        {
+            measureFrom: $('#numOrderItems .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#numOrderItems .daterange').data('daterangepicker').endDate.toISOString()
+        }
+    ).done(function (data) {
+        cb(data);
+    }).fail(function () {
+        console.error('注文アイテム数集計を取得できませんでした')
+    }).always(function () {
+        $('#numOrderItems .overlay').hide();
+    });
+}
+function searchNumPlaceOrder(cb) {
     $('#numPlaceOrder .overlay').show();
-    var dataStarted;
-    var dataCanceled;
-    var dataExpired;
-    var dataConfirmed;
-    var next = function () {
-        if (dataStarted !== undefined
-            && dataCanceled !== undefined
-            && dataExpired !== undefined
-            && dataConfirmed !== undefined
-        ) {
-            $('#numPlaceOrder .overlay').hide();
-            cb(dataStarted, dataCanceled, dataExpired, dataConfirmed);
-        }
-    }
-
     $.getJSON(
-        '/dashboard/telemetry/NumPlaceOrderStarted',
+        TELEMETRY_API_ENDPOINT + '/organizations/project/' + PROJECT_ID + '/telemetry/NumPlaceOrderByStatus',
+        // '/dashboard/telemetry/NumPlaceOrderByStatus',
         {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
+            measureFrom: $('#numPlaceOrder .daterange').data('daterangepicker').startDate.toISOString(),
+            measureThrough: $('#numPlaceOrder .daterange').data('daterangepicker').endDate.toISOString()
         }
     ).done(function (data) {
-        dataStarted = data;
-        next();
+        cb(data);
+        $('#numPlaceOrder .overlay').hide();
     }).fail(function () {
-        alert('取引数を取得できませんでした')
-    });
-
-    $.getJSON(
-        '/dashboard/telemetry/NumPlaceOrderCanceled',
-        {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
-        }
-    ).done(function (data) {
-        dataCanceled = data;
-        next();
-    }).fail(function () {
-        alert('取引数を取得できませんでした')
-    });
-
-    $.getJSON(
-        '/dashboard/telemetry/NumPlaceOrderExpired',
-        {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
-        }
-    ).done(function (data) {
-        dataExpired = data;
-        next();
-    }).fail(function () {
-        alert('取引数を取得できませんでした')
-    });
-
-    $.getJSON(
-        '/dashboard/telemetry/NumPlaceOrderConfirmed',
-        {
-            measureFrom: moment(params.measureFrom).toISOString(),
-            measureThrough: moment(params.measureThrough).toISOString()
-        }
-    ).done(function (data) {
-        dataConfirmed = data;
-        next();
-    }).fail(function () {
-        alert('取引数を取得できませんでした')
+        console.error('取引数を取得できませんでした')
     });
 }
 function searchOrders(cb) {
     page += 1;
     $.getJSON(
-        '/dashboard/latestOrders',
+        '/dashboard/orders',
         {
             limit: limit,
             page: page,
@@ -498,37 +404,44 @@ function searchOrders(cb) {
             orderDateThrough: moment().toISOString()
         }
     ).done(function (data) {
-        $.each(data, function (_, order) {
+        searchedAllOrders = (data.data.length < limit);
+        $.each(data.data, function (_, order) {
             orders.push(order);
         });
-        cb();
+        if (!searchedAllOrders) {
+            searchOrders(cb);
+        } else {
+            cb();
+        }
     }).fail(function () {
-        alert('注文履歴を取得できませんでした')
+        console.error('注文履歴を取得できませんでした')
     });
 }
-function createNumPlaceOrderChart(dataStarted, dataCanceled, dataExpired, dataConfirmed) {
+function createNumPlaceOrderChart(datas) {
+    var statuses = ['Canceled', 'Expired', 'Confirmed'];
+
     new Morris.Line({
         element: 'numPlaceOrderChart',
         resize: true,
-        data: dataStarted.map(function (data, index) {
-            return {
-                y: moment(data.measureDate).toISOString(),
-                started: data.value,
-                canceled: dataCanceled[index].value,
-                expired: dataExpired[index].value,
-                confirmed: dataConfirmed[index].value
-            }
+        data: datas.map(function (data) {
+            var data4chart = { y: moment(data.measureDate).toISOString() };
+            statuses.forEach(function (status) {
+                data4chart[status] = (data.value[status] !== undefined) ? data.value[status] : 0
+            });
+
+            return data4chart;
         }),
         xkey: 'y',
-        ykeys: ['started', 'canceled', 'expired', 'confirmed'],
-        labels: ['started', 'canceled', 'expired', 'confirmed'],
-        lineColors: ['#efefef', '#79f67d', '#e96c6c', '#79ccf5'],
+        ykeys: statuses,
+        labels: statuses,
+        lineColors: ['#fad684', '#e96c6c', '#79f67d'],
+        // lineColors: ['#ffc107', '#dc3545', '#28a745'],
         lineWidth: 2,
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
         pointSize: 4,
-        pointStrokeColors: ['#efefef', '#79f67d', '#e96c6c', '#79ccf5'],
+        pointStrokeColors: ['#fad684', '#e96c6c', '#79f67d'],
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
         gridTextSize: 10
@@ -578,7 +491,7 @@ function createSalesAmountByClientChart(datas) {
     $('#salesAmount input.knob.byClient').map(function () {
         var clientId = $(this).attr('data-clientId');
         var ratio = 0;
-        if (salesAmountByClient[clientId] !== undefined) {
+        if (salesAmountByClient[clientId] !== undefined && totalAmount > 0) {
             ratio = (salesAmountByClient[clientId] / totalAmount * 100).toFixed(1);
         }
         $(this).val(ratio).trigger('change');
@@ -605,8 +518,35 @@ function createSalesAmountByPaymentMethodChart(datas) {
     $('#salesAmount input.knob.byPaymentMethod').map(function () {
         var paymentMethod = $(this).attr('data-paymentMethod');
         var ratio = 0;
-        if (salesAmountByPaymentMethod[paymentMethod] !== undefined) {
+        if (salesAmountByPaymentMethod[paymentMethod] !== undefined && totalAmount > 0) {
             ratio = (salesAmountByPaymentMethod[paymentMethod] / totalAmount * 100).toFixed(1);
+        }
+        $(this).val(ratio).trigger('change');
+    });
+}
+function createSalesAmountBySellerChart(datas) {
+    var salesAmountBySeller = {};
+    datas.forEach(function (data) {
+        const value = data.value;
+        Object.keys(value).forEach(function (sellerId) {
+            if (salesAmountBySeller[sellerId] === undefined) {
+                salesAmountBySeller[sellerId] = 0;
+            }
+            salesAmountBySeller[sellerId] += value[sellerId];
+        });
+    });
+
+    var totalAmount = Object.keys(salesAmountBySeller).reduce(
+        function (a, b) {
+            return a + salesAmountBySeller[b];
+        },
+        0
+    );
+    $('#salesAmount input.knob.bySeller').map(function () {
+        var sellerId = $(this).attr('data-sellerId');
+        var ratio = 0;
+        if (salesAmountBySeller[sellerId] !== undefined && totalAmount > 0) {
+            ratio = (salesAmountBySeller[sellerId] / totalAmount * 100).toFixed(1);
         }
         $(this).val(ratio).trigger('change');
     });
@@ -655,7 +595,7 @@ function createNumOrderItemsByClientChart(datas) {
     $('#numOrderItems input.knob.byClient').map(function () {
         var clientId = $(this).attr('data-clientId');
         var ratio = 0;
-        if (numOrderItemsByClient[clientId] !== undefined) {
+        if (numOrderItemsByClient[clientId] !== undefined && totalNumOrderItems > 0) {
             ratio = (numOrderItemsByClient[clientId] / totalNumOrderItems * 100).toFixed(1);
         }
         $(this).val(ratio).trigger('change');
@@ -682,8 +622,35 @@ function createNumOrderItemsByPaymentMethodChart(datas) {
     $('#numOrderItems input.knob.byPaymentMethod').map(function () {
         var paymentMethod = $(this).attr('data-paymentMethod');
         var ratio = 0;
-        if (numOrderItemsByPaymentMethod[paymentMethod] !== undefined) {
+        if (numOrderItemsByPaymentMethod[paymentMethod] !== undefined && totalNumOrderItems > 0) {
             ratio = (numOrderItemsByPaymentMethod[paymentMethod] / totalNumOrderItems * 100).toFixed(1);
+        }
+        $(this).val(ratio).trigger('change');
+    });
+}
+function createNumOrderItemsBySellerChart(datas) {
+    var numOrderItemsBySeller = {};
+    datas.forEach(function (data) {
+        const value = data.value;
+        Object.keys(value).forEach(function (sellerId) {
+            if (numOrderItemsBySeller[sellerId] === undefined) {
+                numOrderItemsBySeller[sellerId] = 0;
+            }
+            numOrderItemsBySeller[sellerId] += value[sellerId];
+        });
+    });
+
+    var totalNumOrderItems = Object.keys(numOrderItemsBySeller).reduce(
+        function (a, b) {
+            return a + numOrderItemsBySeller[b];
+        },
+        0
+    );
+    $('#numOrderItems input.knob.bySeller').map(function () {
+        var sellerId = $(this).attr('data-sellerId');
+        var ratio = 0;
+        if (numOrderItemsBySeller[sellerId] !== undefined && totalNumOrderItems > 0) {
+            ratio = (numOrderItemsBySeller[sellerId] / totalNumOrderItems * 100).toFixed(1);
         }
         $(this).val(ratio).trigger('change');
     });
@@ -701,23 +668,16 @@ function searchLatestOrders(cb) {
     ).done(function (data) {
         $.each(data.data, function (_, order) {
             orders.push(order);
-            let badge = 'badge-info';
-            switch (order.orderStatus) {
-                case 'OrderDelivered':
-                    badge = 'badge-danger';
-                    break;
-                default:
-            }
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
                 + '<td>' + order.orderDate + '</td>'
                 + '<td>' + order.acceptedOffers.map(function (o) { return o.itemOffered.reservedTicket.ticketedSeat.seatNumber }).join(',') + '</td>'
-                + '<td>' + '<span class="badge ' + badge + '">' + order.orderStatus + '</span>' + '</td>'
+                + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo(".latestOrders tbody");
         });
         cb();
     }).fail(function () {
-        alert('最近の注文を取得できませんでした')
+        console.error('最近の注文を取得できませんでした')
     });
 }
 function countNewOrder(cb) {
@@ -728,7 +688,7 @@ function countNewOrder(cb) {
         $('#newOrderCount').html(data.totalCount.toString());
         cb();
     }).fail(function () {
-        alert('新規注文数を取得できませんでした')
+        console.error('新規注文数を取得できませんでした')
     });
 }
 function aggregateExitRate(cb) {
@@ -739,7 +699,7 @@ function aggregateExitRate(cb) {
         $('#exitRate').html(data.rate.toString() + '<sup style="font-size: 20px">%</sup>');
         cb();
     }).fail(function () {
-        alert('離脱率を取得できませんでした')
+        console.error('離脱率を取得できませんでした')
     });
 }
 function countNewUser(cb) {
@@ -750,7 +710,7 @@ function countNewUser(cb) {
         $('#newUserCount').html(data.totalCount.toString());
         cb();
     }).fail(function () {
-        alert('新規ユーザー数を取得できませんでした')
+        console.error('新規ユーザー数を取得できませんでした')
     });
 }
 function countNewTransaction(cb) {
@@ -761,7 +721,7 @@ function countNewTransaction(cb) {
         $('#newTransactionCount').html(data.totalCount.toString());
         cb();
     }).fail(function () {
-        alert('新規取引数を取得できませんでした')
+        console.error('新規取引数を取得できませんでした')
     });
 }
 function initializeVisitorsChart() {
@@ -802,7 +762,7 @@ function initializeVisitorsChart() {
     });
 }
 function updateWaiterChart() {
-    var datas = waiterDatasets[0].data.map(function (d, index) {
+    numVisitorsChart.setData(waiterDatasets[0].data.map(function (d, index) {
         var data = {
             y: moment(d.x).toISOString()
         };
@@ -818,8 +778,7 @@ function updateWaiterChart() {
         });
 
         return data;
-    });
-    numVisitorsChart.setData(datas);
+    }));
 }
 function startMonitoringWaiter() {
     initializeVisitorsChart();

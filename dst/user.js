@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const jwt = require("jsonwebtoken");
 const ssktsapi = require("./ssktsapi");
-const debug = createDebug('sskts-console:user');
+const debug = createDebug('cinerino-console:user');
 /**
  * リクエストユーザー
  */

@@ -13,15 +13,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const createDebug = require("debug");
 const express = require("express");
+const http_status_1 = require("http-status");
 const moment = require("moment");
 const ssktsapi = require("../ssktsapi");
-// import redisClient from '../redis';
-const debug = createDebug('sskts-console:routes:orders');
+const debug = createDebug('cinerino-console:routes');
 const ordersRouter = express.Router();
 /**
  * 注文検索
  */
-ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+ordersRouter.get('', 
+// tslint:disable-next-line:cyclomatic-complexity
+(req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         debug('req.query:', req.query);
         const orderService = new ssktsapi.service.Order({
@@ -62,16 +64,25 @@ ordersRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, functio
                 ? req.query.confirmationNumbers.split(',').map((v) => v.trim())
                 : []
         };
-        debug('searching orders...', searchConditions);
-        const orders = yield orderService.search(searchConditions);
-        debug(orders.length, 'orders found.', orders);
-        res.render('orders/index', {
-            moment: moment,
-            movieTheaters: movieTheaters,
-            searchConditions: searchConditions,
-            orders: orders,
-            orderStatusChoices: orderStatusChoices
-        });
+        if (req.query.format === 'datatable') {
+            debug('searching orders...', searchConditions);
+            const orders = yield orderService.search(searchConditions);
+            debug(orders.length, 'orders found.');
+            res.json({
+                draw: req.query.draw,
+                recordsTotal: orders.length,
+                recordsFiltered: orders.length,
+                data: orders
+            });
+        }
+        else {
+            res.render('orders/index', {
+                moment: moment,
+                movieTheaters: movieTheaters,
+                searchConditions: searchConditions,
+                orderStatusChoices: orderStatusChoices
+            });
+        }
     }
     catch (error) {
         next(error);
@@ -97,8 +108,34 @@ ordersRouter.get('/:orderNumber', (req, res, next) => __awaiter(this, void 0, vo
         }
         res.render('orders/show', {
             moment: moment,
-            order: order
+            order: order,
+            timelines: [],
+            ActionStatusType: ssktsapi.factory.actionStatusType
         });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+/**
+ * 注文返品
+ */
+ordersRouter.post('/:orderNumber/return', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        // const returnOrderService = new ssktsapi.service.transaction.ReturnOrder({
+        //     endpoint: <string>process.env.API_ENDPOINT,
+        //     auth: req.user.authClient
+        // });
+        // const returnOrderTransaction = await returnOrderService.start({
+        //     expires: moment().add(1, 'minutes').toDate(),
+        //     object: {
+        //         order: {
+        //             orderNumber: req.params.orderNumber
+        //         }
+        //     }
+        // });
+        // await returnOrderService.confirm({ transactionId: returnOrderTransaction.id });
+        res.status(http_status_1.ACCEPTED).end();
     }
     catch (error) {
         next(error);

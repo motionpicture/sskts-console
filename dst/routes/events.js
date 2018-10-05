@@ -13,9 +13,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const createDebug = require("debug");
 const express = require("express");
+// tslint:disable-next-line:no-submodule-imports
+// import { body } from 'express-validator/check';
+// import { CREATED } from 'http-status';
 const moment = require("moment");
+// import validator from '../middlewares/validator';
 const ssktsapi = require("../ssktsapi");
-const debug = createDebug('sskts-console:routes:events');
+const debug = createDebug('cinerino-console:routes:events');
 const eventsRouter = express.Router();
 /**
  * 上映イベント検索
@@ -37,14 +41,25 @@ eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this
                 : new Date(), startThrough: (req.query.startRange !== undefined && req.query.startRange !== '')
                 ? moment(req.query.startRange.split(' - ')[1]).toDate()
                 : moment().add(1, 'day').toDate() }, req.query);
-        debug('searching events...', searchConditions);
-        const events = yield eventService.searchIndividualScreeningEvent(searchConditions);
-        debug(events.length, 'events found.', events);
-        res.render('events/individualScreeningEvent/index', {
-            movieTheaters: movieTheaters,
-            searchConditions: searchConditions,
-            events: events
-        });
+        if (req.query.format === 'datatable') {
+            debug('searching events...', searchConditions);
+            const events = yield eventService.searchIndividualScreeningEvent(searchConditions);
+            debug(events.length, 'events found.', events);
+            res.json({
+                draw: req.query.draw,
+                recordsTotal: events.length,
+                recordsFiltered: events.length,
+                data: events
+            });
+        }
+        else {
+            res.render('events/individualScreeningEvent/index', {
+                moment: moment,
+                movieTheaters: movieTheaters,
+                searchConditions: searchConditions,
+                events: []
+            });
+        }
     }
     catch (error) {
         next(error);
@@ -64,10 +79,6 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const orderService = new ssktsapi.service.Order({
-            endpoint: process.env.API_ENDPOINT,
-            auth: req.user.authClient
-        });
         const placeService = new ssktsapi.service.Place({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
@@ -83,6 +94,36 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
             branchCode: event.superEvent.location.branchCode
         });
         const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
+        res.render('events/individualScreeningEvent/show', {
+            message: '',
+            moment: moment,
+            movieTheater: movieTheater,
+            screeningRoom: screeningRoom,
+            movieTheaters: movieTheaters,
+            event: event,
+            orders: []
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+/**
+ * 上映イベントの注文検索
+ */
+eventsRouter.get('/individualScreeningEvent/:identifier/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const eventService = new ssktsapi.service.Event({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const event = yield eventService.findIndividualScreeningEvent({
+            identifier: req.params.identifier
+        });
         debug('searching orders by event...');
         const reservationStartDate = moment(`${event.coaInfo.rsvStartDate} 00:00:00+09:00`, 'YYYYMMDD HH:mm:ssZ').toDate();
         const orders = yield orderService.search({
@@ -94,14 +135,7 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
             reservedEventIdentifiers: [event.identifier]
         });
         debug(orders.length, 'orders found.');
-        res.render('events/individualScreeningEvent/show', {
-            moment: moment,
-            movieTheater: movieTheater,
-            screeningRoom: screeningRoom,
-            movieTheaters: movieTheaters,
-            event: event,
-            orders: orders
-        });
+        res.json({ totalCount: orders.length, data: orders });
     }
     catch (error) {
         next(error);

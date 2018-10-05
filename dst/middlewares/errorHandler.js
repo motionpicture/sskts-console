@@ -8,9 +8,10 @@ const http_status_1 = require("http-status");
 const api_1 = require("../error/api");
 const ssktsapi_1 = require("../ssktsapi");
 // import logger from '../logger';
-const debug = createDebug('sskts-console:middlewares');
+const debug = createDebug('cinerino-api:middlewares');
 exports.default = (err, __, res, next) => {
     debug(err);
+    // logger.error('cinerino-api:middleware:errorHandler', err);
     if (res.headersSent) {
         next(err);
         return;
@@ -22,10 +23,10 @@ exports.default = (err, __, res, next) => {
     else {
         // エラー配列が入ってくることもある
         if (Array.isArray(err)) {
-            apiError = new api_1.APIError(ssktsError2httpStatusCode(err[0]), err);
+            apiError = new api_1.APIError(cinerinoError2httpStatusCode(err[0]), err);
         }
         else if (err instanceof ssktsapi_1.factory.errors.SSKTS) {
-            apiError = new api_1.APIError(ssktsError2httpStatusCode(err), [err]);
+            apiError = new api_1.APIError(cinerinoError2httpStatusCode(err), [err]);
         }
         else {
             // 500
@@ -39,7 +40,7 @@ exports.default = (err, __, res, next) => {
 /**
  * 内部エラーをHTTPステータスコードへ変換する
  */
-function ssktsError2httpStatusCode(err) {
+function cinerinoError2httpStatusCode(err) {
     let statusCode = http_status_1.BAD_REQUEST;
     switch (true) {
         // 401

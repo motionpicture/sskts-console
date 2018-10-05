@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 // import * as createDebug from 'debug';
 const express = require("express");
-// const debug = createDebug('sskts-console:routes:account');
+// const debug = createDebug('cinerino-console:routes:account');
 const accountsRouter = express.Router();
 /**
  * 口座検索

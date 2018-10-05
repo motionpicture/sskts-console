@@ -1,10 +1,14 @@
+<%
+const thumbnailImageUrl = (event.workPerformed.thumbnailUrl !== undefined)
+? event.workPerformed.thumbnailUrl
+: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrhpsOJOcLBwc1SPD9sWlinildy4S05-I2Wf6z2wRXnSxbmtRz';
+%>
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">上映イベント
-                    <%= event.name.ja %> の詳細</h1>
+                <h1 class="m-0 text-dark">上映イベント詳細</h1>
             </div>
             <!-- /.col -->
             <div class="col-sm-6">
@@ -29,182 +33,210 @@
 <!-- Main content -->
 <section class="content">
     <div class="container-fluid">
+
+        <% if (messages.message) { %>
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5>
+                <i class="icon fa fa-check"></i> Congraturations!</h5>
+            <%= messages.message %>
+        </div>
+        <% } %>
+
+        <% if (message) { %>
+        <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <%- message.replace(/\n/g, '<br>') %>
+        </div>
+        <% } %>
+
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Profile Image -->
+                <div class="card card-dark card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" src="<%= thumbnailImageUrl %>" alt="Thumbnail">
+                        </div>
+
+                        <h3 class="profile-username text-center">
+                            <%= event.name.ja %>
+                        </h3>
+
+                        <p class="text-muted text-center">
+                            <%= event.name.en %>
+                        </p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Orders</b> <a class="float-right" id="orderCount"></a>
+                            </li>
+                        </ul>
+
+                        <!-- <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a> -->
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+
+                <!-- About Me Box -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">About</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <strong><i class="fa fa-info mr-1"></i> Name</strong>
+                        <p class="text-muted">
+                            <%= event.name.ja %><br>
+                            <%= event.name.en %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-info mr-1"></i> SuperEvent</strong>
+                        <p class="text-muted">
+                            <%= event.superEvent.name.ja %><br>
+                            <%= event.superEvent.name.en %><br>
+                            <%= event.superEvent.alternativeHeadline %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-map-marker mr-1"></i> Location</strong>
+                        <p class="text-muted">
+                            <%= event.superEvent.location.name.ja %><br>
+                            <%= event.location.name.ja %><br>
+                            <%= event.maximumAttendeeCapacity %>席
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-film mr-1"></i> Movie</strong>
+                        <p class="text-muted">
+                            <%= event.workPerformed.name %><br>
+                            <%= event.workPerformed.alternativeHeadline %><br>
+                            <%= moment.duration(event.workPerformed.duration).asMinutes() %> minutes
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-clock mr-1"></i> Date</strong>
+                        <p class="text-muted">
+                            <%= event.startDate %> -
+                            <%= event.endDate %>
+                        </p>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#remainingAttendeeCapacity"
+                                    data-toggle="tab">残席数遷移</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#orders" data-toggle="tab">注文履歴</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#others" data-toggle="tab">その他の操作</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="remainingAttendeeCapacity">
+                                <div class="card bg-dark-gradient">
+                                    <div class="card-header no-border">
+                                        <h3 class="card-title">
+                                        </h3>
+
+                                        <div class="card-tools">
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart" id="remainingAttendeeCapacityChart2" style="height: 400px;"></div>
+                                    </div>
+                                    <!-- /.card-body -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+
+                            <div class="tab-pane" id="orders">
+                                <div class="table-responsive">
+                                    <table class="table m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order Number</th>
+                                                <th>Order Date</th>
+                                                <th>Item</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.table-responsive -->
+                            </div>
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(event, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="screeningRoomJsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(screeningRoom, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="settings">
+                                <!-- form start -->
+                                <form role="form" method="post">
+                                </form>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="others">
+                                <!-- general form elements -->
+                                <div class="card card-primary">
+                                    <!-- <div class="card-header">
+                                        <h3 class="card-title">その他の操作</h3>
+                                    </div> -->
+                                    <!-- /.card-header -->
+
+                                    <div class="card-body">
+                                        <!-- <button type="button" class="delete btn btn-danger">削除する</button> -->
+                                    </div>
+                                    <!-- /.card-body -->
+                                    <!-- <div class="card-footer">
+                                        </div> -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
 
             </div>
             <!-- /.col (RIGHT) -->
-        </div>
-        <!-- /.row -->
-
-        <div class="row">
-            <div class="col-md-8">
-                <!-- LINE CHART -->
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">残席数遷移</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-widget="collapse">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                            <!-- <button type="button" class="btn btn-tool" data-widget="remove">
-                                    <i class="fa fa-times"></i>
-                                </button> -->
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="lineChart" style="height:250px"></canvas>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fa fa-text-width"></i>
-                            Details
-                        </h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <dl>
-                            <dt>ID</dt>
-                            <dd>
-                                <%= event.identifier %>
-                            </dd>
-                            <dt>name</dt>
-                            <dd>
-                                <%= event.superEvent.name.ja %>
-                            </dd>
-                            <dd>
-                                <%= event.superEvent.alternativeHeadline %>
-                            </dd>
-                            <dd>
-                                <%= event.name.ja %>
-                            </dd>
-                            <dt>作品</dt>
-                            <dd>
-                                <%= event.workPerformed.name %>
-                            </dd>
-                            <dd>
-                                <%= event.workPerformed.alternativeHeadline %>
-                            </dd>
-                            <dd>
-                                <%= event.workPerformed.duration %>
-                            </dd>
-                            <dt>場所</dt>
-                            <dd>
-                                <%= event.superEvent.location.name.ja %>
-                            </dd>
-                            <dd>
-                                <%= event.location.name.ja %>
-                            </dd>
-                            <dd>
-                                <%= screeningRoom.containsPlace[0].containsPlace.length %>席
-                            </dd>
-                            <dt>期間</dt>
-                            <dd>
-                                <%= `${event.startDate}-${event.endDate}` %>
-                            </dd>
-                        </dl>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fa fa-text-width"></i>
-                            COA情報
-                        </h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <div class="form-group">
-                            <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(event.coaInfo, null, '\t') %></textarea>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-            </div>
-            <!-- ./col -->
-            <div class="col-md-4">
-                <!-- TABLE: LATEST ORDERS -->
-                <div class="card">
-                    <div class="card-header border-transparent">
-                        <h3 class="card-title">注文履歴</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-widget="collapse">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                            <!-- <button type="button" class="btn btn-tool" data-widget="remove">
-                                    <i class="fa fa-times"></i>
-                                </button> -->
-                        </div>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table m-0">
-                                <thead>
-                                    <tr>
-                                        <th>Order Number</th>
-                                        <th>Order Date</th>
-                                        <th>Item</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% orders.forEach(function (order) { %>
-                                        <tr>
-                                            <td>
-                                                <a target="_blank" href="/orders/<%= order.orderNumber %>">
-                                                    <%= order.orderNumber %>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <%= moment(order.orderDate).format('YY-MM-DD hh:mm:ss') %>
-                                            </td>
-                                            <td>
-                                                <%= order.acceptedOffers.map((o)=>o.itemOffered.reservedTicket.ticketedSeat.seatNumber).join(',') %>
-                                            </td>
-                                            <td>
-                                                <%
-                                                    let badge='badge-info';
-                                                    switch (order.orderStatus) {
-                                                        case 'OrderDelivered':
-                                                            badge = 'badge-danger';
-                                                            break;
-                                                        default:
-                                                    }
-                                                    %>
-                                                    <span class="badge <%= badge %>">
-                                                        <%= order.orderStatus %>
-                                                    </span>
-                                            </td>
-                                        </tr>
-                                        <% })  %>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.table-responsive -->
-                    </div>
-                    <!-- /.card-body -->
-                    <div class="card-footer clearfix">
-                        <!-- <a href="javascript:void(0)" class="btn btn-sm btn-info float-left">Place New Order</a>
-                            <a href="javascript:void(0)" class="btn btn-sm btn-secondary float-right">View All Orders</a> -->
-                    </div>
-                    <!-- /.card-footer -->
-                </div>
-                <!-- /.card -->
-            </div>
-            <!-- ./col -->
         </div>
         <!-- /.row -->
 
@@ -222,145 +254,4 @@
 <link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
 <!-- ChartJS 1.0.1 -->
 <script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
-
-<!-- page script -->
-<script>
-    $(function () {
-        var event = JSON.parse('<%- JSON.stringify(event) %>');
-        var screeningRoom = JSON.parse('<%- JSON.stringify(screeningRoom) %>');
-        var orders = JSON.parse('<%- JSON.stringify(orders) %>');
-
-        // 全座席数は
-        var numberOfSeats = screeningRoom.containsPlace[0].containsPlace.length;
-
-        // 売り出し日時は？
-        var reservationStartDate = moment(event.coaInfo.rsvStartDate + ' 00:00:00+09:00', 'YYYYMMDD HH:mm:ssZ').toDate();
-        // 予約期間
-        var reservationPeriodInMinutes = moment(event.endDate).diff(moment(reservationStartDate), 'hours');
-
-        /**
-         * ラインチャート作成
-         */
-        var data = orders.reduce(
-            (a, b) => {
-                numberOfSeats -= b.acceptedOffers.length;
-                // 予約開始からの時間
-                const diff = moment(b.orderDate).diff(moment(reservationStartDate), 'hours', true);
-                a.push({
-                    x: diff,
-                    y: numberOfSeats,
-                });
-
-                return a;
-            },
-            [{ x: 0, y: numberOfSeats }],
-        );
-        var areaChartData = {
-            // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            labels: [],
-            datasets: [
-                {
-                    label: 'Orders',
-                    // backgroundColor: 'rgba(0, 123, 255, 0.9)',
-                    data: data
-                },
-            ]
-        }
-
-        //-------------
-        //- LINE CHART -
-        //--------------
-        var lineChartCanvas = $('#lineChart').get(0).getContext('2d');
-        var lineChartOptions = {
-            //Boolean - If we should show the scale at all
-            showScale: true,
-            //Boolean - Whether grid lines are shown across the chart
-            scaleShowGridLines: false,
-            //String - Colour of the grid lines
-            scaleGridLineColor: 'rgba(0,0,0,.05)',
-            //Number - Width of the grid lines
-            scaleGridLineWidth: 1,
-            //Boolean - Whether to show horizontal lines (except X axis)
-            scaleShowHorizontalLines: true,
-            //Boolean - Whether to show vertical lines (except Y axis)
-            scaleShowVerticalLines: true,
-            //Boolean - Whether the line is curved between points
-            bezierCurve: false,
-            //Number - Tension of the bezier curve between points
-            bezierCurveTension: 0.3,
-            //Boolean - Whether to show a dot for each point
-            pointDot: true,
-            //Number - Radius of each point dot in pixels
-            pointDotRadius: 4,
-            //Number - Pixel width of point dot stroke
-            pointDotStrokeWidth: 1,
-            //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-            pointHitDetectionRadius: 20,
-            //Boolean - Whether to show a stroke for datasets
-            datasetStroke: true,
-            //Number - Pixel width of dataset stroke
-            datasetStrokeWidth: 2,
-            //Boolean - Whether to fill the dataset with a color
-            datasetFill: false,
-            //String - A legend template
-            legendTemplate: '',
-            //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
-            maintainAspectRatio: true,
-            //Boolean - whether to make the chart responsive to window resizing
-            responsive: true,
-            legend: {
-                position: 'bottom',
-                labels: {
-                    // fontColor: '#fff',
-                },
-            },
-            scales: {
-                xAxes: [
-                    {
-                        type: 'linear',
-                        position: 'bottom',
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '販売開始からの経過時間(hours)',
-                        },
-                        gridLines: {
-                            display: true,
-                            // color: Chart.axisLineColor,
-                        },
-                        ticks: {
-                            // fontColor: Chart.textColor,
-                            beginAtZero: true,
-                            min: 0,
-                            max: reservationPeriodInMinutes,
-                            // stepSize: 100,
-                        },
-                    },
-                ],
-                yAxes: [
-                    {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '残席数',
-                        },
-                        gridLines: {
-                            display: true,
-                            // color: Chart.axisLineColor,
-                        },
-                        ticks: {
-                            // fontColor: Chart.textColor,
-                            beginAtZero: true,
-                            min: 0,
-                        },
-                    },
-                ],
-            }
-        };
-        var lineChart = new Chart(lineChartCanvas, {
-            type: 'line',
-            data: areaChartData,
-            options: lineChartOptions
-        });
-    });
-</script>
+<script src="/js/events/individualScreeningEvent/show.js"></script>

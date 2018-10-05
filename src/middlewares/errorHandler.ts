@@ -18,10 +18,11 @@ import { APIError } from '../error/api';
 import { factory } from '../ssktsapi';
 // import logger from '../logger';
 
-const debug = createDebug('sskts-console:middlewares');
+const debug = createDebug('cinerino-api:middlewares');
 
 export default (err: any, __: Request, res: Response, next: NextFunction) => {
     debug(err);
+    // logger.error('cinerino-api:middleware:errorHandler', err);
 
     if (res.headersSent) {
         next(err);
@@ -35,9 +36,9 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
     } else {
         // エラー配列が入ってくることもある
         if (Array.isArray(err)) {
-            apiError = new APIError(ssktsError2httpStatusCode(err[0]), err);
+            apiError = new APIError(cinerinoError2httpStatusCode(err[0]), err);
         } else if (err instanceof factory.errors.SSKTS) {
-            apiError = new APIError(ssktsError2httpStatusCode(err), [err]);
+            apiError = new APIError(cinerinoError2httpStatusCode(err), [err]);
         } else {
             // 500
             apiError = new APIError(INTERNAL_SERVER_ERROR, [new factory.errors.SSKTS(<any>'InternalServerError', err.message)]);
@@ -52,7 +53,7 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
 /**
  * 内部エラーをHTTPステータスコードへ変換する
  */
-function ssktsError2httpStatusCode(err: factory.errors.SSKTS) {
+function cinerinoError2httpStatusCode(err: factory.errors.SSKTS) {
     let statusCode = BAD_REQUEST;
 
     switch (true) {

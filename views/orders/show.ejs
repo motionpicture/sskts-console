@@ -143,12 +143,6 @@
                                         <td>
                                             <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
                                             <%= acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber %>
-                                            <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.ticketName %>
-                                            <br> 販売単価:
-                                            <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.salePrice %>
-                                            <br> 3Dメガネ:
-                                            <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.addGlasses %>
-
                                             <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
                                             <%= acceptedOffer.price %>
                                             <%= acceptedOffer.priceCurrency %>
@@ -228,9 +222,19 @@
                         <div class="col-12">
                             <a href="javascript:void(0)" onclick="window.print(); return false;" class="btn btn-default">
                                 <i class="fa fa-print"></i> Print</a>
-                            <!-- <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                                    <i class="fa fa-download"></i> Generate PDF
-                                </button> -->
+                            <% if (order.orderStatus === 'OrderDelivered') { %>
+                            <!-- <button type="button" class="btn btn-danger float-right returnOrder">
+                                <i class="fa fa-undo"></i> 返品
+                            </button> -->
+                            <!-- <button type="button" class="btn btn-warning float-right sendEmailMessage" style="margin-right: 5px;">
+                                <i class="fa fa-envelope"></i> 配送メール送信
+                            </button> -->
+                            <% } %>
+                            <% if (order.orderStatus === 'OrderReturned') { %>
+                            <button type="button" class="btn btn-default float-right disabled">
+                                <i class="fa fa-undo"></i> 返品済
+                            </button>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -244,13 +248,138 @@
 </section>
 <!-- /.content -->
 
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- ./col -->
+            <div class="col-md-12 no-print">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#timeline" data-toggle="tab">Timeline</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="timeline">
+                                <!-- The timeline -->
+                                <ul class="timeline timeline-inverse">
+                                    <!-- /.timeline-label -->
+                                    <% timelines.forEach(function(timeline, index){ %>
+                                    <% if (index === 0) { %>
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-success">
+                                            <%= moment(timeline.startDate).format('LL') %>
+                                        </span>
+                                    </li>
+                                    <% } %>
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-envelope bg-primary"></i>
+                                        <!-- <i class="fa fa-user bg-info"></i> -->
+                                        <!-- <i class="fa fa-camera bg-purple"></i> -->
+                                        <!-- <i class="fa fa-comments bg-warning"></i> -->
+
+
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock"></i>
+                                                <%= moment(timeline.startDate).toISOString() %></span>
+
+                                            <h3 class="timeline-header">
+                                                <a href="<%= timeline.agent.url %>" target="_blank">
+                                                    <%= timeline.agent.name %></a> が
+                                                <span>
+                                                    <%= timeline.object %></span> を
+                                                <span>
+                                                    <%= timeline.actionName %></span> しました
+                                            </h3>
+
+                                            <div class="timeline-body">
+                                                <span class="badge <%= timeline.actionStatus %>">
+                                                    <%= timeline.actionStatus %></span>
+                                            </div>
+                                            <div class="timeline-footer">
+                                                <a href="#" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                    data-target="#modal-action-<%= timeline.action.id %>">Read more</a>
+                                                <a href="#" class="btn btn-warning btn-sm" data-toggle="modal"
+                                                    data-target="#modal-actionResult-<%= timeline.action.id %>">See
+                                                    results</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                                    <li>
+                                        <i class="fa fa-clock bg-gray"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(order, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<% timelines.forEach(function(timeline, index){ %>
+<div class="modal" id="modal-action-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.action, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal" id="modal-actionResult-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action Result</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.result, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<% }) %>
+
 <!-- DataTables -->
 <link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
 <!-- ChartJS 1.0.1 -->
 <script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
-
-<!-- page script -->
-<script>
-    $(function () {
-    });
-</script>
+<script src="/js/orders/show.js"></script>

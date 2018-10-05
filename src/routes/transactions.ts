@@ -1,27 +1,12 @@
 /**
  * 取引ルーター
  */
-import * as createDebug from 'debug';
 import * as express from 'express';
-// import * as moment from 'moment';
 
-// import * as ssktsapi from '../ssktsapi';
+// import placeOrderTransactionsRouter from './transactions/placeOrder';
+// import returnOrderTransactionsRouter from './transactions/returnOrder';
 
-const debug = createDebug('sskts-console:routes:account');
 const transactionsRouter = express.Router();
-
-/**
- * 取引検索
- */
-transactionsRouter.get(
-    '/',
-    async (req, _, next) => {
-        try {
-            debug('searching transactions...', req.query);
-            throw new Error('Not implemented');
-        } catch (error) {
-            next(error);
-        }
-    });
-
+// transactionsRouter.use('/placeOrder', placeOrderTransactionsRouter);
+// transactionsRouter.use('/returnOrder', returnOrderTransactionsRouter);
 export default transactionsRouter;

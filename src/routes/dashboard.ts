@@ -7,7 +7,7 @@ import * as moment from 'moment';
 
 import * as ssktsapi from '../ssktsapi';
 
-// const debug = createDebug('sskts-console:routes');
+// const debug = createDebug('cinerino-console:routes');
 const dashboardRouter = express.Router();
 dashboardRouter.get(
     '/countNewOrder',
@@ -69,7 +69,7 @@ dashboardRouter.get(
     }
 );
 dashboardRouter.get(
-    '/latestOrders',
+    '/orders',
     async (req, res, next) => {
         try {
             // 直近の実売上データを
@@ -79,10 +79,11 @@ dashboardRouter.get(
             });
             const orders = await orderService.search({
                 // tslint:disable-next-line:no-magic-numbers
-                orderDateFrom: moment().add(-1, 'days').toDate(),
+                orderDateFrom: moment().add(-1, 'hour').toDate(),
                 orderDateThrough: moment().toDate()
             });
-            res.json(orders);
+            const searchOrdersResult = { totalCount: orders.length, data: orders };
+            res.json(searchOrdersResult);
         } catch (error) {
             next(error);
         }

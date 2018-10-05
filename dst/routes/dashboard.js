@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const moment = require("moment");
 const ssktsapi = require("../ssktsapi");
-// const debug = createDebug('sskts-console:routes');
+// const debug = createDebug('cinerino-console:routes');
 const dashboardRouter = express.Router();
 dashboardRouter.get('/countNewOrder', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -68,7 +68,7 @@ dashboardRouter.get('/countNewTransaction', (_, res, next) => __awaiter(this, vo
         next(error);
     }
 }));
-dashboardRouter.get('/latestOrders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+dashboardRouter.get('/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         // 直近の実売上データを
         const orderService = new ssktsapi.service.Order({
@@ -77,10 +77,11 @@ dashboardRouter.get('/latestOrders', (req, res, next) => __awaiter(this, void 0,
         });
         const orders = yield orderService.search({
             // tslint:disable-next-line:no-magic-numbers
-            orderDateFrom: moment().add(-1, 'days').toDate(),
+            orderDateFrom: moment().add(-1, 'hour').toDate(),
             orderDateThrough: moment().toDate()
         });
-        res.json(orders);
+        const searchOrdersResult = { totalCount: orders.length, data: orders };
+        res.json(searchOrdersResult);
     }
     catch (error) {
         next(error);

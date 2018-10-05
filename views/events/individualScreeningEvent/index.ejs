@@ -45,10 +45,12 @@
                                 <label>開催地</label>
                                 <select multiple class="form-control" name="superEventLocationIdentifiers[]">
                                     <% movieTheaters.forEach(function (movieTheater) { %>
-                                        <option value="<%= movieTheater.identifier %>" <%=( searchConditions.superEventLocationIdentifiers.indexOf(movieTheater.identifier)>= 0) ? 'selected' : '' %>>
-                                            <%= movieTheater.name.ja %>
-                                        </option>
-                                        <% }) %>
+                                    <option value="<%= movieTheater.identifier %>" <%=(
+                                        searchConditions.superEventLocationIdentifiers.indexOf(movieTheater.identifier)>=
+                                        0) ? 'selected' : '' %>>
+                                        <%= movieTheater.name.ja %>
+                                    </option>
+                                    <% }) %>
                                 </select>
                             </div>
 
@@ -61,14 +63,16 @@
                                             <i class="fa fa-calendar"></i>
                                         </span>
                                     </div>
-                                    <input type="text" class="form-control" name="startRange" id="reservation" value="<%= searchConditions.startRange %>">
+                                    <input type="text" class="form-control" name="startRange" id="reservation" value="<%= moment(searchConditions.startFrom).format('YYYY-MM-DDT00:00:00Z') %> - <%= moment(searchConditions.startThrough).format('YYYY-MM-DDT00:00:00Z') %>">
                                 </div>
                                 <!-- /.input group -->
                             </div>
                         </div>
 
                         <!-- /.card-body -->
-                        <div class="card-footer">
+                        <div class="card-footer clearfix">
+                            <!-- <button type="button" class="btn btn-primary importScreeningEvents">
+                                <i class="fa fa-plus"></i> 在庫仕入れ from Chevre</button> -->
                             <button type="submit" class="btn btn-secondary float-right">検索</button>
                         </div>
                     </form>
@@ -94,75 +98,14 @@
                                     <th>イベント</th>
                                     <th>場所</th>
                                     <th>作品</th>
-                                    <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <% events.forEach(function(event){ %>
-                                    <tr>
-                                        <td>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <%= event.identifier %>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <%= event.superEvent.name.ja %>
-                                                </li>
-                                                <li>
-                                                    <%= event.superEvent.alternativeHeadline %>
-                                                </li>
-                                                <li>
-                                                    <%= event.name.ja %>
-                                                </li>
-                                                <li>
-                                                    <%= `${event.startDate}-${event.endDate}` %>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <%= event.superEvent.location.name.ja %>
-                                                </li>
-                                                <li>
-                                                    <%= event.location.name.ja %>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <%= event.workPerformed.name %>
-                                                </li>
-                                                <li>
-                                                    <%= event.workPerformed.alternativeHeadline %>
-                                                </li>
-                                                <li>
-                                                    <%= event.workPerformed.duration %>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul class="list-unstyled">
-                                                <li>
-                                                    <a href="/events/individualScreeningEvent/<%= event.identifier %>">詳細</a>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                            </tbody>
                             <tfoot>
                                 <tr>
                                     <th>ID</th>
                                     <th>イベント</th>
                                     <th>場所</th>
                                     <th>作品</th>
-                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -186,20 +129,4 @@
 <link rel="stylesheet" href="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker-bs3.css">
 
 <script src="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker.js"></script>
-
-<!-- page script -->
-<script>
-    $(function () {
-        $("#events-table").DataTable({
-            "order": [[1, 'asc']], // デフォルトは枝番号昇順
-            "ordering": true
-        });
-
-        //Date range picker
-        $('#reservation').daterangepicker({
-            timePicker: false,
-            // timePickerIncrement: 30,
-            format: 'YYYY-MM-DDT00:00:00+0900'
-        })
-    });
-</script>
+<script src="/js/events/individualScreeningEvent/index.js"></script>

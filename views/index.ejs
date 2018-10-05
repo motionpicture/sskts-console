@@ -23,7 +23,7 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
-<div class="content">
+<section class="content">
     <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
@@ -93,6 +93,8 @@
         <!-- Main row -->
         <div class="row">
             <input type="hidden" name="waiterEndpoint" value="<%= process.env.WAITER_ENDPOINT %>">
+            <input type="hidden" name="telemetryEndpoint" value="<%= process.env.TELEMETRY_API_ENDPOINT %>">
+            <input type="hidden" name="projectId" value="<%= process.env.PROJECT_ID %>">
             <!-- Left col -->
             <section class="col-lg-7 connectedSortable">
                 <!-- solid sales graph -->
@@ -129,240 +131,324 @@
                 </div>
                 <!-- /.card -->
 
+                <!-- solid sales graph -->
+                <div class="card bg-dark-gradient" id="numPlaceOrder">
+                    <div class="card-header no-border">
+                        <h3 class="card-title">
+                            <i class="fa fa-th mr-1"></i>
+                            注文取引数
+                        </h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-dark btn-sm daterange" data-toggle="tooltip" title="Date range">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                            <button type="button" class="btn bg-dark btn-sm" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn bg-dark btn-sm" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart" id="numPlaceOrderChart" style="height: 250px;"></div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer bg-transparent">
+                    </div>
+                    <!-- /.card-footer -->
+                    <div class="overlay">
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+                </div>
+                <!-- /.card -->
+
+                <!-- TABLE: LATEST ORDERS -->
+                <div class="card latestOrders">
+                    <div class="card-header border-transparent">
+                        <h3 class="card-title">Latest Orders</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table m-0">
+                                <thead>
+                                    <tr>
+                                        <th>Order Number</th>
+                                        <th>Order Date</th>
+                                        <th>Item</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.table-responsive -->
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        <!-- <a href="#" class="btn btn-sm btn-info float-left">Place New Order</a> -->
+                        <a target="_blank" href="/orders" class="btn btn-sm btn-secondary float-right">View All Orders</a>
+                    </div>
+                    <!-- /.card-footer -->
+                </div>
+                <!-- /.card -->
             </section>
             <!-- /.Left col -->
 
             <!-- right col (We are only adding the ID to make the widgets sortable)-->
             <section class="col-lg-5 connectedSortable">
-                <div class="card bg-dark">
+                <!-- solid sales graph -->
+                <div class="card bg-primary-gradient" id="salesAmount">
                     <div class="card-header no-border">
-                        <div class="d-flex justify-content-between">
-                            <h3 class="card-title">
-                                タスクキュー遷移</h3>
-                            <!-- <a href="javascript:void(0);">View Report</a> -->
+                        <h3 class="card-title">
+                            <i class="fa fa-th mr-1"></i>
+                            売上金額
+                        </h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm daterange" data-toggle="tooltip" title="Date range">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                            <button type="button" class="btn bg-primary btn-sm" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn bg-primary btn-sm" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex">
-                            <p class="d-flex flex-column">
-                                <span class="text-bold text-lg">???</span>
-                                <span>タスクキュー数</span>
-                            </p>
-                            <p class="ml-auto d-flex flex-column text-right">
-                                <!-- <span class="text-success">
-                                        <i class="fa fa-arrow-up"></i> 12.5%
-                                    </span> -->
-                                <span class="text-muted">Since last 12 hours</span>
-                            </p>
+                        <div class="chart" id="salesAmountChart" style="height: 250px;"></div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer bg-transparent">
+                        <div class="row mb-2">
+                            <ul class="nav nav-pills ml-auto mr-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent active show" href="#salesAmountByPaymentMethod"
+                                        data-toggle="tab">決済方法</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent" href="#salesAmountByClient" data-toggle="tab">クライアント</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent" href="#salesAmountBySeller" data-toggle="tab">販売者</a>
+                                </li>
+                            </ul>
                         </div>
-                        <!-- /.d-flex -->
-
-                        <div class="position-relative mb-4">
-                            <canvas id="task-queues-chart" height="200"></canvas>
+                        <div class="tab-content p-0">
+                            <!-- Morris chart - Sales -->
+                            <div class="chart tab-pane active show" id="salesAmountByPaymentMethod">
+                                <div class="row">
+                                    <% Object.keys(PaymentMethodType).forEach(function(key) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob byPaymentMethod" data-paymentMethod="<%= PaymentMethodType[key] %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#86c0ff">
+                                        <div class="text-white">
+                                            <%= PaymentMethodType[key] %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <div class="chart tab-pane" id="salesAmountByClient">
+                                <div class="row">
+                                    <% userPoolClients.forEach(function(userPoolClient) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob byClient" data-clientId="<%= userPoolClient.ClientId %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#86c0ff">
+                                        <div class="text-white">
+                                            <%= userPoolClient.ClientName %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <div class="chart tab-pane" id="salesAmountBySeller">
+                                <div class="row">
+                                    <% sellers.forEach(function(seller) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob bySeller" data-sellerId="<%= seller.id %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#86c0ff">
+                                        <div class="text-white">
+                                            <%= seller.name.ja %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="d-flex flex-row justify-content-end">
-                            <!-- <span class="mr-2">
-                                    <i class="fa fa-square text-primary"></i> This Week
-                                </span>
-    
-                                <span>
-                                    <i class="fa fa-square text-gray"></i> Last Week
-                                </span> -->
-                        </div>
+                    </div>
+                    <!-- /.card-footer -->
+                    <div class="overlay">
+                        <i class="fa fa-refresh fa-spin"></i>
                     </div>
                 </div>
                 <!-- /.card -->
 
-                <div class="card bg-dark">
+                <!-- solid sales graph -->
+                <div class="card bg-info-gradient" id="numOrderItems">
                     <div class="card-header no-border">
-                        <div class="d-flex justify-content-between">
-                            <h3 class="card-title">売上散布図</h3>
-                            <!-- <a href="javascript:void(0);">View Report</a> -->
+                        <h3 class="card-title">
+                            <i class="fa fa-th mr-1"></i>
+                            注文アイテム数
+                        </h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-info btn-sm daterange" data-toggle="tooltip" title="Date range">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                            <button type="button" class="btn bg-info btn-sm" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn bg-info btn-sm" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex">
-                            <p class="d-flex flex-column">
-                                <span class="text-bold text-lg">???</span>
-                                <span>売上</span>
-                            </p>
-                            <p class="ml-auto d-flex flex-column text-right">
-                                <!-- <span class="text-success">
-                                            <i class="fa fa-arrow-up"></i> 12.5%
-                                        </span> -->
-                                <span class="text-muted">Since last 24 hours</span>
-                            </p>
+                        <div class="chart" id="numOrderItemsChart" style="height: 250px;"></div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer bg-transparent">
+                        <div class="row mb-2">
+                            <ul class="nav nav-pills ml-auto mr-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent active show" href="#numOrderItemsByPaymentMethod"
+                                        data-toggle="tab">決済方法</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent" href="#numOrderItemsByClient" data-toggle="tab">クライアント</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link bg-transparent" href="#numOrderItemsBySeller" data-toggle="tab">販売者</a>
+                                </li>
+                            </ul>
                         </div>
-                        <!-- /.d-flex -->
-
-                        <div class="position-relative mb-4">
-                            <canvas id="sales-amount-chart" height="200"></canvas>
-                        </div>
-
-                        <div class="d-flex flex-row justify-content-end">
-                            <!-- <span class="mr-2">
-                                        <i class="fa fa-square text-primary"></i> This Week
-                                    </span>
-        
-                                    <span>
-                                        <i class="fa fa-square text-gray"></i> Last Week
-                                    </span> -->
+                        <div class="tab-content p-0">
+                            <!-- Morris chart - Sales -->
+                            <div class="chart tab-pane active show" id="numOrderItemsByPaymentMethod">
+                                <div class="row">
+                                    <% Object.keys(PaymentMethodType).forEach(function(key) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob byPaymentMethod" data-paymentMethod="<%= PaymentMethodType[key] %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#39CCCC">
+                                        <div class="text-white">
+                                            <%= PaymentMethodType[key] %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                                <!-- /.row -->
+                            </div>
+                            <div class="chart tab-pane" id="numOrderItemsByClient">
+                                <div class="row">
+                                    <% userPoolClients.forEach(function(userPoolClient) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob byClient" data-clientId="<%= userPoolClient.ClientId %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#39CCCC">
+                                        <div class="text-white">
+                                            <%= userPoolClient.ClientName %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                                <!-- /.row -->
+                            </div>
+                            <div class="chart tab-pane" id="numOrderItemsBySeller">
+                                <div class="row">
+                                    <% sellers.forEach(function(seller) { %>
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="knob bySeller" data-sellerId="<%= seller.id %>"
+                                            data-readonly="true" value="0" data-width="60" data-height="60"
+                                            data-fgColor="#39CCCC">
+                                        <div class="text-white">
+                                            <%= seller.name.ja %>
+                                        </div>
+                                    </div>
+                                    <!-- ./col -->
+                                    <% }) %>
+                                </div>
+                                <!-- /.row -->
+                            </div>
                         </div>
                     </div>
+                    <!-- /.card-footer -->
+                    <div class="overlay">
+                        <i class="fa fa-refresh fa-spin"></i>
+                    </div>
+                </div>
+                <!-- /.card -->
+
+                <!-- Calendar -->
+                <div class="card bg-success-gradient">
+                    <div class="card-header no-border">
+
+                        <h3 class="card-title">
+                            <i class="fa fa-calendar"></i>
+                            Calendar
+                        </h3>
+                        <!-- tools card -->
+                        <div class="card-tools">
+                            <!-- button with a dropdown -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-bars"></i></button>
+                                <div class="dropdown-menu float-right" role="menu">
+                                    <a href="#" class="dropdown-item">Add new event</a>
+                                    <a href="#" class="dropdown-item">Clear events</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="#" class="dropdown-item">View calendar</a>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <!-- /. tools -->
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                        <!--The calendar -->
+                        <div id="calendar" style="width: 100%"></div>
+                    </div>
+                    <!-- /.card-body -->
                 </div>
                 <!-- /.card -->
             </section>
             <!-- right col -->
         </div>
         <!-- /.row (main row) -->
-    </div>
-    <!-- /.container-fluid -->
-</div>
-<!-- /.content-header -->
+
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
 
 <!-- ChartJS 1.0.1 -->
 <script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
 <script src="/js/dashboard.js"></script>
-<!-- page script -->
-<script>
-    $(function () {
-        var movieTheaters = JSON.parse('<%- JSON.stringify(movieTheaters) %>');
-        var orders = JSON.parse('<%- JSON.stringify(orders) %>');
-        var globalTelemetries = JSON.parse('<%- JSON.stringify(globalTelemetries) %>');
-        var sellerTelemetries = JSON.parse('<%- JSON.stringify(sellerTelemetries) %>');
-        var globalFlowTelemetries = JSON.parse('<%- JSON.stringify(globalFlowTelemetries) %>');
-        var sellerFlowTelemetries = JSON.parse('<%- JSON.stringify(sellerFlowTelemetries) %>');
-
-        var ticksStyle = {
-            fontColor: '#495057',
-            fontStyle: 'bold'
-        }
-
-        var mode = 'index';
-        var intersect = true;
-
-        // タスクキューチャート
-        var data = globalTelemetries.map(function (telemetry, index) {
-            return {
-                x: telemetry.result.measuredAt,
-                y: telemetry.result.tasks.numberOfUnexecuted
-            };
-        });
-        var taskQueuesChart = new Chart($('#task-queues-chart'), {
-            type: 'line',
-            data: {
-                // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
-                datasets: [
-                    {
-                        data: data,
-                        backgroundColor: 'transparent',
-                        borderColor: '#DAA8F5',
-                        borderWidth: 1,
-                        pointRadius: 2,
-                        pointBorderColor: '#DAA8F5',
-                        pointBackgroundColor: '#DAA8F5',
-                        fill: false
-                    },
-                ]
-            },
-            options: {
-                pointDot: true,
-                maintainAspectRatio: false,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        gridLines: {
-                            display: true,
-                            lineWidth: 1,
-                            color: '#555c62',
-                            zeroLineColor: '#555c62',
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: '#a1a6a9'
-                        }
-                    }],
-                    xAxes: [{
-                        time: {
-                            unit: 'hour'
-                        },
-                        type: 'time',
-                        display: true,
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            fontColor: '#a1a6a9'
-                        }
-                    }]
-                }
-            }
-        });
-
-        // 売上散布チャート
-        var data = orders.map(function (order, index) {
-            return {
-                x: moment().format('YYYY-MM-DDT') + moment(order.orderDate).format('hh:mm:ssZ'),
-                y: order.price
-            };
-        });
-        var taskQueuesChart = new Chart($('#sales-amount-chart'), {
-            type: 'scatter',
-            data: {
-                // labels: ['12時間前', '9時間前', '6時間前', '3時間前', '0時間前'],
-                datasets: [
-                    {
-                        data: data,
-                        backgroundColor: 'transparent',
-                        borderColor: '#DAA8F5',
-                        borderWidth: 1,
-                        pointRadius: 2,
-                        pointBorderColor: '#DAA8F5',
-                        pointBackgroundColor: '#DAA8F5',
-                        fill: false
-                    },
-                ]
-            },
-            options: {
-                pointDot: true,
-                maintainAspectRatio: false,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        gridLines: {
-                            display: true,
-                            lineWidth: 1,
-                            color: '#555c62',
-                            zeroLineColor: '#555c62',
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: '#a1a6a9'
-                        }
-                    }],
-                    xAxes: [{
-                        type: 'time',
-                        time: {
-                            unit: 'hour',
-                            stepSize: 1
-                        },
-                        display: true,
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            fontColor: '#a1a6a9'
-                        }
-                    }]
-                }
-            }
-        });
-    });
-</script>

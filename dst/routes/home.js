@@ -15,7 +15,8 @@ const sskts = require("@motionpicture/sskts-domain");
 // import * as createDebug from 'debug';
 const express = require("express");
 const moment = require("moment");
-// const debug = createDebug('sskts-console:routes:home');
+const ssktsapi = require("../ssktsapi");
+// const debug = createDebug('cinerino-console:routes');
 const homeRouter = express.Router();
 homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -31,7 +32,7 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
         // debug('reporting telemetries measuredFrom - dateTo...', measuredFrom, dateNowByUnitTime);
         const organizationRepo = new sskts.repository.Organization(sskts.mongoose.connection);
         const telemetryRepo = new sskts.repository.Telemetry(sskts.mongoose.connection);
-        const movieTheaters = yield organizationRepo.searchMovieTheaters({});
+        const sellers = yield organizationRepo.searchMovieTheaters({});
         const globalTelemetries = yield sskts.service.report.telemetry.searchGlobalStock({
             measuredFrom: measuredFrom.toDate(),
             measuredThrough: dateNowByUnitTime.toDate()
@@ -57,12 +58,12 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
         // debug(sellerFlowTelemetries.length, 'sellerFlowTelemetries found.');
         res.render('index', {
             message: 'Welcome to SSKTS Console!',
-            orders: [],
-            movieTheaters: movieTheaters,
             globalTelemetries: globalTelemetries,
-            sellerTelemetries: [],
             globalFlowTelemetries: globalFlowTelemetries,
-            sellerFlowTelemetries: []
+            userPool: {},
+            userPoolClients: [],
+            PaymentMethodType: ssktsapi.factory.paymentMethodType,
+            sellers: sellers
         });
     }
     catch (error) {

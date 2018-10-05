@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SSKTS | Console</title>
+    <title>Cinerino | Console</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/default.css">
     <!-- Font Awesome -->
     <!-- <link rel="stylesheet" href="/node_modules/admin-lte/plugins/font-awesome/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
@@ -29,7 +30,6 @@
     <link rel="stylesheet" href="/node_modules/admin-lte/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link rel="stylesheet" href="/css/default.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -76,9 +76,8 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="/" class="brand-link">
-                <img src="/img/cinemasunshineLogo.png" alt="SSKTS Logo" class="brand-image img-circle elevation-3"
-                    style="opacity: .8">
-                <span class="brand-text font-weight-light">SSKTS Console</span>
+                <img src="/img/cinerino.png" alt="Cinerino Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">Cinerino Console</span>
             </a>
 
             <!-- Sidebar -->
@@ -104,7 +103,7 @@
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
                             <a href="/" class="nav-link">
-                                <i class="nav-icon fa fa-dashboard"></i>
+                                <i class="nav-icon fa fa-tachometer-alt"></i>
                                 <p>
                                     Dashboard
                                     <span class="badge badge-info right"></span>
@@ -114,7 +113,7 @@
                         <li class="nav-header">検索</li>
                         <li class="nav-item">
                             <a href="/organizations/movieTheater" class="nav-link">
-                                <i class="nav-icon fa fa-building"></i>
+                                <i class="nav-icon fa fa-store"></i>
                                 <p>
                                     販売者
                                     <span class="badge badge-info right"></span>
@@ -140,6 +139,24 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="/tasks" class="nav-link">
+                                <i class="nav-icon fa fa-tasks"></i>
+                                <p>
+                                    タスク
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a href="/userPools/<%= process.env.DEFAULT_COGNITO_USER_POOL_ID %>" class="nav-link">
+                                <i class="nav-icon fa fa-user"></i>
+                                <p>
+                                    ユーザープール
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li> -->
+                        <li class="nav-item">
                             <a href="/pecorino/accounts/point" class="nav-link">
                                 <i class="nav-icon fa fa-piggy-bank"></i>
                                 <p>
@@ -160,7 +177,7 @@
                         <li class="nav-header">アカウント</li>
                         <li class="nav-item">
                             <a href="<%= user.generateLogoutUrl() %>" class="nav-link">
-                                <i class="nav-icon fa fa-edit"></i>
+                                <i class="nav-icon fa fa-sign-out-alt"></i>
                                 <p>
                                     ログアウト
                                     <span class="badge badge-info right"></span>

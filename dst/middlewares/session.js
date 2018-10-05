@@ -8,7 +8,7 @@ const session = require("express-session");
 const redis_1 = require("../redis");
 const EXPIRES = parseInt(process.env.USER_EXPIRES_IN_SECONDS, 10);
 exports.default = session({
-    secret: 'sskts-console-session-secret',
+    secret: 'cinerino-console-session-secret',
     resave: false,
     rolling: true,
     saveUninitialized: false,

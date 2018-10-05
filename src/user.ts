@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 
 import * as ssktsapi from './ssktsapi';
 
-const debug = createDebug('sskts-console:user');
+const debug = createDebug('cinerino-console:user');
 
 /**
  * ユーザー設定インターフェース
