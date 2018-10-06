@@ -34,7 +34,14 @@ ordersRouter.get('',
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
+        // const userPoolService = new ssktsapi.service.UserPool({
+        //     endpoint: <string>process.env.API_ENDPOINT,
+        //     auth: req.user.authClient
+        // });
         const movieTheaters = yield organizationService.searchMovieTheaters({});
+        // const searchUserPoolClientsResult = await userPoolService.searchClients({
+        //     userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
+        // });
         const orderStatusChoices = [
             ssktsapi.factory.orderStatus.OrderDelivered,
             ssktsapi.factory.orderStatus.OrderPickupAvailable,
@@ -42,12 +49,33 @@ ordersRouter.get('',
             ssktsapi.factory.orderStatus.OrderReturned
         ];
         const searchConditions = {
-            sellerIds: (req.query.sellerIds !== undefined)
-                ? req.query.sellerIds
-                : movieTheaters.map((m) => m.id),
-            customerMembershipNumbers: (req.query.customerMembershipNumbers !== undefined && req.query.customerMembershipNumbers !== '')
-                ? req.query.customerMembershipNumbers.split(',').map((v) => v.trim())
-                : [],
+            limit: req.query.limit,
+            page: req.query.page,
+            seller: {
+                typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                ids: (req.query.seller !== undefined && req.query.seller.ids !== undefined)
+                    ? req.query.seller.ids
+                    : movieTheaters.map((m) => m.id)
+            },
+            customer: {
+                typeOf: ssktsapi.factory.personType.Person,
+                ids: (req.query.customer !== undefined && req.query.customer.ids !== undefined && req.query.customer.ids !== '')
+                    ? req.query.customer.ids.split(',').map((v) => v.trim())
+                    : [],
+                membershipNumbers: (req.query.customer !== undefined
+                    && req.query.customer.membershipNumbers !== undefined
+                    && req.query.customer.membershipNumbers !== '')
+                    ? req.query.customer.membershipNumbers.split(',').map((v) => v.trim())
+                    : [],
+                identifiers: (req.query.customer !== undefined && Array.isArray(req.query.customer.userPoolClients))
+                    ? req.query.customer.userPoolClients.map((userPoolClient) => {
+                        return {
+                            name: 'clientId',
+                            value: userPoolClient
+                        };
+                    })
+                    : []
+            },
             orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
                 ? req.query.orderNumbers.split(',').map((v) => v.trim())
                 : [],
@@ -56,7 +84,7 @@ ordersRouter.get('',
                 : orderStatusChoices,
             orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
-                : moment().add(-1, 'day').toDate(),
+                : moment().add(-1, 'month').toDate(),
             orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
                 : moment().add(1, 'day').toDate(),
@@ -65,20 +93,19 @@ ordersRouter.get('',
                 : []
         };
         if (req.query.format === 'datatable') {
-            debug('searching orders...', searchConditions);
-            const orders = yield orderService.search(searchConditions);
-            debug(orders.length, 'orders found.');
+            const searchOrdersResult = yield orderService.search(searchConditions);
             res.json({
                 draw: req.query.draw,
-                recordsTotal: orders.length,
-                recordsFiltered: orders.length,
-                data: orders
+                recordsTotal: searchOrdersResult.totalCount,
+                recordsFiltered: searchOrdersResult.totalCount,
+                data: searchOrdersResult.data
             });
         }
         else {
             res.render('orders/index', {
                 moment: moment,
                 movieTheaters: movieTheaters,
+                userPoolClients: [],
                 searchConditions: searchConditions,
                 orderStatusChoices: orderStatusChoices
             });
@@ -97,12 +124,12 @@ ordersRouter.get('/:orderNumber', (req, res, next) => __awaiter(this, void 0, vo
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const orders = yield orderService.search({
+        const searchOrdersResult = yield orderService.search({
             orderNumbers: [req.params.orderNumber],
             orderDateFrom: moment('2017-04-20T00:00:00+09:00').toDate(),
             orderDateThrough: new Date()
         });
-        const order = orders.shift();
+        const order = searchOrdersResult.data.shift();
         if (order === undefined) {
             throw new ssktsapi.factory.errors.NotFound('Order');
         }

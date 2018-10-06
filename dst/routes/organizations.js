@@ -200,18 +200,19 @@ organizationsRouter.get('/movieTheater/:id/orders', (req, res, next) => __awaite
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const orders = yield orderService.search({
-            // limit: req.query.limit,
-            // page: req.query.page,
-            // sort: { orderDate: ssktsapi.factory.sortType.Descending },
-            orderDateFrom: moment().add(-1, 'week').toDate(),
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: { orderDate: ssktsapi.factory.sortType.Descending },
+            orderDateFrom: moment().add(-1, 'months').toDate(),
             orderDateThrough: new Date(),
-            sellerIds: [req.params.id]
+            seller: {
+                typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                ids: [req.params.id]
+            }
         });
-        res.json({
-            totalCount: orders.length,
-            data: orders
-        });
+        debug(searchOrdersResult.totalCount, 'orders found.');
+        res.json(searchOrdersResult);
     }
     catch (error) {
         next(error);

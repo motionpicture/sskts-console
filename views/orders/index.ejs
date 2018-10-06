@@ -43,15 +43,35 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="customerMembershipNumbers">購入者会員番号</label>
-                                        <input type="text" class="form-control" id="customerMembershipNumbers" name="customerMembershipNumbers"
-                                            placeholder="購入者会員番号" value="<%= searchConditions.customerMembershipNumbers.join(',') %>">
+                                        <label for="customer[membershipNumbers]">購入者会員番号</label>
+                                        <input type="text" class="form-control" id="customer[membershipNumbers]" name="customer[membershipNumbers]"
+                                            placeholder="購入者会員番号" value="<%= searchConditions.customer.membershipNumbers.join(',') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customer[ids]">購入者ID</label>
+                                        <input type="text" class="form-control" id="customer[ids]" name="customer[ids]"
+                                            placeholder="購入者ID" value="<%= searchConditions.customer.ids.join(',') %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>購入クライアント</label>
+                                        <select multiple class="form-control" name="customer[userPoolClients][]">
+                                            <% userPoolClients.forEach(function (userPoolClient) { %>
+                                            <% 
+                                            var selected = searchConditions.customer.identifiers.filter((identifier)=>identifier.name==='clientId'&& identifier.value===userPoolClient.ClientId).length > 0;
+                                            %>
+                                            <option value="<%= userPoolClient.ClientId %>" <% if (selected) { %>
+                                                selected
+                                                <% } %>>
+                                                <%= userPoolClient.ClientName %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>販売者</label>
-                                        <select multiple class="form-control" name="sellerIds[]">
+                                        <select multiple class="form-control" name="seller[ids][]">
                                             <% movieTheaters.forEach(function (movieTheater) { %>
-                                            <% var selected = searchConditions.sellerIds.indexOf( movieTheater.id) >= 0; %>
+                                            <% var selected = searchConditions.seller.ids.indexOf( movieTheater.id) >= 0; %>
                                             <option value="<%= movieTheater.id %>" <% if (selected) { %> selected
                                                 <% } %>>
                                                 <%= movieTheater.name.ja %>

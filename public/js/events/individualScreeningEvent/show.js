@@ -48,8 +48,7 @@ function searchOrders(cb) {
         { limit: limit, page: page }
     ).done(function (data) {
         $('#orderCount').html(data.totalCount.toString());
-        // searchedAllOrders = (data.data.length < limit);
-        // orders.push(...data.data);
+        searchedAllOrders = (data.data.length < limit);
         data.data.forEach(function (order) {
             orders.push(order);
             $('<tr>').html(
@@ -59,11 +58,11 @@ function searchOrders(cb) {
                 + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo("#orders tbody");
         });
-        // if (!searchedAllOrders) {
-        //     searchOrders(cb);
-        // } else {
-        cb();
-        // }
+        if (!searchedAllOrders) {
+            searchOrders(cb);
+        } else {
+            cb();
+        }
     }).fail(function () {
         console.error('注文履歴を取得できませんでした')
     });

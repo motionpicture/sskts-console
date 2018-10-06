@@ -24,14 +24,14 @@ dashboardRouter.get('/countNewOrder', (req, res, next) => __awaiter(this, void 0
             auth: req.user.authClient
         });
         const searchConditions = {
-            // limit: 1,
-            // page: 1,
+            limit: 1,
+            page: 1,
             orderDateFrom: moment().add(-1, 'day').toDate(),
             orderDateThrough: moment().toDate()
         };
-        const orders = yield orderService.search(searchConditions);
+        const searchResult = yield orderService.search(searchConditions);
         res.json({
-            totalCount: orders.length
+            totalCount: searchResult.totalCount
         });
     }
     catch (error) {
@@ -70,17 +70,18 @@ dashboardRouter.get('/countNewTransaction', (_, res, next) => __awaiter(this, vo
 }));
 dashboardRouter.get('/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // 直近の実売上データを
         const orderService = new ssktsapi.service.Order({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const orders = yield orderService.search({
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: (req.query.sort !== undefined) ? req.query.sort : { orderDate: ssktsapi.factory.sortType.Descending },
             // tslint:disable-next-line:no-magic-numbers
-            orderDateFrom: moment().add(-1, 'hour').toDate(),
-            orderDateThrough: moment().toDate()
+            orderDateFrom: moment(req.query.orderDateFrom).toDate(),
+            orderDateThrough: moment(req.query.orderDateThrough).toDate()
         });
-        const searchOrdersResult = { totalCount: orders.length, data: orders };
         res.json(searchOrdersResult);
     }
     catch (error) {

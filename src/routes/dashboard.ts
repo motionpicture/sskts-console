@@ -18,14 +18,14 @@ dashboardRouter.get(
                 auth: req.user.authClient
             });
             const searchConditions: ssktsapi.factory.order.ISearchConditions = {
-                // limit: 1,
-                // page: 1,
+                limit: 1,
+                page: 1,
                 orderDateFrom: moment().add(-1, 'day').toDate(),
                 orderDateThrough: moment().toDate()
             };
-            const orders = await orderService.search(searchConditions);
+            const searchResult = await orderService.search(searchConditions);
             res.json({
-                totalCount: orders.length
+                totalCount: searchResult.totalCount
             });
         } catch (error) {
             next(error);
@@ -72,17 +72,18 @@ dashboardRouter.get(
     '/orders',
     async (req, res, next) => {
         try {
-            // 直近の実売上データを
             const orderService = new ssktsapi.service.Order({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const orders = await orderService.search({
+            const searchOrdersResult = await orderService.search({
+                limit: req.query.limit,
+                page: req.query.page,
+                sort: (req.query.sort !== undefined) ? req.query.sort : { orderDate: ssktsapi.factory.sortType.Descending },
                 // tslint:disable-next-line:no-magic-numbers
-                orderDateFrom: moment().add(-1, 'hour').toDate(),
-                orderDateThrough: moment().toDate()
+                orderDateFrom: moment(req.query.orderDateFrom).toDate(),
+                orderDateThrough: moment(req.query.orderDateThrough).toDate()
             });
-            const searchOrdersResult = { totalCount: orders.length, data: orders };
             res.json(searchOrdersResult);
         } catch (error) {
             next(error);

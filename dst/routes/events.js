@@ -126,16 +126,16 @@ eventsRouter.get('/individualScreeningEvent/:identifier/orders', (req, res, next
         });
         debug('searching orders by event...');
         const reservationStartDate = moment(`${event.coaInfo.rsvStartDate} 00:00:00+09:00`, 'YYYYMMDD HH:mm:ssZ').toDate();
-        const orders = yield orderService.search({
-            // orderNumbers: (transactions.length > 0)
-            //     ? transactions.map((t) => (<ssktsapi.factory.transaction.placeOrder.IResult>t.result).order.orderNumber)
-            //     : [''],
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: { orderDate: ssktsapi.factory.sortType.Ascending },
             orderDateFrom: reservationStartDate,
             orderDateThrough: new Date(),
             reservedEventIdentifiers: [event.identifier]
         });
-        debug(orders.length, 'orders found.');
-        res.json({ totalCount: orders.length, data: orders });
+        debug(searchOrdersResult.totalCount, 'orders found.');
+        res.json(searchOrdersResult);
     }
     catch (error) {
         next(error);
