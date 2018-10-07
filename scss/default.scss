@@ -62,3 +62,14 @@
 .badge.Mocoin {
     @extend .badge-secondary;
 }
+
+.badge.Point {
+    @extend .badge-primary;
+}
+
+.badge.Opened {
+    @extend .badge-success;
+}
+.badge.Closed {
+    @extend .badge-danger;
+}

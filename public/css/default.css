@@ -3343,10 +3343,10 @@ input[type="button"].btn-block {
   padding-left: 0.6em;
   border-radius: 10rem; }
 
-.badge-primary, .badge.InProgress, .badge.Running, .badge.ActiveActionStatus, .badge.CreditCard {
+.badge-primary, .badge.InProgress, .badge.Running, .badge.ActiveActionStatus, .badge.CreditCard, .badge.Point {
   color: #fff;
   background-color: #007bff; }
-  .badge-primary[href]:hover, .badge.InProgress[href]:hover, .badge.Running[href]:hover, .badge.ActiveActionStatus[href]:hover, .badge.CreditCard[href]:hover, .badge-primary[href]:focus, .badge.InProgress[href]:focus, .badge.Running[href]:focus, .badge.ActiveActionStatus[href]:focus, .badge.CreditCard[href]:focus {
+  .badge-primary[href]:hover, .badge.InProgress[href]:hover, .badge.Running[href]:hover, .badge.ActiveActionStatus[href]:hover, .badge.CreditCard[href]:hover, .badge.Point[href]:hover, .badge-primary[href]:focus, .badge.InProgress[href]:focus, .badge.Running[href]:focus, .badge.ActiveActionStatus[href]:focus, .badge.CreditCard[href]:focus, .badge.Point[href]:focus {
     color: #fff;
     text-decoration: none;
     background-color: #0062cc; }
@@ -3359,10 +3359,10 @@ input[type="button"].btn-block {
     text-decoration: none;
     background-color: #545b62; }
 
-.badge-success, .badge.OrderDelivered, .badge.Confirmed, .badge.Executed, .badge.CompletedActionStatus, .badge.Account {
+.badge-success, .badge.OrderDelivered, .badge.Confirmed, .badge.Executed, .badge.CompletedActionStatus, .badge.Account, .badge.Opened {
   color: #fff;
   background-color: #28a745; }
-  .badge-success[href]:hover, .badge.OrderDelivered[href]:hover, .badge.Confirmed[href]:hover, .badge.Executed[href]:hover, .badge.CompletedActionStatus[href]:hover, .badge.Account[href]:hover, .badge-success[href]:focus, .badge.OrderDelivered[href]:focus, .badge.Confirmed[href]:focus, .badge.Executed[href]:focus, .badge.CompletedActionStatus[href]:focus, .badge.Account[href]:focus {
+  .badge-success[href]:hover, .badge.OrderDelivered[href]:hover, .badge.Confirmed[href]:hover, .badge.Executed[href]:hover, .badge.CompletedActionStatus[href]:hover, .badge.Account[href]:hover, .badge.Opened[href]:hover, .badge-success[href]:focus, .badge.OrderDelivered[href]:focus, .badge.Confirmed[href]:focus, .badge.Executed[href]:focus, .badge.CompletedActionStatus[href]:focus, .badge.Account[href]:focus, .badge.Opened[href]:focus {
     color: #fff;
     text-decoration: none;
     background-color: #1e7e34; }
@@ -3383,10 +3383,10 @@ input[type="button"].btn-block {
     text-decoration: none;
     background-color: #d39e00; }
 
-.badge-danger, .badge.OrderReturned, .badge.Expired, .badge.Aborted, .badge.FailedActionStatus {
+.badge-danger, .badge.OrderReturned, .badge.Expired, .badge.Aborted, .badge.FailedActionStatus, .badge.Closed {
   color: #fff;
   background-color: #dc3545; }
-  .badge-danger[href]:hover, .badge.OrderReturned[href]:hover, .badge.Expired[href]:hover, .badge.Aborted[href]:hover, .badge.FailedActionStatus[href]:hover, .badge-danger[href]:focus, .badge.OrderReturned[href]:focus, .badge.Expired[href]:focus, .badge.Aborted[href]:focus, .badge.FailedActionStatus[href]:focus {
+  .badge-danger[href]:hover, .badge.OrderReturned[href]:hover, .badge.Expired[href]:hover, .badge.Aborted[href]:hover, .badge.FailedActionStatus[href]:hover, .badge.Closed[href]:hover, .badge-danger[href]:focus, .badge.OrderReturned[href]:focus, .badge.Expired[href]:focus, .badge.Aborted[href]:focus, .badge.FailedActionStatus[href]:focus, .badge.Closed[href]:focus {
     color: #fff;
     text-decoration: none;
     background-color: #bd2130; }

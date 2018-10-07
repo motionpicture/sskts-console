@@ -43,31 +43,36 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label for="id">ユーザーID</label>
+                                        <input type="text" class="form-control" id="id" name="id" placeholder="ユーザーID(前方一致)"
+                                            value="<%= searchConditions.id %>">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="username">ユーザーネーム</label>
                                         <input type="text" class="form-control" id="username" name="username"
-                                            placeholder="ユーザーネーム" value="<%= searchConditions.username %>">
+                                            placeholder="ユーザーネーム(前方一致)" value="<%= searchConditions.username %>">
                                     </div>
                                     <div class="form-group">
                                         <label for="familyName">Family Name</label>
                                         <input type="text" class="form-control" id="familyName" name="familyName"
-                                            placeholder="Family Name" value="<%= searchConditions.familyName %>">
+                                            placeholder="Family Name(前方一致)" value="<%= searchConditions.familyName %>">
                                     </div>
                                     <div class="form-group">
                                         <label for="givenName">Given Name</label>
                                         <input type="text" class="form-control" id="givenName" name="givenName"
-                                            placeholder="Given Name" value="<%= searchConditions.givenName %>">
+                                            placeholder="Given Name(前方一致)" value="<%= searchConditions.givenName %>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="email">Email</label>
-                                        <input type="text" class="form-control" id="email" name="email" placeholder="Email"
+                                        <input type="text" class="form-control" id="email" name="email" placeholder="Email(前方一致)"
                                             value="<%= searchConditions.email %>">
                                     </div>
                                     <div class="form-group">
                                         <label for="telephone">Telephone</label>
                                         <input type="text" class="form-control" id="telephone" name="telephone"
-                                            placeholder="Telephone" value="<%= searchConditions.telephone %>">
+                                            placeholder="Telephone(前方一致)" value="<%= searchConditions.telephone %>">
                                     </div>
                                 </div>
                             </div>

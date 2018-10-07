@@ -44,9 +44,14 @@ $(function () {
                             clientId = clienIdIdentifier.value;
                         }
                     }
-                    return '<ul class="list-unstyled">'
-                        + '<li>' + data.customer.id + '</li>'
-                        + '<li><span class="badge badge-info">' + data.customer.typeOf + '</span></li>'
+
+                    var html = '<ul class="list-unstyled">';
+                    if (data.customer.memberOf !== undefined) {
+                        html += '<li><a target="_blank" href="/people/' + data.customer.id + '">' + data.customer.id + '</a></li>';
+                    } else {
+                        html += '<li>' + data.customer.id + '</li>';
+                    }
+                    html += '<li><span class="badge badge-info">' + data.customer.typeOf + '</span></li>'
                         + '<li><span class="badge badge-warning">' + ((data.customer.memberOf !== undefined) ? data.customer.memberOf.membershipNumber : '') + '</span></li>'
                         + '<li>' + data.customer.name + '</li>'
                         + '<li>' + data.customer.email + '</li>'
@@ -54,13 +59,15 @@ $(function () {
                         + '<li>Issuer: <a target="_blank" href="/userPools/' + userPoolId + '">' + tokenIssuer + '</a></li>'
                         + '<li>Client: <a target="_blank" href="/userPools/' + userPoolId + '/clients/' + clientId + '">' + clientId + '</a></li>'
                         + '</ul>';
+
+                    return html;
                 }
             },
             {
                 data: null,
                 render: function (data, type, row) {
                     return '<ul class="list-unstyled">'
-                        + '<li>' + data.seller.id + '</li>'
+                        + '<li><a target="_blank" href="/organizations/' + data.seller.typeOf + '/' + data.seller.id + '">' + data.seller.id + '</a></li>'
                         + '<li><span class="badge badge-info">' + data.seller.typeOf + '</span></li>'
                         + '<li>' + data.seller.name + '</li>'
                         + '<li>' + data.seller.url + '</li>'

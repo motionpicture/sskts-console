@@ -25,6 +25,7 @@ peopleRouter.get(
             const searchConditions = {
                 // limit: req.query.limit,
                 // page: req.query.page,
+                id: (req.query.id !== undefined && req.query.id !== '') ? req.query.id : undefined,
                 username: (req.query.username !== undefined && req.query.username !== '') ? req.query.username : undefined,
                 email: (req.query.email !== undefined && req.query.email !== '') ? req.query.email : undefined,
                 telephone: (req.query.telephone !== undefined && req.query.telephone !== '') ? req.query.telephone : undefined,
@@ -55,9 +56,52 @@ peopleRouter.get(
  */
 peopleRouter.get(
     '/:id',
-    async (_, __, next) => {
+    async (req, res, next) => {
         try {
-            throw new Error('implementing...');
+            const message = '';
+            const personService = new ssktsapi.service.Person({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const person = await personService.findById({ id: req.params.id });
+            const creditCards = await personService.findCreditCards({ personId: req.params.id });
+            const pointAccounts = await personService.findAccounts({ personId: req.params.id });
+            res.render('people/show', {
+                message: message,
+                moment: moment,
+                person: person,
+                creditCards: creditCards,
+                pointAccounts: pointAccounts
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+/**
+ * 会員注文検索
+ */
+peopleRouter.get(
+    '/:id/orders',
+    async (req, res, next) => {
+        try {
+            const orderService = new ssktsapi.service.Order({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const searchOrdersResult = await orderService.search({
+                limit: req.query.limit,
+                page: req.query.page,
+                sort: { orderDate: ssktsapi.factory.sortType.Descending },
+                orderDateFrom: moment().add(-1, 'months').toDate(),
+                orderDateThrough: new Date(),
+                customer: {
+                    typeOf: ssktsapi.factory.personType.Person,
+                    ids: [req.params.id]
+                }
+            });
+            debug(searchOrdersResult.totalCount, 'orders found.');
+            res.json(searchOrdersResult);
         } catch (error) {
             next(error);
         }

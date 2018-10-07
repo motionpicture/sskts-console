@@ -11,7 +11,7 @@
   "config": {},
   "dependencies": {
     "@motionpicture/express-middleware": "^0.1.0",
-    "@motionpicture/sskts-api-nodejs-client": "^4.1.0",
+    "@motionpicture/sskts-api-nodejs-client": "^4.1.1",
     "@motionpicture/sskts-domain": "^26.1.0",
     "admin-lte": "^3.0.0-alpha.2",
     "aws-sdk": "^2.329.0",
