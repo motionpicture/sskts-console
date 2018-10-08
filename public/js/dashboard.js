@@ -440,11 +440,12 @@ function createNumPlaceOrderChart(datas) {
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
-        pointSize: 4,
+        pointSize: 0,
         pointStrokeColors: ['#fad684', '#e96c6c', '#79f67d'],
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
-        gridTextSize: 10
+        gridTextSize: 10,
+        smooth: false
     });
 }
 function createSalesAmountChart(datas) {
@@ -463,11 +464,12 @@ function createSalesAmountChart(datas) {
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
-        pointSize: 4,
+        pointSize: 0,
         pointStrokeColors: ['#efefef'],
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
-        gridTextSize: 10
+        gridTextSize: 10,
+        smooth: false
     });
 }
 function createSalesAmountByClientChart(datas) {
@@ -567,11 +569,12 @@ function createNumOrderItemsChart(datas) {
         hideHover: 'auto',
         gridTextColor: '#fff',
         gridStrokeWidth: 0.4,
-        pointSize: 4,
+        pointSize: 0,
         pointStrokeColors: ['#efefef'],
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
-        gridTextSize: 10
+        gridTextSize: 10,
+        smooth: false
     });
 }
 function createNumOrderItemsByClientChart(datas) {
@@ -666,14 +669,15 @@ function searchLatestOrders(cb) {
             orderDateThrough: moment().toISOString()
         }
     ).done(function (data) {
+        $('.latestOrders tbody').html('');
+        orders = data.data;
         $.each(data.data, function (_, order) {
-            orders.push(order);
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
                 + '<td>' + order.orderDate + '</td>'
-                + '<td>' + order.acceptedOffers.map(function (o) { 
+                + '<td>' + order.acceptedOffers.map(function (o) {
                     if (o.itemOffered.reservedTicket !== undefined) {
-                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber                         
+                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber
                     }
                     return o.itemOffered.typeOf;
                 }).join(',') + '</td>'
@@ -730,7 +734,7 @@ function countNewTransaction(cb) {
     });
 }
 function initializeVisitorsChart() {
-    var colorChoices = ['#daa8f5','#3399FF','#fad684', '#79f67d', '#79ccf5', '#e96c6c','#efefef'];
+    var colorChoices = ['#daa8f5', '#3399FF', '#fad684', '#79f67d', '#79ccf5', '#e96c6c', '#efefef'];
     waiterDatasets = waiterRules.map(function (rule) {
         return {
             scope: rule.scope,
@@ -763,7 +767,8 @@ function initializeVisitorsChart() {
         }),
         gridLineColor: '#efefef',
         gridTextFamily: 'Open Sans',
-        gridTextSize: 10
+        gridTextSize: 10,
+        smooth: false
     });
 }
 function updateWaiterChart() {

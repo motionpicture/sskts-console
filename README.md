@@ -34,6 +34,6 @@
 | `PECORINO_API_CLIENT_ID`           | true     |                    |                                    |
 | `PECORINO_API_CLIENT_SECRET`       | true     |                    |                                    |
 | `PECORINO_CONSOLE_ENDPOINT`        | true     |                    | Pecorinoコンソールエンドポイント   |
-| `COGNITO_USER_POOL_ID`             | true     |                    |                                    |
+| `DEFAULT_COGNITO_USER_POOL_ID`     | true     |                    |                                    |
 | `PROJECT_ID`                       | true     |                    |                                    |
 | `TELEMETRY_API_ENDPOINT`           | true     |                    |                                    |

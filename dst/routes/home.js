@@ -18,8 +18,21 @@ const moment = require("moment");
 const ssktsapi = require("../ssktsapi");
 // const debug = createDebug('cinerino-console:routes');
 const homeRouter = express.Router();
-homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+homeRouter.get('/', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
+        const userPoolService = new ssktsapi.service.UserPool({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const organizationService = new ssktsapi.service.Organization({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const userPool = yield userPoolService.findById({
+            userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
+        });
+        const searchUserPoolClientsResult = yield userPoolService.searchClients({ userPoolId: userPool.Id });
+        const sellers = yield organizationService.searchMovieTheaters({});
         // 集計単位数分の集計を行う
         const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
         const numberOfAggregationUnit = 720; // 集計単位数
@@ -29,10 +42,7 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
         // 基本的に、集計は別のジョブでやっておいて、この報告ジョブでは取得して表示するだけのイメージ
         // tslint:disable-next-line:no-magic-numbers
         let measuredFrom = moment(dateNowByUnitTime).add(numberOfAggregationUnit * -telemetryUnitTimeInSeconds, 'seconds');
-        // debug('reporting telemetries measuredFrom - dateTo...', measuredFrom, dateNowByUnitTime);
-        const organizationRepo = new sskts.repository.Organization(sskts.mongoose.connection);
         const telemetryRepo = new sskts.repository.Telemetry(sskts.mongoose.connection);
-        const sellers = yield organizationRepo.searchMovieTheaters({});
         const globalTelemetries = yield sskts.service.report.telemetry.searchGlobalStock({
             measuredFrom: measuredFrom.toDate(),
             measuredThrough: dateNowByUnitTime.toDate()
@@ -60,9 +70,9 @@ homeRouter.get('/', (_, res, next) => __awaiter(this, void 0, void 0, function* 
             message: 'Welcome to SSKTS Console!',
             globalTelemetries: globalTelemetries,
             globalFlowTelemetries: globalFlowTelemetries,
-            userPool: {},
-            userPoolClients: [],
-            PaymentMethodType: ssktsapi.factory.paymentMethodType,
+            userPool: userPool,
+            userPoolClients: searchUserPoolClientsResult.data,
+            PaymentMethodType: sskts.factory.paymentMethodType,
             sellers: sellers
         });
     }

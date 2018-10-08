@@ -88,7 +88,7 @@ $(function () {
                 render: function (data, type, row) {
                     return '<ul class="list-unstyled">'
                         + data.paymentMethods.map(function (payment) {
-                            return '<li><span class="badge ' + payment.paymentMethod + '">' + payment.paymentMethod + '</span></li>'
+                            return '<li><span class="badge ' + payment.typeOf + '">' + payment.typeOf + '</span></li>'
                         }).join('')
                         + '</ul>';
                 }

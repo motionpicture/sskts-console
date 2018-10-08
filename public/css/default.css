@@ -3367,10 +3367,10 @@ input[type="button"].btn-block {
     text-decoration: none;
     background-color: #1e7e34; }
 
-.badge-info {
+.badge-info, .badge.OrderProcessing {
   color: #fff;
   background-color: #17a2b8; }
-  .badge-info[href]:hover, .badge-info[href]:focus {
+  .badge-info[href]:hover, .badge.OrderProcessing[href]:hover, .badge-info[href]:focus, .badge.OrderProcessing[href]:focus {
     color: #fff;
     text-decoration: none;
     background-color: #117a8b; }

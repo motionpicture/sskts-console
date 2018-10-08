@@ -13,8 +13,22 @@ const homeRouter = express.Router();
 
 homeRouter.get(
     '/',
-    async (_, res, next) => {
+    async (req, res, next) => {
         try {
+            const userPoolService = new ssktsapi.service.UserPool({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const organizationService = new ssktsapi.service.Organization({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const userPool = await userPoolService.findById({
+                userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
+            });
+            const searchUserPoolClientsResult = await userPoolService.searchClients({ userPoolId: <string>userPool.Id });
+            const sellers = await organizationService.searchMovieTheaters({});
+
             // 集計単位数分の集計を行う
             const telemetryUnitTimeInSeconds = 60; // 集計単位時間(秒)
             const numberOfAggregationUnit = 720; // 集計単位数
@@ -25,12 +39,7 @@ homeRouter.get(
             // 基本的に、集計は別のジョブでやっておいて、この報告ジョブでは取得して表示するだけのイメージ
             // tslint:disable-next-line:no-magic-numbers
             let measuredFrom = moment(dateNowByUnitTime).add(numberOfAggregationUnit * -telemetryUnitTimeInSeconds, 'seconds');
-
-            // debug('reporting telemetries measuredFrom - dateTo...', measuredFrom, dateNowByUnitTime);
-            const organizationRepo = new sskts.repository.Organization(sskts.mongoose.connection);
             const telemetryRepo = new sskts.repository.Telemetry(sskts.mongoose.connection);
-            const sellers = await organizationRepo.searchMovieTheaters({});
-
             const globalTelemetries = await sskts.service.report.telemetry.searchGlobalStock({
                 measuredFrom: measuredFrom.toDate(),
                 measuredThrough: dateNowByUnitTime.toDate()
@@ -61,9 +70,9 @@ homeRouter.get(
                 message: 'Welcome to SSKTS Console!',
                 globalTelemetries: globalTelemetries,
                 globalFlowTelemetries: globalFlowTelemetries,
-                userPool: {},
-                userPoolClients: [],
-                PaymentMethodType: ssktsapi.factory.paymentMethodType,
+                userPool: userPool,
+                userPoolClients: searchUserPoolClientsResult.data,
+                PaymentMethodType: sskts.factory.paymentMethodType,
                 sellers: sellers
             });
         } catch (error) {

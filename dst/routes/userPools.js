@@ -11,28 +11,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * ユーザープールルーター
  */
-// import * as createDebug from 'debug';
+const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
-// import * as ssktsapi from '../ssktsapi';
-// const debug = createDebug('cinerino-console:routes');
+const ssktsapi = require("../ssktsapi");
+const debug = createDebug('cinerino-console:routes');
 const userPoolsRouter = express.Router();
 userPoolsRouter.get('/:userPoolId', 
 // tslint:disable-next-line:max-func-body-length
-(_, res, next) => __awaiter(this, void 0, void 0, function* () {
+(req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // const userPoolService = new ssktsapi.service.UserPool({
-        //     endpoint: <string>process.env.API_ENDPOINT,
-        //     auth: req.user.authClient
-        // });
-        // const userPool = await userPoolService.findById({
-        //     userPoolId: req.params.userPoolId
-        // });
-        // const searchUserPoolClientsResult = await userPoolService.searchClients({ userPoolId: req.params.userPoolId });
+        const userPoolService = new ssktsapi.service.UserPool({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const userPool = yield userPoolService.findById({
+            userPoolId: req.params.userPoolId
+        });
+        const searchUserPoolClientsResult = yield userPoolService.searchClients({ userPoolId: req.params.userPoolId });
         res.render('userPools/show', {
             moment: moment,
-            userPool: {},
-            userPoolClients: []
+            userPool: userPool,
+            userPoolClients: searchUserPoolClientsResult.data
         });
     }
     catch (error) {
@@ -42,30 +42,29 @@ userPoolsRouter.get('/:userPoolId',
 /**
  * ユーザープールの注文検索
  */
-userPoolsRouter.get('/:userPoolId/orders', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+userPoolsRouter.get('/:userPoolId/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // const orderService = new ssktsapi.service.Order({
-        //     endpoint: <string>process.env.API_ENDPOINT,
-        //     auth: req.user.authClient
-        // });
-        // const searchOrdersResult = await orderService.search({
-        //     limit: req.query.limit,
-        //     page: req.query.page,
-        //     sort: { orderDate: ssktsapi.factory.sortType.Descending },
-        //     orderDateFrom: moment().add(-1, 'months').toDate(),
-        //     orderDateThrough: new Date(),
-        //     customer: {
-        //         typeOf: ssktsapi.factory.personType.Person,
-        //         identifiers: [
-        //             {
-        //                 name: 'tokenIssuer',
-        //                 value: `https://cognito-idp.ap-northeast-1.amazonaws.com/${req.params.userPoolId}`
-        //             }
-        //         ]
-        //     }
-        // });
-        // debug(searchOrdersResult.totalCount, 'orders found.');
-        const searchOrdersResult = { totalCount: 0, data: [] };
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: { orderDate: ssktsapi.factory.sortType.Descending },
+            orderDateFrom: moment().add(-1, 'months').toDate(),
+            orderDateThrough: new Date(),
+            customer: {
+                typeOf: ssktsapi.factory.personType.Person,
+                identifiers: [
+                    {
+                        name: 'tokenIssuer',
+                        value: `https://cognito-idp.ap-northeast-1.amazonaws.com/${req.params.userPoolId}`
+                    }
+                ]
+            }
+        });
+        debug(searchOrdersResult.totalCount, 'orders found.');
         res.json(searchOrdersResult);
     }
     catch (error) {
@@ -74,19 +73,19 @@ userPoolsRouter.get('/:userPoolId/orders', (_, res, next) => __awaiter(this, voi
 }));
 userPoolsRouter.get('/:userPoolId/clients/:clientId', 
 // tslint:disable-next-line:max-func-body-length
-(_, res, next) => __awaiter(this, void 0, void 0, function* () {
+(req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // const userPoolService = new ssktsapi.service.UserPool({
-        //     endpoint: <string>process.env.API_ENDPOINT,
-        //     auth: req.user.authClient
-        // });
-        // const userPoolClient = await userPoolService.findClientById({
-        //     userPoolId: req.params.userPoolId,
-        //     clientId: req.params.clientId
-        // });
+        const userPoolService = new ssktsapi.service.UserPool({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const userPoolClient = yield userPoolService.findClientById({
+            userPoolId: req.params.userPoolId,
+            clientId: req.params.clientId
+        });
         res.render('userPools/clients/show', {
             moment: moment,
-            userPoolClient: {}
+            userPoolClient: userPoolClient
         });
     }
     catch (error) {
@@ -96,30 +95,29 @@ userPoolsRouter.get('/:userPoolId/clients/:clientId',
 /**
  * クライアントの注文検索
  */
-userPoolsRouter.get('/:userPoolId/clients/:clientId/orders', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+userPoolsRouter.get('/:userPoolId/clients/:clientId/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // const orderService = new ssktsapi.service.Order({
-        //     endpoint: <string>process.env.API_ENDPOINT,
-        //     auth: req.user.authClient
-        // });
-        // const searchOrdersResult = await orderService.search({
-        //     limit: req.query.limit,
-        //     page: req.query.page,
-        //     sort: { orderDate: ssktsapi.factory.sortType.Descending },
-        //     orderDateFrom: moment().add(-1, 'months').toDate(),
-        //     orderDateThrough: new Date(),
-        //     customer: {
-        //         typeOf: ssktsapi.factory.personType.Person,
-        //         identifiers: [
-        //             {
-        //                 name: 'clientId',
-        //                 value: req.params.clientId
-        //             }
-        //         ]
-        //     }
-        // });
-        // debug(searchOrdersResult.totalCount, 'orders found.');
-        const searchOrdersResult = { totalCount: 0, data: [] };
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: { orderDate: ssktsapi.factory.sortType.Descending },
+            orderDateFrom: moment().add(-1, 'months').toDate(),
+            orderDateThrough: new Date(),
+            customer: {
+                typeOf: ssktsapi.factory.personType.Person,
+                identifiers: [
+                    {
+                        name: 'clientId',
+                        value: req.params.clientId
+                    }
+                ]
+            }
+        });
+        debug(searchOrdersResult.totalCount, 'orders found.');
         res.json(searchOrdersResult);
     }
     catch (error) {

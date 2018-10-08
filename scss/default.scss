@@ -7,6 +7,9 @@
 .badge.OrderDelivered {
     @extend .badge-success;
 }
+.badge.OrderProcessing {
+    @extend .badge-info;
+}
 .badge.OrderReturned {
     @extend .badge-danger;
 }

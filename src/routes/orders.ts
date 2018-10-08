@@ -27,14 +27,14 @@ ordersRouter.get(
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            // const userPoolService = new ssktsapi.service.UserPool({
-            //     endpoint: <string>process.env.API_ENDPOINT,
-            //     auth: req.user.authClient
-            // });
+            const userPoolService = new ssktsapi.service.UserPool({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
             const movieTheaters = await organizationService.searchMovieTheaters({});
-            // const searchUserPoolClientsResult = await userPoolService.searchClients({
-            //     userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
-            // });
+            const searchUserPoolClientsResult = await userPoolService.searchClients({
+                userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
+            });
 
             const orderStatusChoices = [
                 ssktsapi.factory.orderStatus.OrderDelivered,
@@ -98,7 +98,7 @@ ordersRouter.get(
                 res.render('orders/index', {
                     moment: moment,
                     movieTheaters: movieTheaters,
-                    userPoolClients: [],
+                    userPoolClients: searchUserPoolClientsResult.data,
                     searchConditions: searchConditions,
                     orderStatusChoices: orderStatusChoices
                 });
