@@ -84,36 +84,51 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <strong><i class="fa fa-map-marker mr-1"></i> Location</strong>
-
                         <p class="text-muted">
                             <%= movieTheater.location.branchCode %>
                             <%= movieTheater.location.name.ja %>
                         </p>
-
                         <hr>
 
                         <strong><i class="fa fa-phone mr-1"></i> Telephone</strong>
-
                         <p class="text-muted">
                             <%= movieTheater.telephone %>
                         </p>
-
                         <hr>
 
                         <strong><i class="fa fa-link mr-1"></i> url</strong>
-
                         <p class="text-muted">
                             <a target="_blank" href="<%= movieTheater.url %>">
                                 <%= movieTheater.url %>
                             </a>
                         </p>
-
                         <hr>
 
                         <strong><i class="fa fa-shopping-cart mr-1"></i> 対応決済方法</strong>
-
                         <p class="text-muted">
-                            <%= movieTheater.paymentAccepted.map((payment)=>payment.paymentMethodType).join(', ') %>
+                            <span class="badge CreditCard">
+                                CreditCard
+                            </span>
+                            <% movieTheater.paymentAccepted.forEach((payment) => { %>
+                            <span class="badge <%= payment.paymentMethodType %>">
+                                <%= payment.paymentMethodType %>
+                            </span>
+                            <% }) %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-piggy-bank mr-1"></i> 口座</strong>
+                        <p class="text-muted">
+                            <% const pointAccounts = movieTheater.paymentAccepted.filter((p) => p.paymentMethodType === 'Pecorino') %>
+                            <% pointAccounts.forEach((account) => { %>
+                            <span class="badge Point">
+                                Point
+                            </span>
+                            <a target="_blank" href="<%= process.env.PECORINO_CONSOLE_ENDPOINT %>/accounts/Point/<%= account.accountNumber %>">
+                                <%= account.accountNumber %>
+                            </a>
+                            <br>
+                            <% }) %>
                         </p>
                     </div>
                     <!-- /.card-body -->

@@ -3343,10 +3343,10 @@ input[type="button"].btn-block {
   padding-left: 0.6em;
   border-radius: 10rem; }
 
-.badge-primary, .badge.InProgress, .badge.Running, .badge.ActiveActionStatus, .badge.CreditCard, .badge.Point {
+.badge-primary, .badge.InProgress, .badge.Running, .badge.ActiveActionStatus, .badge.CreditCard, .badge.Coin, .badge.Point {
   color: #fff;
   background-color: #007bff; }
-  .badge-primary[href]:hover, .badge.InProgress[href]:hover, .badge.Running[href]:hover, .badge.ActiveActionStatus[href]:hover, .badge.CreditCard[href]:hover, .badge.Point[href]:hover, .badge-primary[href]:focus, .badge.InProgress[href]:focus, .badge.Running[href]:focus, .badge.ActiveActionStatus[href]:focus, .badge.CreditCard[href]:focus, .badge.Point[href]:focus {
+  .badge-primary[href]:hover, .badge.InProgress[href]:hover, .badge.Running[href]:hover, .badge.ActiveActionStatus[href]:hover, .badge.CreditCard[href]:hover, .badge.Coin[href]:hover, .badge.Point[href]:hover, .badge-primary[href]:focus, .badge.InProgress[href]:focus, .badge.Running[href]:focus, .badge.ActiveActionStatus[href]:focus, .badge.CreditCard[href]:focus, .badge.Coin[href]:focus, .badge.Point[href]:focus {
     color: #fff;
     text-decoration: none;
     background-color: #0062cc; }

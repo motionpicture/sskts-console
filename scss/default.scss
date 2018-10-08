@@ -66,6 +66,9 @@
     @extend .badge-secondary;
 }
 
+.badge.Coin {
+    @extend .badge-primary;
+}
 .badge.Point {
     @extend .badge-primary;
 }
