@@ -1,6 +1,7 @@
 /**
  * 注文ルーター
  */
+import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
 import { ACCEPTED } from 'http-status';
@@ -113,6 +114,7 @@ ordersRouter.get(
  */
 ordersRouter.get(
     '/:orderNumber',
+    // tslint:disable-next-line:max-func-body-length
     async (req, res, next) => {
         try {
             const orderService = new ssktsapi.service.Order({
@@ -129,10 +131,111 @@ ordersRouter.get(
                 throw new ssktsapi.factory.errors.NotFound('Order');
             }
 
+            // 注文取引を検索
+            const actionRepo = new sskts.repository.Action(sskts.mongoose.connection);
+            let actionsOnOrder = await actionRepo.findByOrderNumber(order.orderNumber);
+            // startDateでソート
+            actionsOnOrder = actionsOnOrder.sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf());
+
+            // tslint:disable-next-line:cyclomatic-complexity
+            const timelines = actionsOnOrder.map((a) => {
+                let agent: any;
+                if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
+                    const url = (a.agent.memberOf !== undefined)
+                        ? `/people/${a.agent.id}`
+                        : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${a.agent.id}`;
+                    agent = {
+                        id: a.agent.id,
+                        name: order.customer.name,
+                        url: url
+                    };
+                } else if (a.agent.typeOf === ssktsapi.factory.organizationType.MovieTheater) {
+                    agent = {
+                        id: a.agent.id,
+                        name: order.seller.name,
+                        url: `/organizations/movieTheater/${a.agent.id}`
+                    };
+                }
+
+                let actionName: string;
+                switch (a.typeOf) {
+                    case ssktsapi.factory.actionType.OrderAction:
+                        actionName = '注文';
+                        break;
+                    case ssktsapi.factory.actionType.GiveAction:
+                        actionName = '付与';
+                        break;
+                    case ssktsapi.factory.actionType.SendAction:
+                        if (a.object.typeOf === 'Order') {
+                            actionName = '配送';
+                        } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                            actionName = '送信';
+                        } else {
+                            actionName = '送信';
+                        }
+                        break;
+                    case ssktsapi.factory.actionType.PayAction:
+                        actionName = '支払';
+                        break;
+                    case ssktsapi.factory.actionType.ReturnAction:
+                        if (a.object.typeOf === 'Order') {
+                            actionName = '返品';
+                        } else {
+                            actionName = '返却';
+                        }
+                        break;
+                    case ssktsapi.factory.actionType.RefundAction:
+                        actionName = '返金';
+                        break;
+                    default:
+                        actionName = a.typeOf;
+                }
+
+                let object: string;
+                switch (a.object.typeOf) {
+                    case 'Order':
+                        object = '注文';
+                        break;
+                    case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
+                        object = 'ポイント';
+                        break;
+                    case ssktsapi.factory.actionType.SendAction:
+                        if (a.object.typeOf === 'Order') {
+                            object = '配送';
+                        } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                            object = '送信';
+                        } else {
+                            object = '送信';
+                        }
+                        break;
+                    case ssktsapi.factory.creativeWorkType.EmailMessage:
+                        object = 'Eメール';
+                        break;
+                    case 'PaymentMethod':
+                        object = a.object.paymentMethod.typeOf;
+                        break;
+                    case ssktsapi.factory.actionType.PayAction:
+                        object = a.object.object.paymentMethod.typeOf;
+                        break;
+                    default:
+                        object = a.object.typeOf;
+                }
+
+                return {
+                    action: a,
+                    agent,
+                    actionName,
+                    object,
+                    startDate: a.startDate,
+                    actionStatus: a.actionStatus,
+                    result: a.result
+                };
+            });
+
             res.render('orders/show', {
                 moment: moment,
                 order: order,
-                timelines: [],
+                timelines: timelines,
                 ActionStatusType: ssktsapi.factory.actionStatusType
             });
         } catch (error) {
@@ -145,21 +248,37 @@ ordersRouter.get(
  */
 ordersRouter.post(
     '/:orderNumber/return',
-    async (_, res, next) => {
+    async (req, res, next) => {
         try {
-            // const returnOrderService = new ssktsapi.service.transaction.ReturnOrder({
-            //     endpoint: <string>process.env.API_ENDPOINT,
-            //     auth: req.user.authClient
-            // });
-            // const returnOrderTransaction = await returnOrderService.start({
-            //     expires: moment().add(1, 'minutes').toDate(),
-            //     object: {
-            //         order: {
-            //             orderNumber: req.params.orderNumber
-            //         }
-            //     }
-            // });
-            // await returnOrderService.confirm({ transactionId: returnOrderTransaction.id });
+            // 注文取引を検索
+            const transactionRepo = new sskts.repository.Transaction(sskts.mongoose.connection);
+            const transaction = await transactionRepo.transactionModel.findOne({
+                'result.order.orderNumber': {
+                    $exists: true,
+                    $eq: req.params.orderNumber
+                }
+            }).exec().then((doc) => {
+                if (doc === null) {
+                    throw new ssktsapi.factory.errors.NotFound('Transaction');
+                }
+
+                return doc.toObject();
+            });
+
+            const returnOrderService = new ssktsapi.service.transaction.ReturnOrder({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const returnOrderTransaction = await returnOrderService.start({
+                expires: moment().add(1, 'minutes').toDate(),
+                transactionId: transaction.id
+                // object: {
+                //     order: {
+                //         orderNumber: req.params.orderNumber
+                //     }
+                // }
+            });
+            await returnOrderService.confirm({ transactionId: returnOrderTransaction.id });
             res.status(ACCEPTED).end();
         } catch (error) {
             next(error);
