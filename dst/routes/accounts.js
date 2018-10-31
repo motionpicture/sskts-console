@@ -3,10 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 口座ルーター
  */
-// import * as ssktsapi from '@motionpicture/sskts-api-nodejs-client';
 // import * as createDebug from 'debug';
 const express = require("express");
-// const debug = createDebug('sskts-console:routes:account');
+// const debug = createDebug('cinerino-console:routes:account');
 const accountsRouter = express.Router();
 /**
  * 口座検索

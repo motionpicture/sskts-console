@@ -18,6 +18,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.1.0 - 2018-10-31
+
+### Added
+
+- 入場制限コンテンツを追加。
+
+### Changed
+
+- ダッシュボードを調整。
+- 注文検索結果を調整。
+- 入場制限コンテンツを追加。
+
 ## v1.0.0 - 2018-09-27
 
 ### Added

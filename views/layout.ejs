@@ -4,11 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SSKTS | Console</title>
+    <title>Cinerino | Console</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/default.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="/node_modules/admin-lte/plugins/font-awesome/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="/node_modules/admin-lte/plugins/font-awesome/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+        crossorigin="anonymous">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Theme style -->
@@ -27,7 +30,6 @@
     <link rel="stylesheet" href="/node_modules/admin-lte/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link rel="stylesheet" href="/css/default.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -74,8 +76,8 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="/" class="brand-link">
-                <img src="/img/cinemasunshineLogo.png" alt="SSKTS Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">SSKTS Console</span>
+                <img src="/img/cinerino.png" alt="Cinerino Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">Cinerino Console</span>
             </a>
 
             <!-- Sidebar -->
@@ -83,12 +85,13 @@
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="https://motionpicture.jp/images/common/logo_01.svg" class="img-circle elevation-2" alt="User Image">
+                        <img src="https://motionpicture.jp/images/common/logo_01.svg" class="img-circle elevation-2"
+                            alt="User Image">
                     </div>
                     <div class="info">
                         <a href="#" class="d-block">
                             <%= user.profile.given_name %>
-                                <%= user.profile.family_name %>
+                            <%= user.profile.family_name %>
                         </a>
                     </div>
                 </div>
@@ -100,7 +103,7 @@
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
                             <a href="/" class="nav-link">
-                                <i class="nav-icon fa fa-dashboard"></i>
+                                <i class="nav-icon fa fa-tachometer-alt"></i>
                                 <p>
                                     Dashboard
                                     <span class="badge badge-info right"></span>
@@ -110,16 +113,16 @@
                         <li class="nav-header">検索</li>
                         <li class="nav-item">
                             <a href="/organizations/movieTheater" class="nav-link">
-                                <i class="nav-icon fa fa-table"></i>
+                                <i class="nav-icon fa fa-store"></i>
                                 <p>
-                                    劇場
+                                    販売者
                                     <span class="badge badge-info right"></span>
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="/events/individualScreeningEvent" class="nav-link">
-                                <i class="nav-icon fa fa-table"></i>
+                                <i class="nav-icon fa fa-film"></i>
                                 <p>
                                     上映イベント
                                     <span class="badge badge-info right"></span>
@@ -128,9 +131,54 @@
                         </li>
                         <li class="nav-item">
                             <a href="/orders" class="nav-link">
-                                <i class="nav-icon fa fa-table"></i>
+                                <i class="nav-icon fa fa-shopping-cart"></i>
                                 <p>
                                     注文
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/people" class="nav-link">
+                                <i class="nav-icon fa fa-user"></i>
+                                <p>
+                                    会員
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/tasks" class="nav-link">
+                                <i class="nav-icon fa fa-tasks"></i>
+                                <p>
+                                    タスク
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/userPools/<%= process.env.DEFAULT_COGNITO_USER_POOL_ID %>" class="nav-link">
+                                <i class="nav-icon fa fa-users"></i>
+                                <p>
+                                    ユーザープール
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/pecorino/accounts/point" class="nav-link">
+                                <i class="nav-icon fa fa-piggy-bank"></i>
+                                <p>
+                                    ポイント口座
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/waiter/rules" class="nav-link">
+                                <i class="nav-icon fa fa-passport"></i>
+                                <p>
+                                    入場制限規則
                                     <span class="badge badge-info right"></span>
                                 </p>
                             </a>
@@ -138,7 +186,7 @@
                         <li class="nav-header">アカウント</li>
                         <li class="nav-item">
                             <a href="<%= user.generateLogoutUrl() %>" class="nav-link">
-                                <i class="nav-icon fa fa-edit"></i>
+                                <i class="nav-icon fa fa-sign-out-alt"></i>
                                 <p>
                                     ログアウト
                                     <span class="badge badge-info right"></span>
@@ -208,7 +256,7 @@
     <!-- AdminLTE App -->
     <script src="/node_modules/admin-lte/dist/js/adminlte.js"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="/node_modules/admin-lte/dist/js/pages/dashboard.js"></script>
+    <!-- <script src="/node_modules/admin-lte/dist/js/pages/dashboard.js"></script> -->
     <!-- AdminLTE for demo purposes -->
     <script src="/node_modules/admin-lte/dist/js/demo.js"></script>
     <!-- DataTables -->

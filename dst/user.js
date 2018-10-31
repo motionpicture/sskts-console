@@ -8,10 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const createDebug = require("debug");
 const jwt = require("jsonwebtoken");
-const debug = createDebug('sskts-console:user');
+const ssktsapi = require("./ssktsapi");
+const debug = createDebug('cinerino-console:user');
 /**
  * リクエストユーザー
  */

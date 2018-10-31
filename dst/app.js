@@ -15,13 +15,13 @@ const errorHandler_1 = require("./middlewares/errorHandler");
 const notFoundHandler_1 = require("./middlewares/notFoundHandler");
 const session_1 = require("./middlewares/session");
 const mongooseConnectionOptions_1 = require("./mongooseConnectionOptions");
-const debug = createDebug('sskts-console:*');
+const debug = createDebug('cinerino-console:*');
 const app = express();
 app.use(middlewares.basicAuth({
     name: process.env.BASIC_AUTH_NAME,
     pass: process.env.BASIC_AUTH_PASS
     // unauthorizedHandler: (__, res, next) => {
-    //     res.setHeader('WWW-Authenticate', 'Basic realm="sskts-api Authentication"');
+    //     res.setHeader('WWW-Authenticate', 'Basic realm="cinerino-console Authentication"');
     //     next(new Error());
     // }
 }));

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 認証ルーター
- * @ignore
  */
 const express = require("express");
 // import * as request from 'request-promise-native';

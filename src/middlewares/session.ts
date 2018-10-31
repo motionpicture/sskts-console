@@ -8,7 +8,7 @@ import redisClient from '../redis';
 
 const EXPIRES = parseInt(<string>process.env.USER_EXPIRES_IN_SECONDS, 10);
 export default session({
-    secret: 'sskts-console-session-secret',
+    secret: 'cinerino-console-session-secret',
     resave: false,
     rolling: true,
     saveUninitialized: false,

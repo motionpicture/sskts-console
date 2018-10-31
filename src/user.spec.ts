@@ -1,10 +1,7 @@
 // tslint:disable:no-implicit-dependencies
-
 /**
  * ユーザーテスト
- * @ignore
  */
-
 // import * as assert from 'assert';
 import * as sinon from 'sinon';
 

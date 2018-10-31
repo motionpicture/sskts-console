@@ -25,10 +25,10 @@
         <div class="row">
             <div class="col-12">
                 <!-- <div class="callout callout-info">
-                    <h5>
-                        <i class="fa fa-info"></i> Note:</h5>
-                    This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
-                </div> -->
+                        <h5>
+                            <i class="fa fa-info"></i> Note:</h5>
+                        This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
+                    </div> -->
 
 
                 <!-- Main content -->
@@ -39,9 +39,9 @@
                             <h4>
                                 <i class="fa fa-film"></i>
                                 <%= order.seller.name %>
-                                    <small class="float-right">Date:
-                                        <%= moment(order.orderDate).format('D/M/YYYY') %>
-                                    </small>
+                                <small class="float-right">Date:
+                                    <%= moment(order.orderDate).format('D/M/YYYY') %>
+                                </small>
                             </h4>
                         </div>
                         <!-- /.col -->
@@ -56,10 +56,10 @@
                                 </strong>
                                 <br> Phone:
                                 <%= order.seller.telephone %>
-                                    <br> Email:
-                                    <%= order.seller.email %>
-                                        <br> Url:
-                                        <%= order.seller.url %>
+                                <br> Email:
+                                <%= order.seller.email %>
+                                <br> Url:
+                                <%= order.seller.url %>
                             </address>
                         </div>
                         <!-- /.col -->
@@ -68,31 +68,31 @@
                             <address>
                                 <strong>
                                     <%= order.customer.givenName %>
-                                        <%= order.customer.familyName %>
+                                    <%= order.customer.familyName %>
                                 </strong>
                                 <br> Phone:
                                 <%= order.customer.telephone %>
-                                    <br> Email:
-                                    <%= order.customer.email %>
+                                <br> Email:
+                                <%= order.customer.email %>
                             </address>
                         </div>
                         <!-- /.col -->
                         <div class="col-sm-4 invoice-col">
                             <!-- <b>Invoice #007612</b>
-                            <br>
-                            <br> -->
+                                <br>
+                                <br> -->
                             <b>注文番号:</b>
                             <%= order.orderNumber %>
-                                <!-- <br>
-                                <b>Payment Due:</b> 2/22/2014 -->
-                                <br>
-                                <b>確認番号:</b>
-                                <%= order.confirmationNumber %>
-                                    <!-- <br>
+                            <!-- <br>
                                     <b>Payment Due:</b> 2/22/2014 -->
-                                    <br>
-                                    <b>Payment Method ID:</b>
-                                    <%= (order.paymentMethods.length > 0) ? order.paymentMethods[0].paymentMethodId : '' %>
+                            <br>
+                            <b>確認番号:</b>
+                            <%= order.confirmationNumber %>
+                            <!-- <br>
+                                        <b>Payment Due:</b> 2/22/2014 -->
+                            <br>
+                            <b>Payment Method ID:</b>
+                            <%= (order.paymentMethods.length > 0) ? order.paymentMethods[0].paymentMethodId : '' %>
                         </div>
                         <!-- /.col -->
                     </div>
@@ -115,54 +115,48 @@
                                 </thead>
                                 <tbody>
                                     <% order.acceptedOffers.forEach(function(acceptedOffer){ %>
-                                        <tr>
-                                            <td>
-                                                <%= (acceptedOffer.itemOffered.numSeats !== undefined) ? acceptedOffer.itemOffered.numSeats : 1 %>
-                                            </td>
-                                            <td>
-                                                <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
-                                                    <a target="_blank" href="/events/individualScreeningEvent/<%= acceptedOffer.itemOffered.reservationFor.identifier %>">
-                                                        <%= acceptedOffer.itemOffered.reservationFor.name.ja %>
-                                                            <br>
-                                                            <%= moment(acceptedOffer.itemOffered.reservationFor.startDate).format('YY-MM-DD hh:mm') %>
-                                                                -
-                                                                <%= moment(acceptedOffer.itemOffered.reservationFor.endDate).format('hh:mm') %>
-                                                                    <br>@
-                                                                    <%= acceptedOffer.itemOffered.reservationFor.superEvent.location.name.ja %>
-                                                                        <%= acceptedOffer.itemOffered.reservationFor.location.name.ja %>
-                                                    </a>
-                                                    <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
-                                                        <%= acceptedOffer.itemOffered.programName %>
-                                                            <% } %>
-                                            </td>
-                                            <td>
-                                                <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
-                                                    <%= acceptedOffer.itemOffered.reservedTicket.ticketToken %>
-                                                        <% } %>
-                                            </td>
-                                            <td>
-                                                <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
-                                                    <%= acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber %>
-                                                        <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.ticketName %>
-                                                            <br> 販売単価:
-                                                            <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.salePrice %>
-                                                                <br> 3Dメガネ:
-                                                                <%= acceptedOffer.itemOffered.reservedTicket.coaTicketInfo.addGlasses %>
+                                    <tr>
+                                        <td>
+                                            <%= (acceptedOffer.itemOffered.numSeats !== undefined) ? acceptedOffer.itemOffered.numSeats : 1 %>
+                                        </td>
+                                        <td>
+                                            <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
+                                            <a target="_blank" href="/events/individualScreeningEvent/<%= acceptedOffer.itemOffered.reservationFor.identifier %>">
+                                                <%= acceptedOffer.itemOffered.reservationFor.name.ja %>
+                                                <br>
+                                                <%= moment(acceptedOffer.itemOffered.reservationFor.startDate).format('YY-MM-DD hh:mm') %>
+                                                -
+                                                <%= moment(acceptedOffer.itemOffered.reservationFor.endDate).format('hh:mm') %>
+                                                <br>@
+                                                <%= acceptedOffer.itemOffered.reservationFor.superEvent.location.name.ja %>
+                                                <%= acceptedOffer.itemOffered.reservationFor.location.name.ja %>
+                                            </a>
+                                            <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
+                                            <%= acceptedOffer.itemOffered.programName %>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
+                                            <%= acceptedOffer.itemOffered.reservedTicket.ticketToken %>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
+                                            <%= acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber %>
+                                            <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
+                                            <%= acceptedOffer.price %>
+                                            <%= acceptedOffer.priceCurrency %>
+                                            per
+                                            <%= moment.duration(acceptedOffer.eligibleDuration.value, 'seconds').humanize() %>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <%= acceptedOffer.price %>
+                                            <%= acceptedOffer.priceCurrency %>
+                                        </td>
+                                    </tr>
 
-                                                                    <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
-                                                                        <%= acceptedOffer.price %>
-                                                                            <%= acceptedOffer.priceCurrency %>
-                                                                                per
-                                                                                <%= moment.duration(acceptedOffer.eligibleDuration.value, 'seconds').humanize() %>
-                                                                                    <% } %>
-                                            </td>
-                                            <td>
-                                                <%= acceptedOffer.price %>
-                                                    <%= acceptedOffer.priceCurrency %>
-                                            </td>
-                                        </tr>
-
-                                        <% }) %>
+                                    <% }) %>
                                 </tbody>
                             </table>
                         </div>
@@ -174,13 +168,13 @@
                         <!-- accepted payments column -->
                         <div class="col-6">
                             <!-- <p class="lead">Payment Methods:</p>
-                            <img src="../../dist/img/credit/visa.png" alt="Visa">
-                            <img src="../../dist/img/credit/mastercard.png" alt="Mastercard">
-                            <img src="../../dist/img/credit/american-express.png" alt="American Express">
-                            <img src="../../dist/img/credit/paypal2.png" alt="Paypal">
-
-                            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-                            </p> -->
+                                <img src="../../dist/img/credit/visa.png" alt="Visa">
+                                <img src="../../dist/img/credit/mastercard.png" alt="Mastercard">
+                                <img src="../../dist/img/credit/american-express.png" alt="American Express">
+                                <img src="../../dist/img/credit/paypal2.png" alt="Paypal">
+    
+                                <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                                </p> -->
                         </div>
                         <!-- /.col -->
                         <div class="col-6">
@@ -191,7 +185,7 @@
                                         <th style="width:50%">Subtotal:</th>
                                         <td>
                                             <%= order.price %>
-                                                <%= order.priceCurrency %>
+                                            <%= order.priceCurrency %>
                                         </td>
                                     </tr>
                                     <tr>
@@ -206,14 +200,14 @@
                                         <th>Discount:</th>
                                         <td>
                                             <%= order.discounts.reduce((a, b)=>a+b.discount,0) %>
-                                                <%= (order.discounts.length > 0) ? order.discounts[0].discountCurrency : 'JPY' %>
+                                            <%= (order.discounts.length > 0) ? order.discounts[0].discountCurrency : 'JPY' %>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Total:</th>
                                         <td>
                                             <%= order.price %>
-                                                <%= order.priceCurrency %>
+                                            <%= order.priceCurrency %>
                                         </td>
                                     </tr>
                                 </table>
@@ -228,9 +222,19 @@
                         <div class="col-12">
                             <a href="javascript:void(0)" onclick="window.print(); return false;" class="btn btn-default">
                                 <i class="fa fa-print"></i> Print</a>
-                            <!-- <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                                <i class="fa fa-download"></i> Generate PDF
+                            <% if (order.orderStatus === 'OrderDelivered') { %>
+                            <button type="button" class="btn btn-danger float-right returnOrder">
+                                <i class="fa fa-undo"></i> 返品
+                            </button>
+                            <!-- <button type="button" class="btn btn-warning float-right sendEmailMessage" style="margin-right: 5px;">
+                                <i class="fa fa-envelope"></i> 配送メール送信
                             </button> -->
+                            <% } %>
+                            <% if (order.orderStatus === 'OrderReturned') { %>
+                            <button type="button" class="btn btn-default float-right disabled">
+                                <i class="fa fa-undo"></i> 返品済
+                            </button>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -244,13 +248,138 @@
 </section>
 <!-- /.content -->
 
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- ./col -->
+            <div class="col-md-12 no-print">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#timeline" data-toggle="tab">Timeline</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="timeline">
+                                <!-- The timeline -->
+                                <ul class="timeline timeline-inverse">
+                                    <!-- /.timeline-label -->
+                                    <% timelines.forEach(function(timeline, index){ %>
+                                    <% if (index === 0) { %>
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-success">
+                                            <%= moment(timeline.startDate).format('LL') %>
+                                        </span>
+                                    </li>
+                                    <% } %>
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-envelope bg-primary"></i>
+                                        <!-- <i class="fa fa-user bg-info"></i> -->
+                                        <!-- <i class="fa fa-camera bg-purple"></i> -->
+                                        <!-- <i class="fa fa-comments bg-warning"></i> -->
+
+
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock"></i>
+                                                <%= moment(timeline.startDate).toISOString() %></span>
+
+                                            <h3 class="timeline-header">
+                                                <a href="<%= timeline.agent.url %>" target="_blank">
+                                                    <%= timeline.agent.name %></a> が
+                                                <span>
+                                                    <%= timeline.object %></span> を
+                                                <span>
+                                                    <%= timeline.actionName %></span> しました
+                                            </h3>
+
+                                            <div class="timeline-body">
+                                                <span class="badge <%= timeline.actionStatus %>">
+                                                    <%= timeline.actionStatus %></span>
+                                            </div>
+                                            <div class="timeline-footer">
+                                                <a href="#" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                    data-target="#modal-action-<%= timeline.action.id %>">Read more</a>
+                                                <a href="#" class="btn btn-warning btn-sm" data-toggle="modal"
+                                                    data-target="#modal-actionResult-<%= timeline.action.id %>">See
+                                                    results</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                                    <li>
+                                        <i class="fa fa-clock bg-gray"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(order, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<% timelines.forEach(function(timeline, index){ %>
+<div class="modal" id="modal-action-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.action, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal" id="modal-actionResult-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action Result</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.result, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<% }) %>
+
 <!-- DataTables -->
 <link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
 <!-- ChartJS 1.0.1 -->
 <script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
-
-<!-- page script -->
-<script>
-    $(function () {
-    });
-</script>
+<script src="/js/orders/show.js"></script>

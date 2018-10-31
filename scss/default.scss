@@ -1,0 +1,81 @@
+@import "../node_modules/bootstrap/scss/bootstrap";
+// @import "../node_modules/admin-lte/build/scss/AdminLTE-raw.scss";
+// .bg-dark {
+//     background: #283037;
+//     color: #fff;
+// }
+.badge.OrderDelivered {
+    @extend .badge-success;
+}
+.badge.OrderProcessing {
+    @extend .badge-info;
+}
+.badge.OrderReturned {
+    @extend .badge-danger;
+}
+.badge.Confirmed {
+    @extend .badge-success;
+}
+.badge.Canceled {
+    @extend .badge-warning;
+}
+.badge.InProgress {
+    @extend .badge-primary;
+}
+.badge.Expired {
+    @extend .badge-danger;
+}
+.badge.Ready {
+    @extend .badge-warning;
+}
+.badge.Running {
+    @extend .badge-primary;
+}
+.badge.Executed {
+    @extend .badge-success;
+}
+.badge.Aborted {
+    @extend .badge-danger;
+}
+.badge.ActiveActionStatus {
+    @extend .badge-primary;
+}
+.badge.CompletedActionStatus {
+    @extend .badge-success;
+}
+.badge.CanceledActionStatus {
+    @extend .badge-warning;
+}
+.badge.FailedActionStatus {
+    @extend .badge-danger;
+}
+
+.badge.CreditCard {
+    @extend .badge-primary;
+}
+.badge.Account {
+    @extend .badge-success;
+}
+.badge.Cash {
+    @extend .badge-secondary;
+}
+.badge.Pecorino {
+    @extend .badge-secondary;
+}
+.badge.Mocoin {
+    @extend .badge-secondary;
+}
+
+.badge.Coin {
+    @extend .badge-primary;
+}
+.badge.Point {
+    @extend .badge-primary;
+}
+
+.badge.Opened {
+    @extend .badge-success;
+}
+.badge.Closed {
+    @extend .badge-danger;
+}

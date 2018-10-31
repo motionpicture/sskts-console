@@ -1,6 +1,5 @@
 /**
  * 認証ルーター
- * @ignore
  */
 import * as express from 'express';
 // import * as request from 'request-promise-native';
@@ -8,7 +7,6 @@ import * as express from 'express';
 import User from '../user';
 
 const authRouter = express.Router();
-
 /**
  * サインイン
  * Cognitoからリダイレクトしてくる
@@ -31,7 +29,6 @@ authRouter.get(
             next(error);
         }
     });
-
 /**
  * ログアウト
  */
@@ -51,5 +48,4 @@ authRouter.get(
             next(error);
         }
     });
-
 export default authRouter;

@@ -11,12 +11,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 組織ルーター
  */
-const ssktsapi = require("@motionpicture/sskts-api-nodejs-client");
 const sskts = require("@motionpicture/sskts-domain");
 const createDebug = require("debug");
 const express = require("express");
+const moment = require("moment");
+const ssktsapi = require("../ssktsapi");
 const redis_1 = require("../redis");
-const debug = createDebug('sskts-console:routes:organizations');
+const debug = createDebug('cinerino-console:routes');
 const organizationsRouter = express.Router();
 const pecorinoAuthClient = new sskts.pecorinoapi.auth.ClientCredentials({
     domain: process.env.PECORINO_AUTHORIZE_SERVER_DOMAIN,
@@ -26,7 +27,7 @@ const pecorinoAuthClient = new sskts.pecorinoapi.auth.ClientCredentials({
     state: ''
 });
 /**
- * 劇場検索
+ * 販売者検索
  */
 organizationsRouter.get('/movieTheater', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -34,20 +35,29 @@ organizationsRouter.get('/movieTheater', (req, res, next) => __awaiter(this, voi
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        debug('searching movie theaters...', req.query);
-        const movieTheaters = yield organizationService.searchMovieTheaters({});
-        debug('movie theaters found.', movieTheaters);
-        res.render('organizations/movieTheater/index', {
-            query: req.query,
-            movieTheaters: movieTheaters
-        });
+        if (req.query.format === 'datatable') {
+            debug('searching movie theaters...', req.query);
+            const movieTheaters = yield organizationService.searchMovieTheaters({});
+            debug('movie theaters found.', movieTheaters);
+            res.json({
+                draw: req.query.draw,
+                recordsTotal: movieTheaters.length,
+                recordsFiltered: movieTheaters.length,
+                data: movieTheaters
+            });
+        }
+        else {
+            res.render('organizations/movieTheater/index', {
+                searchConditions: req.query
+            });
+        }
     }
     catch (error) {
         next(error);
     }
 }));
 /**
- * 劇場追加
+ * 販売者追加
  */
 organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -109,7 +119,8 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
             }
         }
         res.render('organizations/movieTheater/new', {
-            message: message
+            message: message,
+            PaymentMethodType: ssktsapi.factory.paymentMethodType
         });
     }
     catch (error) {
@@ -117,7 +128,7 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
     }
 }));
 /**
- * 劇場編集
+ * 販売者編集
  */
 organizationsRouter.all('/movieTheater/:id', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -172,8 +183,36 @@ organizationsRouter.all('/movieTheater/:id', (req, res, next) => __awaiter(this,
         }
         res.render('organizations/movieTheater/edit', {
             message: message,
-            movieTheater: movieTheater
+            movieTheater: movieTheater,
+            PaymentMethodType: ssktsapi.factory.paymentMethodType
         });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+/**
+ * 劇場の注文検索
+ */
+organizationsRouter.get('/movieTheater/:id/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const orderService = new ssktsapi.service.Order({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const searchOrdersResult = yield orderService.search({
+            limit: req.query.limit,
+            page: req.query.page,
+            sort: { orderDate: ssktsapi.factory.sortType.Descending },
+            orderDateFrom: moment().add(-1, 'months').toDate(),
+            orderDateThrough: new Date(),
+            seller: {
+                typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                ids: [req.params.id]
+            }
+        });
+        debug(searchOrdersResult.totalCount, 'orders found.');
+        res.json(searchOrdersResult);
     }
     catch (error) {
         next(error);
