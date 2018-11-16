@@ -10,8 +10,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- COA劇場マスタが未設定でも販売組織を登録できるように変更。
-
 ### Deprecated
 
 ### Removed
@@ -19,6 +17,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.1.1 - 2018-11-16
+
+### Changed
+
+- COA劇場マスタが未設定でも販売組織を登録できるように変更。
 
 ## v1.1.0 - 2018-10-31
 
