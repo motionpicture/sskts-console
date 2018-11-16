@@ -104,8 +104,8 @@ organizationsRouter.all(
                         paymentAccepted: [],
                         gmoInfo: {
                             siteId: <string>process.env.GMO_SITE_ID,
-                            shopId: req.body['gmoInfo.shopId'],
-                            shopPass: req.body['gmoInfo.shopPass']
+                            shopId: req.body.gmoInfo.shopId,
+                            shopPass: req.body.gmoInfo.shopPass
                         }
                     };
                     debug('creating movie...');

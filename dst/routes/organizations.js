@@ -108,8 +108,8 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
                     paymentAccepted: [],
                     gmoInfo: {
                         siteId: process.env.GMO_SITE_ID,
-                        shopId: req.body['gmoInfo.shopId'],
-                        shopPass: req.body['gmoInfo.shopPass']
+                        shopId: req.body.gmoInfo.shopId,
+                        shopPass: req.body.gmoInfo.shopPass
                     }
                 };
                 debug('creating movie...');

@@ -23,9 +23,9 @@ function searchOrders(cb) {
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
                 + '<td>' + order.orderDate + '</td>'
-                + '<td>' + order.acceptedOffers.map(function (o) { 
+                + '<td>' + order.acceptedOffers.map(function (o) {
                     if (o.itemOffered.reservedTicket !== undefined) {
-                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber                         
+                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber
                     }
                     return o.itemOffered.typeOf;
                 }).join(',') + '</td>'
@@ -46,7 +46,7 @@ $(function () {
     $('button.delete').click(function () {
         if (window.confirm('元には戻せません。本当に削除しますか？')) {
             $.ajax({
-                url: '/organizations/movieTheater/<%= movieTheater.id %>',
+                url: '/organizations/movieTheater/' + movieTheater.id,
                 type: 'DELETE'
             }).done(function () {
                 alert('削除しました');
