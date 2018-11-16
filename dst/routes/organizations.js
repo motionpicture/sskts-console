@@ -67,14 +67,20 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
             try {
                 debug('creating...', req.body);
                 // COAから劇場情報抽出
-                const theaterFromCOA = yield sskts.COA.services.master.theater({ theaterCode: req.body.branchCode });
+                let theaterFromCOA;
+                try {
+                    theaterFromCOA = yield sskts.COA.services.master.theater({ theaterCode: req.body.branchCode });
+                }
+                catch (error) {
+                    // no op
+                }
                 let movieTheater = {
                     id: '',
                     typeOf: sskts.factory.organizationType.MovieTheater,
                     identifier: `${sskts.factory.organizationType.MovieTheater}-${req.body.branchCode}`,
                     name: {
-                        ja: theaterFromCOA.theaterName,
-                        en: theaterFromCOA.theaterNameEng
+                        ja: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterName : req.body.name.ja,
+                        en: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterNameEng : req.body.name.en
                     },
                     legalName: {
                         ja: '',
@@ -93,17 +99,17 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
                         typeOf: sskts.factory.placeType.MovieTheater,
                         branchCode: req.body.branchCode,
                         name: {
-                            ja: theaterFromCOA.theaterName,
-                            en: theaterFromCOA.theaterNameEng
+                            ja: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterName : '',
+                            en: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterNameEng : ''
                         }
                     },
-                    telephone: theaterFromCOA.theaterTelNum,
+                    telephone: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterTelNum : '',
                     url: req.body.url,
                     paymentAccepted: [],
                     gmoInfo: {
                         siteId: process.env.GMO_SITE_ID,
-                        shopId: req.body['gmoInfo.shopId'],
-                        shopPass: req.body['gmoInfo.shopPass']
+                        shopId: req.body.gmoInfo.shopId,
+                        shopPass: req.body.gmoInfo.shopPass
                     }
                 };
                 debug('creating movie...');
