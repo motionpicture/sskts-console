@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.1.2 - 2018-11-17
+
+### Fixed
+
+- 組織のGMOサイトIDを更新できないバグを解消。
+
 ## v1.1.1 - 2018-11-16
 
 ### Changed
