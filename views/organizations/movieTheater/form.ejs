@@ -31,7 +31,8 @@ if (movieTheater !== undefined) {
 </div>
 <div class="form-group">
     <label for="gmoInfo[siteId]">GMOサイトID</label>
-    <input type="text" class="form-control" id="gmoInfo[siteId]" disabled placeholder="GMOサイトID" value="<%= process.env.GMO_SITE_ID %>">
+    <input type="text" class="form-control" id="gmoInfo[siteId]" name="gmoInfo[siteId]" readonly placeholder="GMOサイトID"
+        value="<%= process.env.GMO_SITE_ID %>">
 </div>
 <div class="form-group">
     <label for="gmoInfo[shopId]">GMOショップID</label>

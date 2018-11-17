@@ -102,11 +102,7 @@ organizationsRouter.all(
                         telephone: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterTelNum : '',
                         url: req.body.url,
                         paymentAccepted: [],
-                        gmoInfo: {
-                            siteId: <string>process.env.GMO_SITE_ID,
-                            shopId: req.body.gmoInfo.shopId,
-                            shopPass: req.body.gmoInfo.shopPass
-                        }
+                        gmoInfo: req.body.gmoInfo
                     };
                     debug('creating movie...');
                     const doc = await organizationRepo.organizationModel.create(movieTheater);
