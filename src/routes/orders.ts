@@ -16,7 +16,7 @@ const ordersRouter = express.Router();
  */
 ordersRouter.get(
     '',
-    // tslint:disable-next-line:cyclomatic-complexity
+    // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
     async (req, res, next) => {
         try {
             debug('req.query:', req.query);
@@ -35,6 +35,9 @@ ordersRouter.get(
             const movieTheaters = await organizationService.searchMovieTheaters({});
             const searchUserPoolClientsResult = await userPoolService.searchClients({
                 userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
+            });
+            const searchAdminUserPoolClientsResult = await userPoolService.searchClients({
+                userPoolId: <string>process.env.ADMIN_COGNITO_USER_POOL_ID
             });
 
             const orderStatusChoices = [
@@ -62,14 +65,7 @@ ordersRouter.get(
                         && req.query.customer.membershipNumbers !== '')
                         ? (<string>req.query.customer.membershipNumbers).split(',').map((v) => v.trim())
                         : [],
-                    identifiers: (req.query.customer !== undefined && Array.isArray(req.query.customer.userPoolClients))
-                        ? req.query.customer.userPoolClients.map((userPoolClient: string) => {
-                            return {
-                                name: 'clientId',
-                                value: userPoolClient
-                            };
-                        })
-                        : []
+                    telephone: (req.query.customer !== undefined) ? req.query.customer.telephone : undefined
                 },
                 orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
                     ? (<string>req.query.orderNumbers).split(',').map((v) => v.trim())
@@ -79,13 +75,58 @@ ordersRouter.get(
                     : orderStatusChoices,
                 orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                     ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
-                    : moment().add(-1, 'month').toDate(),
+                    : moment().add(-1, 'week').toDate(),
                 orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                     ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
                     : moment().add(1, 'day').toDate(),
                 confirmationNumbers: (req.query.confirmationNumbers !== undefined && req.query.confirmationNumbers !== '')
                     ? (<string>req.query.confirmationNumbers).split(',').map((v) => v.trim())
-                    : []
+                    : [],
+                acceptedOffers: {
+                    itemOffered: {
+                        reservationFor: {
+                            ids: (req.query.acceptedOffers !== undefined
+                                && req.query.acceptedOffers.itemOffered !== undefined
+                                && req.query.acceptedOffers.itemOffered.reservationFor !== undefined
+                                && req.query.acceptedOffers.itemOffered.reservationFor.ids !== '')
+                                ? (<string>req.query.acceptedOffers.itemOffered.reservationFor.ids).split(',').map((v) => v.trim())
+                                : [],
+                            superEvent: {
+                                ids: (req.query.acceptedOffers !== undefined
+                                    && req.query.acceptedOffers.itemOffered !== undefined
+                                    && req.query.acceptedOffers.itemOffered.reservationFor !== undefined
+                                    && req.query.acceptedOffers.itemOffered.reservationFor.superEvent !== undefined
+                                    && req.query.acceptedOffers.itemOffered.reservationFor.superEvent.ids !== '')
+                                    ? (<string>req.query.acceptedOffers.itemOffered.reservationFor.superEvent.ids)
+                                        .split(',').map((v) => v.trim())
+                                    : [],
+                                workPerformed: {
+                                    identifiers: (req.query.acceptedOffers !== undefined
+                                        && req.query.acceptedOffers.itemOffered !== undefined
+                                        && req.query.acceptedOffers.itemOffered.reservationFor !== undefined
+                                        && req.query.acceptedOffers.itemOffered.reservationFor.superEvent !== undefined
+                                        && req.query.acceptedOffers.itemOffered.reservationFor.superEvent.workPerformed !== undefined
+                                        && req.query.acceptedOffers.itemOffered.reservationFor.superEvent.workPerformed.identifiers !== '')
+                                        ? (<string>req.query.acceptedOffers.itemOffered.reservationFor.superEvent.workPerformed.identifiers)
+                                            .split(',').map((v) => v.trim())
+                                        : []
+                                }
+                            }
+                        }
+                    }
+                },
+                paymentMethods: {
+                    typeOfs: (req.query.paymentMethods !== undefined
+                        && req.query.paymentMethods.typeOfs !== undefined)
+                        ? req.query.paymentMethods.typeOfs
+                        : Object.keys(ssktsapi.factory.paymentMethodType)
+                            .map((key) => (<any>ssktsapi.factory.paymentMethodType)[key]),
+                    paymentMethodIds: (req.query.paymentMethods !== undefined
+                        && req.query.paymentMethods.paymentMethodIds !== undefined
+                        && req.query.paymentMethods.paymentMethodIds !== '')
+                        ? (<string>req.query.paymentMethods.paymentMethodIds).split(',').map((v) => v.trim())
+                        : []
+                }
             };
             if (req.query.format === 'datatable') {
                 const searchOrdersResult = await orderService.search(searchConditions);
@@ -100,8 +141,10 @@ ordersRouter.get(
                     moment: moment,
                     movieTheaters: movieTheaters,
                     userPoolClients: searchUserPoolClientsResult.data,
+                    adminUserPoolClients: searchAdminUserPoolClientsResult.data,
                     searchConditions: searchConditions,
-                    orderStatusChoices: orderStatusChoices
+                    orderStatusChoices: orderStatusChoices,
+                    PaymentMethodType: ssktsapi.factory.paymentMethodType
                 });
             }
         } catch (error) {
@@ -137,7 +180,7 @@ ordersRouter.get(
             // startDateでソート
             actionsOnOrder = actionsOnOrder.sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf());
 
-            // tslint:disable-next-line:cyclomatic-complexity
+            // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
             const timelines = actionsOnOrder.map((a) => {
                 let agent: any;
                 if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
@@ -192,33 +235,46 @@ ordersRouter.get(
                 }
 
                 let object: string;
-                switch (a.object.typeOf) {
-                    case 'Order':
-                        object = '注文';
-                        break;
-                    case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
-                        object = 'ポイント';
-                        break;
-                    case ssktsapi.factory.actionType.SendAction:
-                        if (a.object.typeOf === 'Order') {
-                            object = '配送';
-                        } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
-                            object = '送信';
-                        } else {
-                            object = '送信';
-                        }
-                        break;
-                    case ssktsapi.factory.creativeWorkType.EmailMessage:
-                        object = 'Eメール';
-                        break;
-                    case 'PaymentMethod':
-                        object = a.object.paymentMethod.typeOf;
-                        break;
-                    case ssktsapi.factory.actionType.PayAction:
-                        object = a.object.object.paymentMethod.typeOf;
-                        break;
-                    default:
-                        object = a.object.typeOf;
+                if (Array.isArray(a.object)) {
+                    switch (a.object[0].typeOf) {
+                        case 'PaymentMethod':
+                            object = a.object[0].paymentMethod.name;
+                            break;
+                        case ssktsapi.factory.actionType.PayAction:
+                            object = a.object[0].object.paymentMethod.typeOf;
+                            break;
+                        default:
+                            object = a.object[0].typeOf;
+                    }
+                } else {
+                    switch (a.object.typeOf) {
+                        case 'Order':
+                            object = '注文';
+                            break;
+                        case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
+                            object = 'ポイント';
+                            break;
+                        case ssktsapi.factory.actionType.SendAction:
+                            if (a.object.typeOf === 'Order') {
+                                object = '配送';
+                            } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                                object = '送信';
+                            } else {
+                                object = '送信';
+                            }
+                            break;
+                        case ssktsapi.factory.creativeWorkType.EmailMessage:
+                            object = 'Eメール';
+                            break;
+                        case 'PaymentMethod':
+                            object = a.object.paymentMethod.typeOf;
+                            break;
+                        case ssktsapi.factory.actionType.PayAction:
+                            object = a.object.object.paymentMethod.typeOf;
+                            break;
+                        default:
+                            object = a.object.typeOf;
+                    }
                 }
 
                 return {

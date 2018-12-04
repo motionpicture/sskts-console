@@ -36,6 +36,7 @@ $(function () {
                     if (Array.isArray(data.customer.identifier)) {
                         var tokenIssuerIdentifier = data.customer.identifier.find((i) => i.name === 'tokenIssuer');
                         var clienIdIdentifier = data.customer.identifier.find((i) => i.name === 'clientId');
+                        var usernameIdentifier = data.customer.identifier.find((i) => i.name === 'username');
                         if (tokenIssuerIdentifier !== undefined) {
                             tokenIssuer = tokenIssuerIdentifier.value;
                             userPoolId = tokenIssuer.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
@@ -47,7 +48,7 @@ $(function () {
 
                     var html = '<ul class="list-unstyled">';
                     if (data.customer.memberOf !== undefined) {
-                        html += '<li><a target="_blank" href="/people/' + data.customer.id + '">' + data.customer.id + '</a></li>';
+                        html += '<li><a target="_blank" href="/userPools/' + userPoolId + '/people/' + data.customer.id + '">' + data.customer.id + '</a></li>';
                     } else {
                         html += '<li>' + data.customer.id + '</li>';
                     }
@@ -89,6 +90,7 @@ $(function () {
                     return '<ul class="list-unstyled">'
                         + data.paymentMethods.map(function (payment) {
                             return '<li><span class="badge ' + payment.typeOf + '">' + payment.typeOf + '</span></li>'
+                                + '<li><span>' + payment.paymentMethodId + '</span></li>';
                         }).join('')
                         + '</ul>';
                 }

@@ -14,7 +14,10 @@ waiterRouter.get(
     async (req, res, next) => {
         try {
             if (req.query.format === 'datatable') {
-                const rules = await request.get(`${process.env.WAITER_ENDPOINT}/rules`, { json: true }).promise();
+                const rules = await request.get(
+                    `${process.env.WAITER_ENDPOINT}/projects/${process.env.PROJECT_ID}/rules`,
+                    { json: true }
+                ).promise();
                 res.json({
                     draw: req.query.draw,
                     recordsTotal: rules.length,

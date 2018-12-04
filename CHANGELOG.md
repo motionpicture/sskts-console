@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- 注文検索条件強化
+- Waiterを本家へ統合
+
 ### Deprecated
 
 ### Removed
