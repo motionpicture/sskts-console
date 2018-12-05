@@ -39,6 +39,56 @@
                         </div>
                     </div> -->
                     <form role="form" method="get">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>タスク名</label>
+                                        <select size="10" class="form-control" name="name">
+                                            <% taskNameChoices.forEach(function (taskName) { %>
+                                            <% var selected = searchConditions.name === taskName %>
+                                            <option value="<%= taskName %>" <% if (selected) { %> selected
+                                                <% } %>>
+                                                <%= taskName %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>実行日時</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control" name="runsRange" id="runsRange"
+                                                value="<%= moment(searchConditions.runsFrom).format('YYYY-MM-DDT00:00:00Z') %> - <%= moment(searchConditions.runsThrough).format('YYYY-MM-DDT00:00:00Z') %>">
+                                        </div>
+                                        <!-- /.input group -->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>タスクステータス</label>
+                                        <select multiple class="form-control" name="statuses[]">
+                                            <% taskStatusChoices.forEach(function (taskStatus) { %>
+                                            <% var selected = searchConditions.statuses.indexOf(taskStatus) >= 0; %>
+                                            <option value="<%= taskStatus %>" <% if (selected) { %> selected
+                                                <% } %>>
+                                                <%= taskStatus %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-secondary float-right">検索</button>
+                        </div>
                     </form>
                 </div>
                 <!-- /.card -->

@@ -11,43 +11,47 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * タスクルーター
  */
-// import * as createDebug from 'debug';
+const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
-const ssktsapi = require("../ssktsapi");
-// const debug = createDebug('cinerino-console:routes');
+const cinerinoapi = require("../ssktsapi");
+const debug = createDebug('cinerino-console:routes');
 const tasksRouter = express.Router();
 /**
  * タスク検索
  */
 tasksRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // debug('req.query:', req.query);
-        // const taskService = new ssktsapi.service.Task({
-        //     endpoint: <string>process.env.API_ENDPOINT,
-        //     auth: req.user.authClient
-        // });
-        const taskNameChoices = Object.keys(ssktsapi.factory.taskName).map((name) => ssktsapi.factory.taskName[name]);
-        const taskStatusChoices = Object.keys(ssktsapi.factory.taskStatus).map((name) => ssktsapi.factory.taskStatus[name]);
-        // const searchConditions: ssktsapi.factory.task.ISearchConditions<ssktsapi.factory.taskName> = {
-        //     limit: req.query.limit,
-        //     page: req.query.page,
-        //     name: (req.query.name !== '')
-        //         ? req.query.name
-        //         : undefined,
-        //     statuses: (req.query.statuses !== undefined)
-        //         ? req.query.statuses
-        //         : taskStatusChoices,
-        //     runsFrom: (req.query.runsRange !== undefined && req.query.runsRange !== '')
-        //         ? moment(req.query.runsRange.split(' - ')[0]).toDate()
-        //         : moment().add(-1, 'month').toDate(),
-        //     runsThrough: (req.query.runsRange !== undefined && req.query.runsRange !== '')
-        //         ? moment(req.query.runsRange.split(' - ')[1]).toDate()
-        //         : moment().add(1, 'day').toDate()
-        // };
+        debug('req.query:', req.query);
+        const taskService = new cinerinoapi.service.Task({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const taskNameChoices = Object.keys(cinerinoapi.factory.taskName).map((name) => cinerinoapi.factory.taskName[name]);
+        const taskStatusChoices = [
+            cinerinoapi.factory.taskStatus.Aborted,
+            cinerinoapi.factory.taskStatus.Executed,
+            cinerinoapi.factory.taskStatus.Ready,
+            cinerinoapi.factory.taskStatus.Running
+        ];
+        const searchConditions = {
+            limit: req.query.limit,
+            page: req.query.page,
+            name: (req.query.name !== '')
+                ? req.query.name
+                : undefined,
+            statuses: (req.query.statuses !== undefined)
+                ? req.query.statuses
+                : taskStatusChoices,
+            runsFrom: (req.query.runsRange !== undefined && req.query.runsRange !== '')
+                ? moment(req.query.runsRange.split(' - ')[0]).toDate()
+                : moment().add(-1, 'day').toDate(),
+            runsThrough: (req.query.runsRange !== undefined && req.query.runsRange !== '')
+                ? moment(req.query.runsRange.split(' - ')[1]).toDate()
+                : moment().add(1, 'day').toDate()
+        };
         if (req.query.format === 'datatable') {
-            // const searchResult = await taskService.search(searchConditions);
-            const searchResult = { totalCount: 0, data: [] };
+            const searchResult = yield taskService.search(searchConditions);
             res.json({
                 draw: req.query.draw,
                 recordsTotal: searchResult.totalCount,
@@ -58,7 +62,7 @@ tasksRouter.get('', (req, res, next) => __awaiter(this, void 0, void 0, function
         else {
             res.render('tasks/index', {
                 moment: moment,
-                searchConditions: {},
+                searchConditions: searchConditions,
                 taskNameChoices: taskNameChoices,
                 taskStatusChoices: taskStatusChoices
             });
