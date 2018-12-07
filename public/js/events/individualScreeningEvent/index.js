@@ -77,7 +77,7 @@ $(function () {
 
     // 上映イベントインポート
     $('button.importScreeningEvents').click(function () {
-        var message = '開催地: ' + $('select[name="superEventLocationBranchCodes[]"]').val().join(',')
+        var message = '開催地: ' + $('select[name="superEventLocationIdentifiers[]"]').val().join(',')
             + '\n開催日: ' + $('input[name="startRange"]').val()
             + '\nの上映イベントをインポートしようとしています。'
             + '\nよろしいですか？';

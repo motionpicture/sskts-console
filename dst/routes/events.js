@@ -14,10 +14,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const express = require("express");
 // tslint:disable-next-line:no-submodule-imports
-// import { body } from 'express-validator/check';
-// import { CREATED } from 'http-status';
+const check_1 = require("express-validator/check");
+const http_status_1 = require("http-status");
 const moment = require("moment");
-// import validator from '../middlewares/validator';
+const validator_1 = require("../middlewares/validator");
 const ssktsapi = require("../ssktsapi");
 const debug = createDebug('cinerino-console:routes:events');
 const eventsRouter = express.Router();
@@ -60,6 +60,59 @@ eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this
                 events: []
             });
         }
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+/**
+ * 上映イベントインポート
+ */
+eventsRouter.post('/individualScreeningEvent/import', ...[
+    check_1.body('superEventLocationIdentifiers').not().isEmpty().withMessage((_, options) => `${options.path} is required`)
+        .isArray(),
+    check_1.body('startRange').not().isEmpty().withMessage((_, options) => `${options.path} is required`)
+], validator_1.default, (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const organizationService = new ssktsapi.service.Organization({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const placeService = new ssktsapi.service.Place({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const taskService = new ssktsapi.service.Task({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const locationIdentifiers = req.body.superEventLocationIdentifiers;
+        let movieTheaters = yield placeService.searchMovieTheaters({});
+        movieTheaters = movieTheaters.filter((m) => locationIdentifiers.indexOf(m.identifier) >= 0);
+        const branchCodes = movieTheaters.map((m) => m.branchCode);
+        let movieTheaterOrganizations = yield organizationService.searchMovieTheaters({});
+        movieTheaterOrganizations = movieTheaterOrganizations.filter((m) => branchCodes.indexOf(m.location.branchCode) >= 0);
+        const startFrom = moment(req.body.startRange.split(' - ')[0]).toDate();
+        const startThrough = moment(req.body.startRange.split(' - ')[1]).toDate();
+        const tasks = yield Promise.all(movieTheaterOrganizations.map((movieTheater) => __awaiter(this, void 0, void 0, function* () {
+            const taskAttributes = {
+                name: ssktsapi.factory.taskName.ImportScreeningEvents,
+                status: ssktsapi.factory.taskStatus.Ready,
+                runsAt: new Date(),
+                remainingNumberOfTries: 1,
+                lastTriedAt: null,
+                numberOfTried: 0,
+                executionResults: [],
+                data: {
+                    locationBranchCode: movieTheater.location.branchCode,
+                    importFrom: startFrom,
+                    importThrough: startThrough,
+                    xmlEndPoint: movieTheater.xmlEndPoint
+                }
+            };
+            return taskService.create(taskAttributes);
+        })));
+        res.status(http_status_1.CREATED).json(tasks);
     }
     catch (error) {
         next(error);
