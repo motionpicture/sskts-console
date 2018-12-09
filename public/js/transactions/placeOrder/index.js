@@ -30,14 +30,20 @@ $(function () {
             {
                 data: null,
                 render: function (data, type, row) {
+                    var userPoolId = '';
+                    if (data.object.clientUser !== undefined) {
+                        userPoolId = data.object.clientUser.iss.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
+                    }
                     var html = '<ul class="list-unstyled">'
                         + '<li>' + data.agent.typeOf + '</li>';
+
                     if (data.agent.memberOf !== undefined) {
-                        html += '<li><a target="_blank" href="/people/' + data.agent.id + '">' + data.agent.id + '</a></li>'
+                        html += '<li><a target="_blank" href="/userPools/' + userPoolId + '/people/' + data.agent.id + '">' + data.agent.id + '</a></li>'
                             + '<li>' + data.agent.memberOf.membershipNumber + '</li>';
                     } else {
                         html += '<li>' + data.agent.id + '</li>';
                     }
+
                     if (data.object.customerContact !== undefined) {
                         html += '<li>' + data.object.customerContact.familyName + ' ' + data.object.customerContact.givenName + '</li>'
                             + '<li>' + data.object.customerContact.email + '</li>'
@@ -62,12 +68,25 @@ $(function () {
             {
                 data: null,
                 render: function (data, type, row) {
-                    var userPoolId = data.object.clientUser.iss.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
-                    return '<ul class="list-unstyled">'
-                        + '<li>' + data.object.clientUser.sub + '</li>'
-                        + '<li><a target="_blank" href="/userPools/' + userPoolId + '">' + data.object.clientUser.iss + '</a></li>'
-                        + '<li><a target="_blank" href="/userPools/' + userPoolId + '/clients/' + data.object.clientUser.client_id + '">' + data.object.clientUser.client_id + '</a></li>'
-                        + '</ul>';
+                    var userPoolId = '';
+                    var iss = '';
+                    var clientId = '';
+                    if (data.object.clientUser !== undefined) {
+                        userPoolId = data.object.clientUser.iss.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
+                        iss = data.object.clientUser.iss;
+                        clientId = data.object.clientUser.client_id;
+                    }
+                    var html = '<ul class="list-unstyled">'
+                        + '<li><a target="_blank" href="/userPools/' + userPoolId + '">' + iss + '</a></li>'
+                        + '<li><a target="_blank" href="/userPools/' + userPoolId + '/clients/' + clientId + '">' + clientId + '</a></li>';
+
+                    if (data.agent.memberOf !== undefined) {
+                        html += '<li><a target="_blank" href="/userPools/' + userPoolId + '/people/' + data.agent.id + '">' + data.agent.id + '</a></li>';
+                    }
+
+                    html += '</ul>';
+
+                    return html;
                 }
             },
             {

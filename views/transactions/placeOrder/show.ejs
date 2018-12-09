@@ -1,0 +1,262 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>注文取引詳細</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active">注文取引詳細</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- <div class="callout callout-info">
+                        <h5>
+                            <i class="fa fa-info"></i> Note:</h5>
+                        This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
+                    </div> -->
+
+
+                <!-- Main content -->
+                <div class="invoice p-3 mb-3">
+                    <!-- title row -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>
+                                <i class="fa fa-film"></i>
+                                <%= transaction.seller.name.ja %>
+                                <small class="float-right">Date:
+                                    <%= moment(transaction.startDate).format('D/M/YYYY') %>
+                                </small>
+                            </h4>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- info row -->
+                    <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+                            販売者
+                            <address>
+                                <strong>
+                                    <a target="_blank" href="/organizations/<%= transaction.seller.typeOf %>/<%= transaction.seller.id %>">
+                                        <%= transaction.seller.name.ja %>
+                                    </a>
+                                </strong>
+                                <br> Type:
+                                <%= transaction.seller.typeOf %>
+                                <br> Phone:
+                                <%= transaction.seller.telephone %>
+                                <br> Email:
+                                <%= transaction.seller.email %>
+                                <br> Url:
+                                <%= transaction.seller.url %>
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                        <%
+                        let customerCotact = (transaction.object.customerContact !== undefined) ? transaction.object.customerContact: {};
+                        %>
+                        <div class="col-sm-4 invoice-col">
+                            購入者
+                            <address>
+                                <strong>
+                                    <% if (transaction.agent.memberOf !== undefined) { %>
+                                    <a target="_blank" href="/people/<%= transaction.agent.id %>">
+                                        <%= transaction.agent.memberOf.membershipNumber %>
+                                    </a>
+                                    <% } else {%>
+                                    <%= transaction.agent.id %>
+                                    <% } %>
+                                </strong>
+                                <br> Type:
+                                <%= transaction.agent.typeOf %>
+                                <br> Family Name:
+                                <%= customerCotact.familyName %>
+                                <br> Given Name:
+                                <%= customerCotact.givenName %>
+                                <br> Phone:
+                                <%= customerCotact.telephone %>
+                                <br> Email:
+                                <%= customerCotact.email %>
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                            <!-- <b>Invoice #007612</b>
+                                <br>
+                                <br> -->
+                            <b>注文:</b>
+                            <% if (transaction.result !== undefined) { %>
+                            <a target="_blank" href="/orders/<%= transaction.result.order.orderNumber %>">
+                                <%= transaction.result.order.orderNumber %>
+                            </a>
+                            <% } %>
+                            <!-- <br>
+                                    <b>Payment Due:</b> 2/22/2014 -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.invoice -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- ./col -->
+            <div class="col-md-12 no-print">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#timeline" data-toggle="tab">Timeline</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab">activity</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="timeline">
+                                <!-- The timeline -->
+                                <ul class="timeline timeline-inverse">
+                                    <!-- /.timeline-label -->
+                                    <% timelines.forEach(function(timeline, index){ %>
+                                    <% if (index === 0) { %>
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-success">
+                                            <%= moment(timeline.startDate).format('LL') %>
+                                        </span>
+                                    </li>
+                                    <% } %>
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-envelope bg-primary"></i>
+                                        <!-- <i class="fa fa-user bg-info"></i> -->
+                                        <!-- <i class="fa fa-camera bg-purple"></i> -->
+                                        <!-- <i class="fa fa-comments bg-warning"></i> -->
+
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock"></i>
+                                                <%= moment(timeline.startDate).toISOString() %></span>
+
+                                            <h3 class="timeline-header">
+                                                <a href="<%= timeline.agent.url %>" target="_blank">
+                                                    <%= timeline.agent.name %></a> が
+                                                <span>
+                                                    <%= timeline.object %></span> を
+                                                <span>
+                                                    <%= timeline.actionName %></span> しました
+                                            </h3>
+
+                                            <div class="timeline-body">
+                                                <span class="badge <%= timeline.actionStatus %>">
+                                                    <%= timeline.actionStatus %></span>
+                                            </div>
+                                            <div class="timeline-footer">
+                                                <a href="#" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                    data-target="#modal-action-<%= timeline.action.id %>">Read more</a>
+                                                <a href="#" class="btn btn-warning btn-sm" data-toggle="modal"
+                                                    data-target="#modal-actionResult-<%= timeline.action.id %>">See
+                                                    results</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                                    <li>
+                                        <i class="fa fa-clock bg-gray"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(transaction, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="activity">
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<% timelines.forEach(function(timeline, index){ %>
+<div class="modal" id="modal-action-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.action, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal" id="modal-actionResult-<%= timeline.action.id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Action Result</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <textarea rows="40" class="form-control" placeholder="" disabled=""><%= JSON.stringify(timeline.result, null, '\t') %></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<% }) %>
+
+<!-- DataTables -->
+<link rel="stylesheet" href="/node_modules/admin-lte/plugins/datatables/dataTables.bootstrap4.css">
+<!-- ChartJS 1.0.1 -->
+<script src="/node_modules/admin-lte/plugins/chart.js/Chart.min.js"></script>
