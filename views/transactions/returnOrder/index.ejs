@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">タスク検索</h1>
+                <h1 class="m-0 text-dark">注文返品取引検索</h1>
             </div>
             <!-- /.col -->
             <div class="col-sm-6">
@@ -11,7 +11,7 @@
                     <li class="breadcrumb-item">
                         <a href="/">Home</a>
                     </li>
-                    <li class="breadcrumb-item active">タスク検索</li>
+                    <li class="breadcrumb-item active">注文返品取引検索</li>
                 </ol>
             </div>
             <!-- /.col -->
@@ -29,54 +29,45 @@
             <!-- left column -->
             <div class="col-md-12">
                 <!-- general form elements -->
-                <div class="card card-default">
+                <div class="card card-primary">
                     <!-- <div class="card-header">
-                        <h3 class="card-title">Select2</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-widget="collapse">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                        </div>
+                        <h3 class="card-title">Quick Example</h3>
                     </div> -->
+                    <!-- /.card-header -->
+                    <!-- form start -->
                     <form role="form" method="get">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>タスク名</label>
-                                        <select size="10" class="form-control" name="name">
-                                            <% taskNameChoices.forEach(function (taskName) { %>
-                                            <% var selected = searchConditions.name === taskName %>
-                                            <option value="<%= taskName %>" <% if (selected) { %> selected
-                                                <% } %>>
-                                                <%= taskName %>
-                                            </option>
-                                            <% }) %>
-                                        </select>
+                                        <label for="object[order][orderNumbers]">注文番号</label>
+                                        <input type="text" class="form-control" id="object[order][orderNumbers]" name="object[order][orderNumbers]"
+                                            placeholder="注文番号" value="<%= searchConditions.object.order.orderNumbers.join(',') %>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>実行日時</label>
+                                        <label>取引開始日時</label>
+
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
                                                     <i class="fa fa-calendar"></i>
                                                 </span>
                                             </div>
-                                            <input type="text" class="form-control" name="runsRange" id="runsRange"
-                                                value="<%= moment(searchConditions.runsFrom).format('YYYY-MM-DDT00:00:00Z') %> - <%= moment(searchConditions.runsThrough).format('YYYY-MM-DDT00:00:00Z') %>">
+                                            <input type="text" class="form-control" name="startRange" id="startRange"
+                                                value="<%= moment(searchConditions.startFrom).format('YYYY-MM-DDT00:00:00Z') %> - <%= moment(searchConditions.startThrough).format('YYYY-MM-DDT00:00:00Z') %>">
                                         </div>
                                         <!-- /.input group -->
                                     </div>
                                     <div class="form-group">
-                                        <label>タスクステータス</label>
+                                        <label>ステータス</label>
                                         <select multiple class="form-control" name="statuses[]">
-                                            <% taskStatusChoices.forEach(function (taskStatus) { %>
-                                            <% var selected = searchConditions.statuses.indexOf(taskStatus) >= 0; %>
-                                            <option value="<%= taskStatus %>" <% if (selected) { %> selected
+                                            <% transactionStatusChoices.forEach(function (transactionStatus) { %>
+                                            <% var selected = searchConditions.statuses.indexOf(transactionStatus) >= 0; %>
+                                            <option value="<%= transactionStatus %>" <% if (selected) { %> selected
                                                 <% } %>>
-                                                <%= taskStatus %>
+                                                <%= transactionStatus %>
                                             </option>
                                             <% }) %>
                                         </select>
@@ -87,7 +78,19 @@
 
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-secondary float-right">検索</button>
+                            <div class="btn-group float-right">
+                                <button type="button" class="btn btn-info search">検索</button>
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                    <a class="dropdown-item search" href="#">検索</a>
+                                    <a class="dropdown-item downloadCSV" href="#">CSVダウンロード</a>
+                                    <!-- <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">Separated link</a> -->
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -105,23 +108,19 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body table-responsive">
-                        <table id="tasks-table" class="table table-bordered table-hover dataTable">
+                        <table id="transactions-table" class="table table-bordered table-hover dataTable">
                             <thead>
                                 <tr>
-                                    <th>ID<br>Name<br>残試行回数 / 試行回数</span>
-                                    </th>
-                                    <th>実行日時<br>最終試行日時</th>
-                                    <th>Status</th>
-                                    <th>実行結果</th>
+                                    <th>ID<br>Status<br>Start<br>End<br>Expires</th>
+                                    <th>処理者</th>
+                                    <th>販売者</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th>ID<br>Name<br>残試行回数 / 試行回数</span>
-                                    </th>
-                                    <th>実行日時<br>最終試行日時</th>
-                                    <th>Status</th>
-                                    <th>実行結果</th>
+                                    <th>ID<br>Status<br>Start<br>End<br>Expires</th>
+                                    <th>処理者</th>
+                                    <th>販売者</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -145,4 +144,4 @@
 <link rel="stylesheet" href="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker-bs3.css">
 
 <script src="/node_modules/admin-lte/plugins/daterangepicker/daterangepicker.js"></script>
-<script src="/js/tasks/index.js"></script>
+<script src="/js/transactions/returnOrder/index.js"></script>

@@ -3,10 +3,10 @@
  */
 import * as express from 'express';
 
-// import placeOrderTransactionsRouter from './transactions/placeOrder';
-// import returnOrderTransactionsRouter from './transactions/returnOrder';
+import placeOrderTransactionsRouter from './transactions/placeOrder';
+import returnOrderTransactionsRouter from './transactions/returnOrder';
 
 const transactionsRouter = express.Router();
-// transactionsRouter.use('/placeOrder', placeOrderTransactionsRouter);
-// transactionsRouter.use('/returnOrder', returnOrderTransactionsRouter);
+transactionsRouter.use('/placeOrder', placeOrderTransactionsRouter);
+transactionsRouter.use('/returnOrder', returnOrderTransactionsRouter);
 export default transactionsRouter;

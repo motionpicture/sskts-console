@@ -204,7 +204,7 @@ $(function () {
     );
 
     $.getJSON(
-        WAITER_ENDPOINT + '/rules',
+        WAITER_ENDPOINT + '/projects/' + PROJECT_ID + '/rules',
         {}
     ).done(function (data) {
         waiterRules = data;
@@ -934,7 +934,7 @@ function startMonitoringWaiter() {
         function () {
             waiterDatasets.map(function (dataset, index) {
                 $.getJSON(
-                    WAITER_ENDPOINT + '/passports/' + dataset.scope + '/currentIssueUnit',
+                    WAITER_ENDPOINT + '/projects/' + PROJECT_ID + '/passports/' + dataset.scope + '/currentIssueUnit',
                     {}
                 ).done(function (data) {
                     // 時点での発行数データを追加
