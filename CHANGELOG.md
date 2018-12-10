@@ -8,13 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- タスク検索を追加
-- 取引検索を追加
-
 ### Changed
-
-- 注文検索条件強化
-- Waiterを本家へ統合
 
 ### Deprecated
 
@@ -23,6 +17,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.2.0 - 2018-12-10
+
+### Added
+
+- タスク検索を追加
+- 取引検索を追加
+
+### Changed
+
+- 注文検索条件強化
+- Waiterを本家へ統合
 
 ## v1.1.2 - 2018-11-17
 
