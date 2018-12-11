@@ -23,6 +23,7 @@ const ordersRouter = express.Router();
  * 注文検索
  */
 ordersRouter.get('', 
+// tslint:disable-next-line:cyclomatic-complexity
 // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
 (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
@@ -39,7 +40,7 @@ ordersRouter.get('',
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const movieTheaters = yield organizationService.searchMovieTheaters({});
+        const searchMovieTheatersResult = yield organizationService.searchMovieTheaters({});
         const searchUserPoolClientsResult = yield userPoolService.searchClients({
             userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
         });
@@ -59,7 +60,7 @@ ordersRouter.get('',
                 typeOf: ssktsapi.factory.organizationType.MovieTheater,
                 ids: (req.query.seller !== undefined && req.query.seller.ids !== undefined)
                     ? req.query.seller.ids
-                    : movieTheaters.map((m) => m.id)
+                    : searchMovieTheatersResult.map((m) => m.id)
             },
             customer: {
                 typeOf: ssktsapi.factory.personType.Person,
@@ -71,6 +72,14 @@ ordersRouter.get('',
                     && req.query.customer.membershipNumbers !== '')
                     ? req.query.customer.membershipNumbers.split(',').map((v) => v.trim())
                     : [],
+                identifiers: (req.query.customer !== undefined && Array.isArray(req.query.customer.userPoolClients))
+                    ? req.query.customer.userPoolClients.map((userPoolClient) => {
+                        return {
+                            name: 'clientId',
+                            value: userPoolClient
+                        };
+                    })
+                    : undefined,
                 telephone: (req.query.customer !== undefined) ? req.query.customer.telephone : undefined
             },
             orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
@@ -125,8 +134,7 @@ ordersRouter.get('',
                 typeOfs: (req.query.paymentMethods !== undefined
                     && req.query.paymentMethods.typeOfs !== undefined)
                     ? req.query.paymentMethods.typeOfs
-                    : Object.keys(ssktsapi.factory.paymentMethodType)
-                        .map((key) => ssktsapi.factory.paymentMethodType[key]),
+                    : undefined,
                 paymentMethodIds: (req.query.paymentMethods !== undefined
                     && req.query.paymentMethods.paymentMethodIds !== undefined
                     && req.query.paymentMethods.paymentMethodIds !== '')
@@ -146,7 +154,7 @@ ordersRouter.get('',
         else {
             res.render('orders/index', {
                 moment: moment,
-                movieTheaters: movieTheaters,
+                movieTheaters: searchMovieTheatersResult,
                 userPoolClients: searchUserPoolClientsResult.data,
                 adminUserPoolClients: searchAdminUserPoolClientsResult.data,
                 searchConditions: searchConditions,
