@@ -32,25 +32,27 @@ eventsRouter.get(
             const movieTheaters = await organizationService.searchMovieTheaters({});
 
             const searchConditions: ssktsapi.factory.event.individualScreeningEvent.ISearchConditions = {
-                superEventLocationIdentifiers: movieTheaters.map((m) => m.identifier),
+                limit: req.query.limit,
+                page: req.query.page,
+                sort: { startDate: ssktsapi.factory.sortType.Ascending },
+                superEventLocationIdentifiers: (req.query.superEventLocationIdentifiers !== undefined)
+                    ? req.query.superEventLocationIdentifiers
+                    : movieTheaters.map((m) => m.identifier),
                 startFrom: (req.query.startRange !== undefined && req.query.startRange !== '')
                     ? moment(req.query.startRange.split(' - ')[0]).toDate()
                     : new Date(),
                 startThrough: (req.query.startRange !== undefined && req.query.startRange !== '')
                     ? moment(req.query.startRange.split(' - ')[1]).toDate()
-                    : moment().add(1, 'day').toDate(),
-                ...req.query
+                    : moment().add(1, 'day').toDate()
             };
 
             if (req.query.format === 'datatable') {
-                debug('searching events...', searchConditions);
-                const events = await eventService.searchIndividualScreeningEvent(searchConditions);
-                debug(events.length, 'events found.', events);
+                const searchEventsResult = await eventService.searchIndividualScreeningEventWithPagination(searchConditions);
                 res.json({
                     draw: req.query.draw,
-                    recordsTotal: events.length,
-                    recordsFiltered: events.length,
-                    data: events
+                    recordsTotal: searchEventsResult.totalCount,
+                    recordsFiltered: searchEventsResult.totalCount,
+                    data: searchEventsResult.data
                 });
             } else {
                 res.render('events/individualScreeningEvent/index', {
