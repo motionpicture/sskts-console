@@ -10,8 +10,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- 上映イベント検索にページネーション追加
-
 ### Deprecated
 
 ### Removed
@@ -19,6 +17,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.2.1 - 2018-12-11
+
+### Changed
+
+- 上映イベント検索にページネーション追加
 
 ## v1.2.0 - 2018-12-10
 
