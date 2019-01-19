@@ -118,7 +118,7 @@ eventsRouter.post(
                     }
                 };
 
-                return taskService.create(taskAttributes);
+                return taskService.create(<any>taskAttributes);
             }));
             res.status(CREATED).json(tasks);
         } catch (error) {
