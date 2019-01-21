@@ -91,8 +91,9 @@
                             <!-- <br>
                                         <b>Payment Due:</b> 2/22/2014 -->
                             <br>
-                            <b>Payment Method ID:</b>
-                            <%= (order.paymentMethods.length > 0) ? order.paymentMethods[0].paymentMethodId : '' %>
+                            <b>Payment Method:</b>
+                            <br>
+                            <%- (order.paymentMethods.length > 0) ? order.paymentMethods.map((p)=>`${p.typeOf} ${p.paymentMethodId}`).join('<br>') : '' %>
                         </div>
                         <!-- /.col -->
                     </div>

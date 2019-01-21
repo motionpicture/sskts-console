@@ -145,17 +145,17 @@
                                     <div class="form-group">
                                         <label>決済方法</label>
                                         <select multiple class="form-control" name="paymentMethods[typeOfs][]">
-                                            <% Object.keys(PaymentMethodType).forEach(function (key) { %>
+                                            <% Object.values(PaymentMethodType).forEach(function (paymentMethod) { %>
                                             <%
                                             var selected = false;
-                                            if (Array.isArray(searchConditions.paymentMethods)) {
-                                                selected = searchConditions.paymentMethods.typeOfs.indexOf(PaymentMethodType[key]) >= 0;
+                                            if (searchConditions.paymentMethods !== undefined && searchConditions.paymentMethods.typeOfs !== undefined) {
+                                                selected = searchConditions.paymentMethods.typeOfs.indexOf(paymentMethod) >= 0;
                                             }
                                             %>
-                                            <option value="<%= PaymentMethodType[key] %>" <% if (selected) { %>
+                                            <option value="<%= paymentMethod %>" <% if (selected) { %>
                                                 selected
                                                 <% } %>>
-                                                <%= PaymentMethodType[key] %>
+                                                <%= paymentMethod %>
                                             </option>
                                             <% }) %>
                                         </select>

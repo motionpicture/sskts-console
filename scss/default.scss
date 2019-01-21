@@ -65,6 +65,9 @@
 .badge.Mocoin {
     @extend .badge-secondary;
 }
+.badge.MovieTicket {
+    @extend .badge-warning;
+}
 
 .badge.Coin {
     @extend .badge-primary;
