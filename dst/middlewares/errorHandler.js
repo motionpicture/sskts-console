@@ -25,12 +25,12 @@ exports.default = (err, __, res, next) => {
         if (Array.isArray(err)) {
             apiError = new api_1.APIError(cinerinoError2httpStatusCode(err[0]), err);
         }
-        else if (err instanceof ssktsapi_1.factory.errors.SSKTS) {
+        else if (err instanceof ssktsapi_1.factory.errors.Cinerino) {
             apiError = new api_1.APIError(cinerinoError2httpStatusCode(err), [err]);
         }
         else {
             // 500
-            apiError = new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new ssktsapi_1.factory.errors.SSKTS('InternalServerError', err.message)]);
+            apiError = new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new ssktsapi_1.factory.errors.Cinerino('InternalServerError', err.message)]);
         }
     }
     res.status(apiError.code).json({

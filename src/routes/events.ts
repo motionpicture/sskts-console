@@ -31,7 +31,7 @@ eventsRouter.get(
             });
             const movieTheaters = await organizationService.searchMovieTheaters({});
 
-            const searchConditions: ssktsapi.factory.event.individualScreeningEvent.ISearchConditions = {
+            const searchConditions: ssktsapi.factory.event.screeningEvent.ISearchConditions = {
                 limit: req.query.limit,
                 page: req.query.page,
                 sort: { startDate: ssktsapi.factory.sortType.Ascending },
