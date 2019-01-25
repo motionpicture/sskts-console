@@ -192,7 +192,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
                 case ssktsapi.factory.paymentMethodType.CreditCard:
                     object = 'クレジットカード決済';
                     break;
-                case ssktsapi.factory.paymentMethodType.Pecorino:
+                case ssktsapi.factory.paymentMethodType.Account:
                     object = 'ポイント決済';
                     break;
                 case ssktsapi.factory.action.authorize.award.pecorino.ObjectType.PecorinoAward:

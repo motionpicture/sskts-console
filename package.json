@@ -11,10 +11,10 @@
   "config": {},
   "dependencies": {
     "@motionpicture/express-middleware": "^0.1.0",
-    "@motionpicture/sskts-api-nodejs-client": "^4.5.0-alpha.3",
-    "@motionpicture/sskts-domain": "^27.0.0-alpha.1",
+    "@motionpicture/sskts-api-nodejs-client": "^4.5.0-alpha.4",
+    "@motionpicture/sskts-domain": "^27.0.0-alpha.4",
     "admin-lte": "^3.0.0-alpha.2",
-    "aws-sdk": "^2.393.0",
+    "aws-sdk": "^2.394.0",
     "body-parser": "^1.18.3",
     "connect-redis": "^3.4.0",
     "cookie-parser": "^1.4.3",

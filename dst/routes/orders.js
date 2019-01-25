@@ -267,6 +267,7 @@ ordersRouter.get('/:orderNumber',
                         object = '注文';
                         break;
                     case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
+                        // case ssktsapi.factory.action.transfer.give.pointAward.ObjectType.PointAward:
                         object = 'ポイント';
                         break;
                     case ssktsapi.factory.actionType.SendAction:
@@ -284,10 +285,10 @@ ordersRouter.get('/:orderNumber',
                         object = 'Eメール';
                         break;
                     case 'PaymentMethod':
-                        object = a.object.paymentMethod.typeOf;
+                        object = a.object.object[0].paymentMethod.name;
                         break;
                     case ssktsapi.factory.actionType.PayAction:
-                        object = a.object.object.paymentMethod.typeOf;
+                        object = a.object.object[0].paymentMethod.typeOf;
                         break;
                     default:
                         object = a.object.typeOf;
