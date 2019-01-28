@@ -41,12 +41,21 @@ ordersRouter.get('',
             auth: req.user.authClient
         });
         const searchMovieTheatersResult = yield organizationService.searchMovieTheaters({});
-        const searchUserPoolClientsResult = yield userPoolService.searchClients({
-            userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
-        });
-        const searchAdminUserPoolClientsResult = yield userPoolService.searchClients({
-            userPoolId: process.env.ADMIN_COGNITO_USER_POOL_ID
-        });
+        let userPoolClients = [];
+        let adminUserPoolClients = [];
+        try {
+            const searchUserPoolClientsResult = yield userPoolService.searchClients({
+                userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
+            });
+            const searchAdminUserPoolClientsResult = yield userPoolService.searchClients({
+                userPoolId: process.env.ADMIN_COGNITO_USER_POOL_ID
+            });
+            userPoolClients = searchUserPoolClientsResult.data;
+            adminUserPoolClients = searchAdminUserPoolClientsResult.data;
+        }
+        catch (error) {
+            // no op
+        }
         const orderStatusChoices = [
             ssktsapi.factory.orderStatus.OrderDelivered,
             ssktsapi.factory.orderStatus.OrderPickupAvailable,
@@ -57,21 +66,21 @@ ordersRouter.get('',
             limit: req.query.limit,
             page: req.query.page,
             seller: {
-                typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                // typeOf: ssktsapi.factory.organizationType.MovieTheater,
                 ids: (req.query.seller !== undefined && req.query.seller.ids !== undefined)
                     ? req.query.seller.ids
-                    : searchMovieTheatersResult.map((m) => m.id)
+                    : undefined
             },
             customer: {
-                typeOf: ssktsapi.factory.personType.Person,
+                // typeOf: ssktsapi.factory.personType.Person,
                 ids: (req.query.customer !== undefined && req.query.customer.ids !== undefined && req.query.customer.ids !== '')
                     ? req.query.customer.ids.split(',').map((v) => v.trim())
-                    : [],
+                    : undefined,
                 membershipNumbers: (req.query.customer !== undefined
                     && req.query.customer.membershipNumbers !== undefined
                     && req.query.customer.membershipNumbers !== '')
                     ? req.query.customer.membershipNumbers.split(',').map((v) => v.trim())
-                    : [],
+                    : undefined,
                 identifiers: (req.query.customer !== undefined && Array.isArray(req.query.customer.userPoolClients))
                     ? req.query.customer.userPoolClients.map((userPoolClient) => {
                         return {
@@ -80,7 +89,32 @@ ordersRouter.get('',
                         };
                     })
                     : undefined,
-                telephone: (req.query.customer !== undefined) ? req.query.customer.telephone : undefined
+                // : [
+                //     ...searchUserPoolClientsResult.data.map((userPoolClient) => {
+                //         return {
+                //             name: 'clientId',
+                //             value: <string>userPoolClient.ClientId
+                //         };
+                //     }),
+                //     ...searchAdminUserPoolClientsResult.data.map((userPoolClient) => {
+                //         return {
+                //             name: 'clientId',
+                //             value: <string>userPoolClient.ClientId
+                //         };
+                //     })
+                // ],
+                givenName: (req.query.customer !== undefined && req.query.customer.givenName !== '')
+                    ? req.query.customer.givenName
+                    : undefined,
+                familyName: (req.query.customer !== undefined && req.query.customer.familyName !== '')
+                    ? req.query.customer.familyName
+                    : undefined,
+                email: (req.query.customer !== undefined && req.query.customer.email !== '')
+                    ? req.query.customer.email
+                    : undefined,
+                telephone: (req.query.customer !== undefined && req.query.customer.telephone !== '')
+                    ? req.query.customer.telephone
+                    : undefined
             },
             orderNumbers: (req.query.orderNumbers !== undefined && req.query.orderNumbers !== '')
                 ? req.query.orderNumbers.split(',').map((v) => v.trim())
@@ -90,7 +124,7 @@ ordersRouter.get('',
                 : orderStatusChoices,
             orderDateFrom: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[0]).toDate()
-                : moment().add(-1, 'week').toDate(),
+                : moment().add(-1, 'month').toDate(),
             orderDateThrough: (req.query.orderDateRange !== undefined && req.query.orderDateRange !== '')
                 ? moment(req.query.orderDateRange.split(' - ')[1]).toDate()
                 : moment().add(1, 'day').toDate(),
@@ -135,6 +169,7 @@ ordersRouter.get('',
                     && req.query.paymentMethods.typeOfs !== undefined)
                     ? req.query.paymentMethods.typeOfs
                     : undefined,
+                // : Object.values(ssktsapi.factory.paymentMethodType),
                 paymentMethodIds: (req.query.paymentMethods !== undefined
                     && req.query.paymentMethods.paymentMethodIds !== undefined
                     && req.query.paymentMethods.paymentMethodIds !== '')
@@ -143,7 +178,19 @@ ordersRouter.get('',
             }
         };
         if (req.query.format === 'datatable') {
-            const searchOrdersResult = yield orderService.search(searchConditions);
+            const searchOrdersResult = yield orderService.search({
+                limit: searchConditions.limit,
+                page: searchConditions.page,
+                orderDateFrom: searchConditions.orderDateFrom,
+                orderDateThrough: searchConditions.orderDateThrough,
+                seller: searchConditions.seller,
+                customer: searchConditions.customer,
+                orderNumbers: searchConditions.orderNumbers,
+                orderStatuses: searchConditions.orderStatuses,
+                confirmationNumbers: searchConditions.confirmationNumbers,
+                acceptedOffers: searchConditions.acceptedOffers,
+                paymentMethods: searchConditions.paymentMethods
+            });
             res.json({
                 draw: req.query.draw,
                 recordsTotal: searchOrdersResult.totalCount,
@@ -155,8 +202,8 @@ ordersRouter.get('',
             res.render('orders/index', {
                 moment: moment,
                 movieTheaters: searchMovieTheatersResult,
-                userPoolClients: searchUserPoolClientsResult.data,
-                adminUserPoolClients: searchAdminUserPoolClientsResult.data,
+                userPoolClients: userPoolClients,
+                adminUserPoolClients: adminUserPoolClients,
                 searchConditions: searchConditions,
                 orderStatusChoices: orderStatusChoices,
                 PaymentMethodType: ssktsapi.factory.paymentMethodType
@@ -187,123 +234,133 @@ ordersRouter.get('/:orderNumber',
         if (order === undefined) {
             throw new ssktsapi.factory.errors.NotFound('Order');
         }
-        // 注文取引を検索
-        const actionRepo = new sskts.repository.Action(sskts.mongoose.connection);
-        let actionsOnOrder = yield actionRepo.findByOrderNumber(order.orderNumber);
-        // startDateでソート
-        actionsOnOrder = actionsOnOrder.sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf());
-        // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
-        const timelines = actionsOnOrder.map((a) => {
-            let agent;
-            if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
-                const url = (a.agent.memberOf !== undefined)
-                    ? `/people/${a.agent.id}`
-                    : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${a.agent.id}`;
-                agent = {
-                    id: a.agent.id,
-                    name: order.customer.name,
-                    url: url
-                };
-            }
-            else if (a.agent.typeOf === ssktsapi.factory.organizationType.MovieTheater) {
-                agent = {
-                    id: a.agent.id,
-                    name: order.seller.name,
-                    url: `/organizations/movieTheater/${a.agent.id}`
-                };
-            }
-            let actionName;
-            switch (a.typeOf) {
-                case ssktsapi.factory.actionType.OrderAction:
-                    actionName = '注文';
-                    break;
-                case ssktsapi.factory.actionType.GiveAction:
-                    actionName = '付与';
-                    break;
-                case ssktsapi.factory.actionType.SendAction:
-                    if (a.object.typeOf === 'Order') {
-                        actionName = '配送';
-                    }
-                    else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
-                        actionName = '送信';
-                    }
-                    else {
-                        actionName = '送信';
-                    }
-                    break;
-                case ssktsapi.factory.actionType.PayAction:
-                    actionName = '支払';
-                    break;
-                case ssktsapi.factory.actionType.ReturnAction:
-                    if (a.object.typeOf === 'Order') {
-                        actionName = '返品';
-                    }
-                    else {
-                        actionName = '返却';
-                    }
-                    break;
-                case ssktsapi.factory.actionType.RefundAction:
-                    actionName = '返金';
-                    break;
-                default:
-                    actionName = a.typeOf;
-            }
-            let object;
-            if (Array.isArray(a.object)) {
-                switch (a.object[0].typeOf) {
-                    case 'PaymentMethod':
-                        object = a.object[0].paymentMethod.name;
-                        break;
-                    case ssktsapi.factory.actionType.PayAction:
-                        object = a.object[0].object.paymentMethod.typeOf;
-                        break;
-                    default:
-                        object = a.object[0].typeOf;
+        let actionsOnOrder = [];
+        let timelines = [];
+        try {
+            const actionRepo = new sskts.repository.Action(sskts.mongoose.connection);
+            actionsOnOrder = yield actionRepo.findByOrderNumber(order.orderNumber);
+            // startDateでソート
+            actionsOnOrder = actionsOnOrder.sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf());
+            //     actionsOnOrder = await orderService.searchActionsByOrderNumber({
+            //     orderNumber: order.orderNumber,
+            //     sort: { endDate: ssktsapi.factory.sortType.Ascending }
+            // });
+            // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
+            timelines = actionsOnOrder.map((a) => {
+                let agent;
+                if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
+                    const url = (a.agent.memberOf !== undefined)
+                        ? `/people/${a.agent.id}`
+                        : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${a.agent.id}`;
+                    agent = {
+                        id: a.agent.id,
+                        name: order.customer.name,
+                        url: url
+                    };
                 }
-            }
-            else {
-                switch (a.object.typeOf) {
-                    case 'Order':
-                        object = '注文';
+                else if (a.agent.typeOf === ssktsapi.factory.organizationType.MovieTheater) {
+                    agent = {
+                        id: a.agent.id,
+                        name: order.seller.name,
+                        url: `/organizations/movieTheater/${a.agent.id}`
+                    };
+                }
+                let actionName;
+                switch (a.typeOf) {
+                    case ssktsapi.factory.actionType.OrderAction:
+                        actionName = '注文';
                         break;
-                    case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
-                        // case ssktsapi.factory.action.transfer.give.pointAward.ObjectType.PointAward:
-                        object = 'ポイント';
+                    case ssktsapi.factory.actionType.GiveAction:
+                        actionName = '付与';
                         break;
                     case ssktsapi.factory.actionType.SendAction:
                         if (a.object.typeOf === 'Order') {
-                            object = '配送';
+                            actionName = '配送';
                         }
                         else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
-                            object = '送信';
+                            actionName = '送信';
                         }
                         else {
-                            object = '送信';
+                            actionName = '送信';
                         }
                         break;
-                    case ssktsapi.factory.creativeWorkType.EmailMessage:
-                        object = 'Eメール';
-                        break;
-                    case 'PaymentMethod':
-                        object = a.object.object[0].paymentMethod.name;
-                        break;
                     case ssktsapi.factory.actionType.PayAction:
-                        object = a.object.object[0].paymentMethod.typeOf;
+                        actionName = '支払';
+                        break;
+                    case ssktsapi.factory.actionType.ReturnAction:
+                        if (a.object.typeOf === 'Order') {
+                            actionName = '返品';
+                        }
+                        else {
+                            actionName = '返却';
+                        }
+                        break;
+                    case ssktsapi.factory.actionType.RefundAction:
+                        actionName = '返金';
                         break;
                     default:
-                        object = a.object.typeOf;
+                        actionName = a.typeOf;
                 }
-            }
-            return {
-                action: a,
-                agent,
-                actionName,
-                object,
-                startDate: a.startDate,
-                actionStatus: a.actionStatus,
-                result: a.result
-            };
-        });
+                let object;
+                if (Array.isArray(a.object)) {
+                    switch (a.object[0].typeOf) {
+                        case 'PaymentMethod':
+                            object = a.object[0].paymentMethod.name;
+                            break;
+                        case ssktsapi.factory.actionType.PayAction:
+                            object = a.object[0].object.paymentMethod.typeOf;
+                            break;
+                        default:
+                            object = a.object[0].typeOf;
+                    }
+                }
+                else {
+                    switch (a.object.typeOf) {
+                        case 'Order':
+                            object = '注文';
+                            break;
+                        case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
+                            // case ssktsapi.factory.action.transfer.give.pointAward.ObjectType.PointAward:
+                            object = 'ポイント';
+                            break;
+                        case ssktsapi.factory.actionType.SendAction:
+                            if (a.object.typeOf === 'Order') {
+                                object = '配送';
+                            }
+                            else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                                object = '送信';
+                            }
+                            else {
+                                object = '送信';
+                            }
+                            break;
+                        case ssktsapi.factory.creativeWorkType.EmailMessage:
+                            object = 'Eメール';
+                            break;
+                        case 'PaymentMethod':
+                            object = a.object.object[0].paymentMethod.name;
+                            break;
+                        case ssktsapi.factory.actionType.PayAction:
+                            object = a.object.object[0].paymentMethod.typeOf;
+                            break;
+                        default:
+                            object = a.object.typeOf;
+                    }
+                }
+                return {
+                    action: a,
+                    agent,
+                    actionName,
+                    object,
+                    startDate: a.startDate,
+                    actionStatus: a.actionStatus,
+                    result: a.result
+                };
+            });
+        }
+        catch (error) {
+            // no op
+        }
         res.render('orders/show', {
             moment: moment,
             order: order,
@@ -320,34 +377,80 @@ ordersRouter.get('/:orderNumber',
  */
 ordersRouter.post('/:orderNumber/return', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        // 注文取引を検索
-        const transactionRepo = new sskts.repository.Transaction(sskts.mongoose.connection);
-        const transaction = yield transactionRepo.transactionModel.findOne({
-            'result.order.orderNumber': {
-                $exists: true,
-                $eq: req.params.orderNumber
-            }
-        }).exec().then((doc) => {
-            if (doc === null) {
-                throw new ssktsapi.factory.errors.NotFound('Transaction');
-            }
-            return doc.toObject();
-        });
         const returnOrderService = new ssktsapi.service.transaction.ReturnOrder({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
         const returnOrderTransaction = yield returnOrderService.start({
             expires: moment().add(1, 'minutes').toDate(),
-            transactionId: transaction.id
-            // object: {
-            //     order: {
-            //         orderNumber: req.params.orderNumber
-            //     }
-            // }
+            object: {
+                order: {
+                    orderNumber: req.params.orderNumber
+                }
+            }
         });
-        yield returnOrderService.confirm({ transactionId: returnOrderTransaction.id });
+        yield returnOrderService.confirm(returnOrderTransaction);
         res.status(http_status_1.ACCEPTED).end();
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+/**
+ * 注文配送メール送信
+ */
+ordersRouter.post('/:orderNumber/sendEmailMessage', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const placeOrderService = new ssktsapi.service.transaction.PlaceOrder({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const taskService = new ssktsapi.service.Task({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const searchTransactionsResult = yield placeOrderService.search({
+            limit: 1,
+            typeOf: ssktsapi.factory.transactionType.PlaceOrder,
+            result: { order: { orderNumbers: [req.params.orderNumber] } }
+        });
+        if (searchTransactionsResult.totalCount === 0) {
+            throw new ssktsapi.factory.errors.NotFound('Order');
+        }
+        const placeOrderTransaction = searchTransactionsResult.data[0];
+        const potentialActions = placeOrderTransaction.potentialActions;
+        if (potentialActions === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('Transactino potentialActions');
+        }
+        const orderPotentialActions = potentialActions.order.potentialActions;
+        if (orderPotentialActions === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('Order potentialActions');
+        }
+        if (orderPotentialActions.sendOrder === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('SendOrder actionAttributes');
+        }
+        const sendOrderPotentialActions = orderPotentialActions.sendOrder.potentialActions;
+        if (sendOrderPotentialActions === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('SendOrder potentialActions');
+        }
+        const sendEmailMessageActionAttributes = sendOrderPotentialActions.sendEmailMessage;
+        if (sendEmailMessageActionAttributes === undefined) {
+            throw new ssktsapi.factory.errors.NotFound('SendEmailMessage actionAttributes');
+        }
+        const taskAttributes = {
+            name: ssktsapi.factory.taskName.SendEmailMessage,
+            status: ssktsapi.factory.taskStatus.Ready,
+            runsAt: new Date(),
+            remainingNumberOfTries: 3,
+            lastTriedAt: null,
+            numberOfTried: 0,
+            executionResults: [],
+            data: {
+                actionAttributes: sendEmailMessageActionAttributes
+            }
+        };
+        const task = yield taskService.create(taskAttributes);
+        res.status(http_status_1.CREATED).json(task);
     }
     catch (error) {
         next(error);

@@ -106,7 +106,10 @@ organizationsRouter.all('/movieTheater/new', (req, res, next) => __awaiter(this,
                     telephone: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterTelNum : '',
                     url: req.body.url,
                     paymentAccepted: [],
-                    gmoInfo: req.body.gmoInfo
+                    gmoInfo: req.body.gmoInfo,
+                    hasPOS: [],
+                    areaServed: [],
+                    makesOffer: []
                 };
                 debug('creating movie...');
                 const doc = yield organizationRepo.organizationModel.create(movieTheater);

@@ -198,7 +198,13 @@ eventsRouter.get(
                 sort: { orderDate: ssktsapi.factory.sortType.Ascending },
                 orderDateFrom: reservationStartDate,
                 orderDateThrough: new Date(),
-                reservedEventIdentifiers: [event.identifier]
+                acceptedOffers: {
+                    itemOffered: {
+                        reservationFor: {
+                            ids: [event.identifier]
+                        }
+                    }
+                }
             });
             debug(searchOrdersResult.totalCount, 'orders found.');
             res.json(searchOrdersResult);
