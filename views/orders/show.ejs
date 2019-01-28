@@ -91,8 +91,9 @@
                             <!-- <br>
                                         <b>Payment Due:</b> 2/22/2014 -->
                             <br>
-                            <b>Payment Method ID:</b>
-                            <%= (order.paymentMethods.length > 0) ? order.paymentMethods[0].paymentMethodId : '' %>
+                            <b>Payment Method:</b>
+                            <br>
+                            <%- (order.paymentMethods.length > 0) ? order.paymentMethods.map((p)=>`${p.typeOf} ${p.paymentMethodId}`).join('<br>') : '' %>
                         </div>
                         <!-- /.col -->
                     </div>
@@ -121,7 +122,8 @@
                                         </td>
                                         <td>
                                             <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
-                                            <a target="_blank" href="/events/individualScreeningEvent/<%= acceptedOffer.itemOffered.reservationFor.identifier %>">
+                                            <% if (acceptedOffer.itemOffered.reservationFor !== undefined) { %>
+                                            <a target="_blank" href="/events/screeningEvent/<%= acceptedOffer.itemOffered.reservationFor.id %>">
                                                 <%= acceptedOffer.itemOffered.reservationFor.name.ja %>
                                                 <br>
                                                 <%= moment(acceptedOffer.itemOffered.reservationFor.startDate).format('YY-MM-DD hh:mm') %>
@@ -131,18 +133,21 @@
                                                 <%= acceptedOffer.itemOffered.reservationFor.superEvent.location.name.ja %>
                                                 <%= acceptedOffer.itemOffered.reservationFor.location.name.ja %>
                                             </a>
+                                            <% } %>
                                             <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
                                             <%= acceptedOffer.itemOffered.programName %>
                                             <% } %>
                                         </td>
                                         <td>
                                             <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
-                                            <%= acceptedOffer.itemOffered.reservedTicket.ticketToken %>
+                                            <%= (acceptedOffer.itemOffered.reservedTicket !== undefined) ? acceptedOffer.itemOffered.reservedTicket.ticketToken : '' %>
                                             <% } %>
                                         </td>
                                         <td>
                                             <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
+                                            <% if (acceptedOffer.itemOffered.reservedTicket!==undefined) { %>
                                             <%= acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber %>
+                                            <% } %>
                                             <% } else if (acceptedOffer.itemOffered.typeOf === 'ProgramMembership') { %>
                                             <%= acceptedOffer.price %>
                                             <%= acceptedOffer.priceCurrency %>
@@ -226,9 +231,9 @@
                             <button type="button" class="btn btn-danger float-right returnOrder">
                                 <i class="fa fa-undo"></i> 返品
                             </button>
-                            <!-- <button type="button" class="btn btn-warning float-right sendEmailMessage" style="margin-right: 5px;">
+                            <button type="button" class="btn btn-warning float-right sendEmailMessage" style="margin-right: 5px;">
                                 <i class="fa fa-envelope"></i> 配送メール送信
-                            </button> -->
+                            </button>
                             <% } %>
                             <% if (order.orderStatus === 'OrderReturned') { %>
                             <button type="button" class="btn btn-default float-right disabled">

@@ -24,7 +24,7 @@ const eventsRouter = express.Router();
 /**
  * 上映イベント検索
  */
-eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+eventsRouter.get('/screeningEvent', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         debug('req.query:', req.query);
         const eventService = new ssktsapi.service.Event({
@@ -60,7 +60,7 @@ eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this
             });
         }
         else {
-            res.render('events/individualScreeningEvent/index', {
+            res.render('events/screeningEvent/index', {
                 moment: moment,
                 movieTheaters: movieTheaters,
                 searchConditions: searchConditions,
@@ -75,7 +75,7 @@ eventsRouter.get('/individualScreeningEvent', (req, res, next) => __awaiter(this
 /**
  * 上映イベントインポート
  */
-eventsRouter.post('/individualScreeningEvent/import', ...[
+eventsRouter.post('/screeningEvent/import', ...[
     check_1.body('superEventLocationIdentifiers').not().isEmpty().withMessage((_, options) => `${options.path} is required`)
         .isArray(),
     check_1.body('startRange').not().isEmpty().withMessage((_, options) => `${options.path} is required`)
@@ -128,7 +128,7 @@ eventsRouter.post('/individualScreeningEvent/import', ...[
 /**
  * 上映イベント詳細
  */
-eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+eventsRouter.get('/screeningEvent/:identifier', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         debug('req.query:', req.query);
         const eventService = new ssktsapi.service.Event({
@@ -154,7 +154,7 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
             branchCode: event.superEvent.location.branchCode
         });
         const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
-        res.render('events/individualScreeningEvent/show', {
+        res.render('events/screeningEvent/show', {
             message: '',
             moment: moment,
             movieTheater: movieTheater,
@@ -171,7 +171,7 @@ eventsRouter.get('/individualScreeningEvent/:identifier', (req, res, next) => __
 /**
  * 上映イベントの注文検索
  */
-eventsRouter.get('/individualScreeningEvent/:identifier/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+eventsRouter.get('/screeningEvent/:identifier/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         const eventService = new ssktsapi.service.Event({
             endpoint: process.env.API_ENDPOINT,
@@ -192,7 +192,13 @@ eventsRouter.get('/individualScreeningEvent/:identifier/orders', (req, res, next
             sort: { orderDate: ssktsapi.factory.sortType.Ascending },
             orderDateFrom: reservationStartDate,
             orderDateThrough: new Date(),
-            reservedEventIdentifiers: [event.identifier]
+            acceptedOffers: {
+                itemOffered: {
+                    reservationFor: {
+                        ids: [event.identifier]
+                    }
+                }
+            }
         });
         debug(searchOrdersResult.totalCount, 'orders found.');
         res.json(searchOrdersResult);

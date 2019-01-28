@@ -3375,10 +3375,10 @@ input[type="button"].btn-block {
     text-decoration: none;
     background-color: #117a8b; }
 
-.badge-warning, .badge.Canceled, .badge.Ready, .badge.CanceledActionStatus {
+.badge-warning, .badge.Canceled, .badge.Ready, .badge.CanceledActionStatus, .badge.MovieTicket {
   color: #212529;
   background-color: #ffc107; }
-  .badge-warning[href]:hover, .badge.Canceled[href]:hover, .badge.Ready[href]:hover, .badge.CanceledActionStatus[href]:hover, .badge-warning[href]:focus, .badge.Canceled[href]:focus, .badge.Ready[href]:focus, .badge.CanceledActionStatus[href]:focus {
+  .badge-warning[href]:hover, .badge.Canceled[href]:hover, .badge.Ready[href]:hover, .badge.CanceledActionStatus[href]:hover, .badge.MovieTicket[href]:hover, .badge-warning[href]:focus, .badge.Canceled[href]:focus, .badge.Ready[href]:focus, .badge.CanceledActionStatus[href]:focus, .badge.MovieTicket[href]:focus {
     color: #212529;
     text-decoration: none;
     background-color: #d39e00; }

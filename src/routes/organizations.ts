@@ -102,7 +102,10 @@ organizationsRouter.all(
                         telephone: (theaterFromCOA !== undefined) ? theaterFromCOA.theaterTelNum : '',
                         url: req.body.url,
                         paymentAccepted: [],
-                        gmoInfo: req.body.gmoInfo
+                        gmoInfo: req.body.gmoInfo,
+                        hasPOS: [],
+                        areaServed: [],
+                        makesOffer: []
                     };
                     debug('creating movie...');
                     const doc = await organizationRepo.organizationModel.create(movieTheater);
@@ -142,7 +145,7 @@ organizationsRouter.all(
             }
             const movieTheater = <sskts.factory.organization.movieTheater.IOrganization>doc.toObject();
             if (Array.isArray(movieTheater.paymentAccepted) &&
-                movieTheater.paymentAccepted.find((p) => p.paymentMethodType === sskts.factory.paymentMethodType.Pecorino) !== undefined) {
+                movieTheater.paymentAccepted.find((p) => p.paymentMethodType === sskts.factory.paymentMethodType.Account) !== undefined) {
                 (<any>movieTheater).pecorinoPaymentAccepted = 'on';
             }
 
@@ -157,7 +160,7 @@ organizationsRouter.all(
                     // ポイント決済を有効にする場合、口座未開設であれば開設する
                     if (update.pecorinoPaymentAccepted === 'on') {
                         // tslint:disable-next-line:max-line-length
-                        if (movieTheater.paymentAccepted.find((p) => p.paymentMethodType === sskts.factory.paymentMethodType.Pecorino) === undefined) {
+                        if (movieTheater.paymentAccepted.find((p) => p.paymentMethodType === sskts.factory.paymentMethodType.Account) === undefined) {
                             const account = await sskts.service.account.open({
                                 name: movieTheater.name.ja
                             })({
@@ -169,7 +172,7 @@ organizationsRouter.all(
                             });
                             debug('account opened.');
                             update.paymentAccepted.push({
-                                paymentMethodType: sskts.factory.paymentMethodType.Pecorino,
+                                paymentMethodType: sskts.factory.paymentMethodType.Account,
                                 accountNumber: account.accountNumber
                             });
                         }

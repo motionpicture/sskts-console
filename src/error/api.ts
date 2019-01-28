@@ -5,9 +5,9 @@ import { factory } from '../ssktsapi';
  */
 export class APIError extends Error {
     public readonly code: number;
-    public readonly errors: factory.errors.SSKTS[];
+    public readonly errors: factory.errors.Cinerino[];
 
-    constructor(code: number, errors: factory.errors.SSKTS[]) {
+    constructor(code: number, errors: factory.errors.Cinerino[]) {
         const message = errors.map((error) => error.message).join('\n');
         super(message);
 

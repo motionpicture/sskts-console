@@ -42,7 +42,7 @@
                                     <div class="form-group">
                                         <label for="agent[ids]">購入者</label>
                                         <input type="text" class="form-control" id="agent[ids]" name="agent[ids]"
-                                            placeholder="購入者ID" value="<%= searchConditions.agent.ids.join(',') %>">
+                                            placeholder="購入者ID" value="<%= (Array.isArray(searchConditions.agent.ids)) ? searchConditions.agent.ids.join(',') : '' %>">
                                     </div>
                                     <div class="form-group">
                                         <input type="text" class="form-control" id="object[customerContact][familyName]"
@@ -77,7 +77,7 @@
                                     <div class="form-group">
                                         <label for="result[order][orderNumbers]">注文番号</label>
                                         <input type="text" class="form-control" id="result[order][orderNumbers]" name="result[order][orderNumbers]"
-                                            placeholder="注文番号" value="<%= searchConditions.result.order.orderNumbers.join(',') %>">
+                                            placeholder="注文番号" value="<%= (Array.isArray(searchConditions.result.order.orderNumbers)) ? searchConditions.result.order.orderNumbers.join(',') : '' %>">
                                     </div>
                                     <div class="form-group">
                                         <label>取引開始日時</label>
@@ -101,6 +101,18 @@
                                             <option value="<%= transactionStatus %>" <% if (selected) { %> selected
                                                 <% } %>>
                                                 <%= transactionStatus %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>タスクエクスポートステータス</label>
+                                        <select multiple class="form-control" name="tasksExportationStatuses[]">
+                                            <% Object.values(TransactionTasksExportationStatus).forEach(function (status) { %>
+                                            <% var selected = searchConditions.tasksExportationStatuses.indexOf(status) >= 0; %>
+                                            <option value="<%= status %>" <% if (selected) { %> selected
+                                                <% } %>>
+                                                <%= status %>
                                             </option>
                                             <% }) %>
                                         </select>
@@ -149,6 +161,7 @@
                                     <th>販売者</th>
                                     <th>ユーザー主体<br>トークン発行者<br>クライアント</th>
                                     <th>結果</th>
+                                    <th>タスクエクスポート</th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -158,6 +171,7 @@
                                     <th>販売者</th>
                                     <th>ユーザー主体<br>トークン発行者<br>クライアント</th>
                                     <th>結果</th>
+                                    <th>タスクエクスポート</th>
                                 </tr>
                             </tfoot>
                         </table>
