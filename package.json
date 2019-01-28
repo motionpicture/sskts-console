@@ -12,8 +12,8 @@
   "dependencies": {
     "@cinerino/api-nodejs-client": "^1.1.0-alpha.39",
     "@motionpicture/express-middleware": "^0.1.0",
-    "@motionpicture/sskts-api-nodejs-client": "^5.0.0-alpha.0",
-    "@motionpicture/sskts-domain": "^27.0.0-alpha.7",
+    "@motionpicture/sskts-api-nodejs-client": "^5.0.0",
+    "@motionpicture/sskts-domain": "^27.0.0",
     "admin-lte": "^3.0.0-alpha.2",
     "aws-sdk": "^2.395.0",
     "body-parser": "^1.18.3",

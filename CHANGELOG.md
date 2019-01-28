@@ -10,7 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- update sskts-api-nodejs-client
+- install @motionpicture/sskts-api-nodejs-client@5.0.0
+- install @motionpicture/sskts-domain@27.0.0
 
 ### Deprecated
 
