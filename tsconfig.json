@@ -9,6 +9,10 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
+        "lib": [
+            "dom",
+            "es2017"
+        ],
         "inlineSourceMap": false,
         "inlineSources": false,
         "isolatedModules": false,

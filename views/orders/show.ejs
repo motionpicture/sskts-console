@@ -123,7 +123,7 @@
                                         <td>
                                             <% if (acceptedOffer.itemOffered.typeOf === 'EventReservation') { %>
                                             <% if (acceptedOffer.itemOffered.reservationFor !== undefined) { %>
-                                            <a target="_blank" href="/events/individualScreeningEvent/<%= acceptedOffer.itemOffered.reservationFor.id %>">
+                                            <a target="_blank" href="/events/screeningEvent/<%= acceptedOffer.itemOffered.reservationFor.id %>">
                                                 <%= acceptedOffer.itemOffered.reservationFor.name.ja %>
                                                 <br>
                                                 <%= moment(acceptedOffer.itemOffered.reservationFor.startDate).format('YY-MM-DD hh:mm') %>

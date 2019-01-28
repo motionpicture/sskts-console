@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
-const ssktsapi = require("../../ssktsapi");
+const cinerinoapi = require("../../cinerinoapi");
 // import validator from '../../middlewares/validator';
 const debug = createDebug('cinerino-console:routes');
 const placeOrderTransactionsRouter = express.Router();
@@ -26,26 +26,26 @@ placeOrderTransactionsRouter.get('',
 (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         debug('req.query:', req.query);
-        const placeOrderService = new ssktsapi.service.transaction.PlaceOrder({
+        const placeOrderService = new cinerinoapi.service.transaction.PlaceOrder({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const organizationService = new ssktsapi.service.Organization({
+        const sellerService = new cinerinoapi.service.Seller({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const searchMovieTheatersResult = yield organizationService.searchMovieTheaters({});
+        const searchSellersResult = yield sellerService.search({});
         const transactionStatusChoices = [
-            ssktsapi.factory.transactionStatusType.Canceled,
-            ssktsapi.factory.transactionStatusType.Confirmed,
-            ssktsapi.factory.transactionStatusType.Expired,
-            ssktsapi.factory.transactionStatusType.InProgress
+            cinerinoapi.factory.transactionStatusType.Canceled,
+            cinerinoapi.factory.transactionStatusType.Confirmed,
+            cinerinoapi.factory.transactionStatusType.Expired,
+            cinerinoapi.factory.transactionStatusType.InProgress
         ];
         const searchConditions = {
             limit: req.query.limit,
             page: req.query.page,
-            sort: { startDate: ssktsapi.factory.sortType.Descending },
-            typeOf: ssktsapi.factory.transactionType.PlaceOrder,
+            sort: { startDate: cinerinoapi.factory.sortType.Descending },
+            typeOf: cinerinoapi.factory.transactionType.PlaceOrder,
             ids: (Array.isArray(req.query.ids)) ? req.query.ids : undefined,
             statuses: (req.query.statuses !== undefined)
                 ? req.query.statuses
@@ -59,21 +59,30 @@ placeOrderTransactionsRouter.get('',
             endFrom: (req.query.endFrom !== undefined) ? moment(req.query.endFrom).toDate() : undefined,
             endThrough: (req.query.endThrough !== undefined) ? moment(req.query.endThrough).toDate() : undefined,
             agent: {
-                typeOf: ssktsapi.factory.personType.Person,
-                ids: (req.query.agent !== undefined && req.query.agent.ids !== '')
+                // typeOf: cinerinoapi.factory.personType.Person,
+                ids: (req.query.agent !== undefined && req.query.agent.ids !== undefined && req.query.agent.ids !== '')
                     ? req.query.agent.ids.split(',').map((v) => v.trim())
-                    : []
+                    : undefined
             },
             seller: {
-                typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                // typeOf: cinerinoapi.factory.organizationType.MovieTheater,
                 ids: (req.query.seller !== undefined && req.query.seller.ids !== undefined)
                     ? req.query.seller.ids
-                    : searchMovieTheatersResult.map((m) => m.id)
+                    : searchSellersResult.data.map((m) => m.id)
             },
             object: {
                 customerContact: (req.query.object !== undefined
                     && req.query.object.customerContact !== undefined)
-                    ? req.query.object.customerContact
+                    ? {
+                        givenName: (req.query.object.customerContact.givenName !== '')
+                            ? req.query.object.customerContact.givenName : undefined,
+                        familyName: (req.query.object.customerContact.familyName !== '')
+                            ? req.query.object.customerContact.familyName : undefined,
+                        telephone: (req.query.object.customerContact.telephone !== '')
+                            ? req.query.object.customerContact.telephone : undefined,
+                        email: (req.query.object.customerContact.email !== '')
+                            ? req.query.object.customerContact.email : undefined
+                    }
                     : {}
             },
             result: {
@@ -82,33 +91,36 @@ placeOrderTransactionsRouter.get('',
                         && req.query.result.order !== undefined
                         && req.query.result.order.orderNumbers !== '')
                         ? req.query.result.order.orderNumbers.split(',').map((v) => v.trim())
-                        : []
+                        : undefined
                 }
-            }
+            },
+            tasksExportationStatuses: (req.query.tasksExportationStatuses !== undefined)
+                ? req.query.tasksExportationStatuses
+                : Object.values(cinerinoapi.factory.transactionTasksExportationStatus)
         };
+        debug('searchConditions:', searchConditions);
         if (req.query.format === 'datatable') {
-            const searchScreeningEventsResult = yield placeOrderService.search(Object.assign({}, searchConditions, { limit: searchConditions.limit, page: searchConditions.page, typeOf: searchConditions.typeOf, sort: searchConditions.sort, startFrom: searchConditions.startFrom, startThrough: searchConditions.startThrough, statuses: searchConditions.statuses }));
+            const searchScreeningEventsResult = yield placeOrderService.search(searchConditions);
             res.json({
                 draw: req.query.draw,
                 recordsTotal: searchScreeningEventsResult.totalCount,
                 recordsFiltered: searchScreeningEventsResult.totalCount,
                 data: searchScreeningEventsResult.data
             });
-            // } else if (req.query.format === ssktsapi.factory.encodingFormat.Text.csv) {
-            //     const stream = <NodeJS.ReadableStream>await placeOrderService.downloadReport({
-            //         ...searchConditions,
-            //         format: ssktsapi.factory.encodingFormat.Text.csv
-            //     });
-            //     const filename = 'TransactionReport';
-            //     res.setHeader('Content-disposition', `attachment; filename*=UTF-8\'\'${encodeURIComponent(`${filename}.csv`)}`);
-            //     res.setHeader('Content-Type', 'text/csv; charset=UTF-8');
-            //     stream.pipe(res);
+        }
+        else if (req.query.format === cinerinoapi.factory.encodingFormat.Text.csv) {
+            const stream = yield placeOrderService.downloadReport(Object.assign({}, searchConditions, { format: cinerinoapi.factory.encodingFormat.Text.csv }));
+            const filename = 'TransactionReport';
+            res.setHeader('Content-disposition', `attachment; filename*=UTF-8\'\'${encodeURIComponent(`${filename}.csv`)}`);
+            res.setHeader('Content-Type', 'text/csv; charset=UTF-8');
+            stream.pipe(res);
         }
         else {
             res.render('transactions/placeOrder/index', {
                 moment: moment,
-                movieTheaters: searchMovieTheatersResult,
+                movieTheaters: searchSellersResult.data,
                 transactionStatusChoices: transactionStatusChoices,
+                TransactionTasksExportationStatus: cinerinoapi.factory.transactionTasksExportationStatus,
                 searchConditions: searchConditions
             });
         }
@@ -124,22 +136,28 @@ placeOrderTransactionsRouter.get('/:transactionId',
 // tslint:disable-next-line:max-func-body-length
 (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const placeOrderService = new ssktsapi.service.transaction.PlaceOrder({
+        const placeOrderService = new cinerinoapi.service.transaction.PlaceOrder({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
         const searchTransactionsResult = yield placeOrderService.search({
-            typeOf: ssktsapi.factory.transactionType.PlaceOrder,
+            typeOf: cinerinoapi.factory.transactionType.PlaceOrder,
             ids: [req.params.transactionId]
         });
         const transaction = searchTransactionsResult.data.shift();
         if (transaction === undefined) {
-            throw new ssktsapi.factory.errors.NotFound('Transaction');
+            throw new cinerinoapi.factory.errors.NotFound('Transaction');
         }
-        const actionsOnTransaction = yield placeOrderService.searchActionsByTransactionId({
-            id: transaction.id,
-            sort: { endDate: ssktsapi.factory.sortType.Ascending }
-        });
+        let actionsOnTransaction = [];
+        try {
+            actionsOnTransaction = yield placeOrderService.searchActionsByTransactionId({
+                id: transaction.id,
+                sort: { endDate: cinerinoapi.factory.sortType.Ascending }
+            });
+        }
+        catch (error) {
+            // no op
+        }
         const transactionAgentUrl = (transaction.agent.memberOf !== undefined)
             ? `/people/${transaction.agent.id}`
             : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${transaction.agent.id}`;
@@ -153,13 +171,13 @@ placeOrderTransactionsRouter.get('/:transactionId',
                 actionName: '開始',
                 object: '取引',
                 startDate: transaction.startDate,
-                actionStatus: ssktsapi.factory.actionStatusType.CompletedActionStatus,
+                actionStatus: cinerinoapi.factory.actionStatusType.CompletedActionStatus,
                 result: undefined
             }];
         // tslint:disable-next-line:cyclomatic-complexity
         timelines.push(...actionsOnTransaction.map((a) => {
             let agent;
-            if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
+            if (a.agent.typeOf === cinerinoapi.factory.personType.Person) {
                 const url = (a.agent.memberOf !== undefined)
                     ? `/people/${a.agent.id}`
                     : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${a.agent.id}`;
@@ -169,7 +187,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
                     url: url
                 };
             }
-            else if (a.agent.typeOf === ssktsapi.factory.organizationType.MovieTheater) {
+            else if (a.agent.typeOf === cinerinoapi.factory.organizationType.MovieTheater) {
                 agent = {
                     id: a.agent.id,
                     name: transaction.seller.name.ja,
@@ -178,7 +196,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
             }
             let actionName;
             switch (a.typeOf) {
-                case ssktsapi.factory.actionType.AuthorizeAction:
+                case cinerinoapi.factory.actionType.AuthorizeAction:
                     actionName = '承認';
                     break;
                 default:
@@ -186,16 +204,16 @@ placeOrderTransactionsRouter.get('/:transactionId',
             }
             let object;
             switch (a.object.typeOf) {
-                case ssktsapi.factory.action.authorize.offer.seatReservation.ObjectType.SeatReservation:
+                case cinerinoapi.factory.action.authorize.offer.seatReservation.ObjectType.SeatReservation:
                     object = '座席予約';
                     break;
-                case ssktsapi.factory.paymentMethodType.CreditCard:
+                case cinerinoapi.factory.paymentMethodType.CreditCard:
                     object = 'クレジットカード決済';
                     break;
-                case ssktsapi.factory.paymentMethodType.Account:
-                    object = 'ポイント決済';
+                case cinerinoapi.factory.paymentMethodType.Account:
+                    object = '口座決済';
                     break;
-                case ssktsapi.factory.action.authorize.award.pecorino.ObjectType.PecorinoAward:
+                case cinerinoapi.factory.action.authorize.award.point.ObjectType.PointAward:
                     object = 'ポイントインセンティブ';
                     break;
                 default:
@@ -213,7 +231,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
         }));
         if (transaction.endDate !== undefined) {
             switch (transaction.status) {
-                case ssktsapi.factory.transactionStatusType.Canceled:
+                case cinerinoapi.factory.transactionStatusType.Canceled:
                     timelines.push({
                         action: {},
                         agent: {
@@ -224,11 +242,11 @@ placeOrderTransactionsRouter.get('/:transactionId',
                         actionName: '中止',
                         object: '取引',
                         startDate: transaction.endDate,
-                        actionStatus: ssktsapi.factory.actionStatusType.CompletedActionStatus,
+                        actionStatus: cinerinoapi.factory.actionStatusType.CompletedActionStatus,
                         result: undefined
                     });
                     break;
-                case ssktsapi.factory.transactionStatusType.Confirmed:
+                case cinerinoapi.factory.transactionStatusType.Confirmed:
                     timelines.push({
                         action: {},
                         agent: {
@@ -239,11 +257,11 @@ placeOrderTransactionsRouter.get('/:transactionId',
                         actionName: '確定',
                         object: '取引',
                         startDate: transaction.endDate,
-                        actionStatus: ssktsapi.factory.actionStatusType.CompletedActionStatus,
+                        actionStatus: cinerinoapi.factory.actionStatusType.CompletedActionStatus,
                         result: undefined
                     });
                     break;
-                case ssktsapi.factory.transactionStatusType.Expired:
+                case cinerinoapi.factory.transactionStatusType.Expired:
                     timelines.push({
                         action: {},
                         agent: {
@@ -254,7 +272,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
                         actionName: '終了',
                         object: '取引',
                         startDate: transaction.endDate,
-                        actionStatus: ssktsapi.factory.actionStatusType.CompletedActionStatus,
+                        actionStatus: cinerinoapi.factory.actionStatusType.CompletedActionStatus,
                         result: undefined
                     });
                     break;
@@ -265,7 +283,7 @@ placeOrderTransactionsRouter.get('/:transactionId',
             moment: moment,
             transaction: transaction,
             timelines: timelines,
-            ActionStatusType: ssktsapi.factory.actionStatusType
+            ActionStatusType: cinerinoapi.factory.actionStatusType
         });
     }
     catch (error) {

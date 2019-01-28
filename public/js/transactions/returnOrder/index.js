@@ -30,9 +30,13 @@ $(function () {
             {
                 data: null,
                 render: function (data, type, row) {
-                    var userPoolId = data.object.clientUser.iss.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
+                    var userPoolId = '';
+                    if (data.object.clientUser !== undefined) {
+                        userPoolId = data.object.clientUser.iss.replace('https://cognito-idp.ap-northeast-1.amazonaws.com/', '');
+                    }
+
                     var html = '<ul class="list-unstyled">'
-                        + '<li>' + data.agent.typeOf + '</li>';
+                        + '<li><span class="badge badge-secondary ' + data.agent.typeOf + '">' + data.agent.typeOf + '</span></li>';
 
                     if (data.agent.memberOf !== undefined) {
                         html += '<li><a target="_blank" href="/userPools/' + userPoolId + '/people/' + data.agent.id + '">' + data.agent.id + '</a></li>'
@@ -52,15 +56,36 @@ $(function () {
                     var seller = {};
                     if (data.object.order !== undefined) {
                         seller = data.object.order.seller;
-                    } else {
-                        seller = data.object.transaction.result.order.seller;
                     }
 
                     return '<ul class="list-unstyled">'
-                        + '<li>' + seller.typeOf + '</li>'
+                        + '<li><span class="badge badge-secondary ' + seller.typeOf + '">' + seller.typeOf + '</span></li>'
                         + '<li><a target="_blank" href="/organizations/' + seller.typeOf + '/' + seller.id + '">' + seller.name + '</a></li>'
                         + '<li>' + seller.telephone + '</li>'
                         + '<li>' + seller.url + '</li>'
+                        + '</ul>';
+                }
+            },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    if (data.object !== undefined && data.object.order !== undefined) {
+                        return '<ul class="list-unstyled">'
+                            + '<li><a target="_blank" href="/orders/' + data.object.order.orderNumber + '">' + data.object.order.orderNumber + '</a></li>'
+                            + '</ul>';
+                    } else {
+                        return '<ul class="list-unstyled">'
+                            + '<li>No Object</li>'
+                            + '</ul>';
+                    }
+                }
+            },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return '<ul class="list-unstyled">'
+                        + '<li><span class="badge badge-secondary ' + data.tasksExportationStatus + '">' + data.tasksExportationStatus + '</span></li>'
+                        + '<li>' + data.tasksExportedAt + '</li>'
                         + '</ul>';
                 }
             }

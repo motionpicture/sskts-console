@@ -4,7 +4,7 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/events/individualScreeningEvent?' * $('form').serialize(),
+            url: '/events/screeningEvent?' * $('form').serialize(),
             data: function (d) {
                 d.limit = d.length;
                 d.page = (d.start / d.length) + 1;
@@ -29,10 +29,10 @@ $(function () {
                         + '<img src="' + thumbnailImageUrl + '" alt="Product Image" class="img-size-50">'
                         + '</div>'
                         + '<div class="product-info">'
-                        + '<a target="_blank" href="/events/individualScreeningEvent/' + data.identifier + '">' + data.identifier + '</a>'
+                        + '<a target="_blank" href="/events/screeningEvent/' + data.identifier + '">' + data.identifier + '</a>'
                         + '</div>'
                         + '</li>'
-                        // + '<li><a target="_blank" href="/events/individualScreeningEvent/' + data.identifier + '">' + data.identifier + '</a></li>'
+                        // + '<li><a target="_blank" href="/events/screeningEvent/' + data.identifier + '">' + data.identifier + '</a></li>'
                         + '</ul>';
                 }
             },
@@ -83,7 +83,7 @@ $(function () {
             + '\nよろしいですか？';
         if (window.confirm(message)) {
             $.ajax({
-                url: '/events/individualScreeningEvent/import',
+                url: '/events/screeningEvent/import',
                 type: 'POST',
                 dataType: 'json',
                 data: $('form').serialize()

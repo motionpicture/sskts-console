@@ -17,7 +17,7 @@ const eventsRouter = express.Router();
  * 上映イベント検索
  */
 eventsRouter.get(
-    '/individualScreeningEvent',
+    '/screeningEvent',
     async (req, res, next) => {
         try {
             debug('req.query:', req.query);
@@ -55,7 +55,7 @@ eventsRouter.get(
                     data: searchEventsResult.data
                 });
             } else {
-                res.render('events/individualScreeningEvent/index', {
+                res.render('events/screeningEvent/index', {
                     moment: moment,
                     movieTheaters: movieTheaters,
                     searchConditions: searchConditions,
@@ -70,7 +70,7 @@ eventsRouter.get(
  * 上映イベントインポート
  */
 eventsRouter.post(
-    '/individualScreeningEvent/import',
+    '/screeningEvent/import',
     ...[
         body('superEventLocationIdentifiers').not().isEmpty().withMessage((_, options) => `${options.path} is required`)
             .isArray(),
@@ -129,7 +129,7 @@ eventsRouter.post(
  * 上映イベント詳細
  */
 eventsRouter.get(
-    '/individualScreeningEvent/:identifier',
+    '/screeningEvent/:identifier',
     async (req, res, next) => {
         try {
             debug('req.query:', req.query);
@@ -159,7 +159,7 @@ eventsRouter.get(
             });
             const screeningRoom = movieTheater.containsPlace.find((p) => p.branchCode === event.location.branchCode);
 
-            res.render('events/individualScreeningEvent/show', {
+            res.render('events/screeningEvent/show', {
                 message: '',
                 moment: moment,
                 movieTheater: movieTheater,
@@ -176,7 +176,7 @@ eventsRouter.get(
  * 上映イベントの注文検索
  */
 eventsRouter.get(
-    '/individualScreeningEvent/:identifier/orders',
+    '/screeningEvent/:identifier/orders',
     async (req, res, next) => {
         try {
             const eventService = new ssktsapi.service.Event({

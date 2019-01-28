@@ -44,7 +44,7 @@ $(function () {
 function searchOrders(cb) {
     page += 1;
     $.getJSON(
-        '/events/individualScreeningEvent/' + event.identifier + '/orders',
+        '/events/screeningEvent/' + event.identifier + '/orders',
         { limit: limit, page: page }
     ).done(function (data) {
         $('#orderCount').html(data.totalCount.toString());

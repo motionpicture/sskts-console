@@ -1,13 +1,12 @@
 /**
  * 注文ルーター
  */
-import * as sskts from '@motionpicture/sskts-domain';
 import * as createDebug from 'debug';
 import * as express from 'express';
 import { ACCEPTED, CREATED } from 'http-status';
 import * as moment from 'moment';
 
-import * as ssktsapi from '../ssktsapi';
+import * as cinerinoapi from '../cinerinoapi';
 
 const debug = createDebug('cinerino-console:routes');
 const ordersRouter = express.Router();
@@ -21,22 +20,23 @@ ordersRouter.get(
     async (req, res, next) => {
         try {
             debug('req.query:', req.query);
-            const orderService = new ssktsapi.service.Order({
+            const orderService = new cinerinoapi.service.Order({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const organizationService = new ssktsapi.service.Organization({
+            const sellerService = new cinerinoapi.service.Seller({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const userPoolService = new ssktsapi.service.UserPool({
+            const userPoolService = new cinerinoapi.service.UserPool({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
 
-            let userPoolClients: ssktsapi.factory.cognito.UserPoolClientListType = [];
-            let adminUserPoolClients: ssktsapi.factory.cognito.UserPoolClientListType = [];
+            const searchSellersResult = await sellerService.search({});
+
+            let userPoolClients: cinerinoapi.factory.cognito.UserPoolClientListType = [];
+            let adminUserPoolClients: cinerinoapi.factory.cognito.UserPoolClientListType = [];
             try {
                 const searchUserPoolClientsResult = await userPoolService.searchClients({
                     userPoolId: <string>process.env.DEFAULT_COGNITO_USER_POOL_ID
@@ -51,22 +51,22 @@ ordersRouter.get(
             }
 
             const orderStatusChoices = [
-                ssktsapi.factory.orderStatus.OrderDelivered,
-                ssktsapi.factory.orderStatus.OrderPickupAvailable,
-                ssktsapi.factory.orderStatus.OrderProcessing,
-                ssktsapi.factory.orderStatus.OrderReturned
+                cinerinoapi.factory.orderStatus.OrderDelivered,
+                cinerinoapi.factory.orderStatus.OrderPickupAvailable,
+                cinerinoapi.factory.orderStatus.OrderProcessing,
+                cinerinoapi.factory.orderStatus.OrderReturned
             ];
-            const searchConditions: ssktsapi.factory.order.ISearchConditions = {
+            const searchConditions: cinerinoapi.factory.order.ISearchConditions = {
                 limit: req.query.limit,
                 page: req.query.page,
                 seller: {
-                    // typeOf: ssktsapi.factory.organizationType.MovieTheater,
+                    // typeOf: cinerinoapi.factory.organizationType.MovieTheater,
                     ids: (req.query.seller !== undefined && req.query.seller.ids !== undefined)
                         ? req.query.seller.ids
                         : undefined
                 },
                 customer: {
-                    // typeOf: ssktsapi.factory.personType.Person,
+                    // typeOf: cinerinoapi.factory.personType.Person,
                     ids: (req.query.customer !== undefined && req.query.customer.ids !== undefined && req.query.customer.ids !== '')
                         ? (<string>req.query.customer.ids).split(',').map((v) => v.trim())
                         : undefined,
@@ -163,7 +163,7 @@ ordersRouter.get(
                         && req.query.paymentMethods.typeOfs !== undefined)
                         ? req.query.paymentMethods.typeOfs
                         : undefined,
-                    // : Object.values(ssktsapi.factory.paymentMethodType),
+                    // : Object.values(cinerinoapi.factory.paymentMethodType),
                     paymentMethodIds: (req.query.paymentMethods !== undefined
                         && req.query.paymentMethods.paymentMethodIds !== undefined
                         && req.query.paymentMethods.paymentMethodIds !== '')
@@ -194,12 +194,12 @@ ordersRouter.get(
             } else {
                 res.render('orders/index', {
                     moment: moment,
-                    movieTheaters: searchMovieTheatersResult,
+                    movieTheaters: searchSellersResult.data,
                     userPoolClients: userPoolClients,
                     adminUserPoolClients: adminUserPoolClients,
                     searchConditions: searchConditions,
                     orderStatusChoices: orderStatusChoices,
-                    PaymentMethodType: ssktsapi.factory.paymentMethodType
+                    PaymentMethodType: cinerinoapi.factory.paymentMethodType
                 });
             }
         } catch (error) {
@@ -215,7 +215,7 @@ ordersRouter.get(
     // tslint:disable-next-line:max-func-body-length
     async (req, res, next) => {
         try {
-            const orderService = new ssktsapi.service.Order({
+            const orderService = new cinerinoapi.service.Order({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
@@ -226,25 +226,21 @@ ordersRouter.get(
             });
             const order = searchOrdersResult.data.shift();
             if (order === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('Order');
+                throw new cinerinoapi.factory.errors.NotFound('Order');
             }
 
             let actionsOnOrder: any[] = [];
             let timelines: any[] = [];
             try {
-                const actionRepo = new sskts.repository.Action(sskts.mongoose.connection);
-                actionsOnOrder = await actionRepo.findByOrderNumber(order.orderNumber);
-                // startDateでソート
-                actionsOnOrder = actionsOnOrder.sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf());
-                //     actionsOnOrder = await orderService.searchActionsByOrderNumber({
-                //     orderNumber: order.orderNumber,
-                //     sort: { endDate: ssktsapi.factory.sortType.Ascending }
-                // });
+                actionsOnOrder = await orderService.searchActionsByOrderNumber({
+                    orderNumber: order.orderNumber,
+                    sort: { endDate: cinerinoapi.factory.sortType.Ascending }
+                });
 
                 // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
                 timelines = actionsOnOrder.map((a) => {
                     let agent: any;
-                    if (a.agent.typeOf === ssktsapi.factory.personType.Person) {
+                    if (a.agent.typeOf === cinerinoapi.factory.personType.Person) {
                         const url = (a.agent.memberOf !== undefined)
                             ? `/people/${a.agent.id}`
                             : `/userPools/${process.env.DEFAULT_COGNITO_USER_POOL_ID}/clients/${a.agent.id}`;
@@ -253,7 +249,7 @@ ordersRouter.get(
                             name: order.customer.name,
                             url: url
                         };
-                    } else if (a.agent.typeOf === ssktsapi.factory.organizationType.MovieTheater) {
+                    } else if (a.agent.typeOf === cinerinoapi.factory.organizationType.MovieTheater) {
                         agent = {
                             id: a.agent.id,
                             name: order.seller.name,
@@ -263,32 +259,32 @@ ordersRouter.get(
 
                     let actionName: string;
                     switch (a.typeOf) {
-                        case ssktsapi.factory.actionType.OrderAction:
+                        case cinerinoapi.factory.actionType.OrderAction:
                             actionName = '注文';
                             break;
-                        case ssktsapi.factory.actionType.GiveAction:
+                        case cinerinoapi.factory.actionType.GiveAction:
                             actionName = '付与';
                             break;
-                        case ssktsapi.factory.actionType.SendAction:
+                        case cinerinoapi.factory.actionType.SendAction:
                             if (a.object.typeOf === 'Order') {
                                 actionName = '配送';
-                            } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                            } else if (a.object.typeOf === cinerinoapi.factory.creativeWorkType.EmailMessage) {
                                 actionName = '送信';
                             } else {
                                 actionName = '送信';
                             }
                             break;
-                        case ssktsapi.factory.actionType.PayAction:
+                        case cinerinoapi.factory.actionType.PayAction:
                             actionName = '支払';
                             break;
-                        case ssktsapi.factory.actionType.ReturnAction:
+                        case cinerinoapi.factory.actionType.ReturnAction:
                             if (a.object.typeOf === 'Order') {
                                 actionName = '返品';
                             } else {
                                 actionName = '返却';
                             }
                             break;
-                        case ssktsapi.factory.actionType.RefundAction:
+                        case cinerinoapi.factory.actionType.RefundAction:
                             actionName = '返金';
                             break;
                         default:
@@ -301,7 +297,7 @@ ordersRouter.get(
                             case 'PaymentMethod':
                                 object = a.object[0].paymentMethod.name;
                                 break;
-                            case ssktsapi.factory.actionType.PayAction:
+                            case cinerinoapi.factory.actionType.PayAction:
                                 object = a.object[0].object.paymentMethod.typeOf;
                                 break;
                             default:
@@ -312,26 +308,25 @@ ordersRouter.get(
                             case 'Order':
                                 object = '注文';
                                 break;
-                            case ssktsapi.factory.action.transfer.give.pecorinoAward.ObjectType.PecorinoAward:
-                                // case ssktsapi.factory.action.transfer.give.pointAward.ObjectType.PointAward:
+                            case cinerinoapi.factory.action.transfer.give.pointAward.ObjectType.PointAward:
                                 object = 'ポイント';
                                 break;
-                            case ssktsapi.factory.actionType.SendAction:
+                            case cinerinoapi.factory.actionType.SendAction:
                                 if (a.object.typeOf === 'Order') {
                                     object = '配送';
-                                } else if (a.object.typeOf === ssktsapi.factory.creativeWorkType.EmailMessage) {
+                                } else if (a.object.typeOf === cinerinoapi.factory.creativeWorkType.EmailMessage) {
                                     object = '送信';
                                 } else {
                                     object = '送信';
                                 }
                                 break;
-                            case ssktsapi.factory.creativeWorkType.EmailMessage:
+                            case cinerinoapi.factory.creativeWorkType.EmailMessage:
                                 object = 'Eメール';
                                 break;
                             case 'PaymentMethod':
                                 object = a.object.object[0].paymentMethod.name;
                                 break;
-                            case ssktsapi.factory.actionType.PayAction:
+                            case cinerinoapi.factory.actionType.PayAction:
                                 object = a.object.object[0].paymentMethod.typeOf;
                                 break;
                             default:
@@ -357,7 +352,7 @@ ordersRouter.get(
                 moment: moment,
                 order: order,
                 timelines: timelines,
-                ActionStatusType: ssktsapi.factory.actionStatusType
+                ActionStatusType: cinerinoapi.factory.actionStatusType
             });
         } catch (error) {
             next(error);
@@ -371,7 +366,7 @@ ordersRouter.post(
     '/:orderNumber/return',
     async (req, res, next) => {
         try {
-            const returnOrderService = new ssktsapi.service.transaction.ReturnOrder({
+            const returnOrderService = new cinerinoapi.service.txn.ReturnOrder({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
@@ -397,45 +392,45 @@ ordersRouter.post(
     '/:orderNumber/sendEmailMessage',
     async (req, res, next) => {
         try {
-            const placeOrderService = new ssktsapi.service.transaction.PlaceOrder({
+            const placeOrderService = new cinerinoapi.service.transaction.PlaceOrder({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const taskService = new ssktsapi.service.Task({
+            const taskService = new cinerinoapi.service.Task({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
             const searchTransactionsResult = await placeOrderService.search({
                 limit: 1,
-                typeOf: ssktsapi.factory.transactionType.PlaceOrder,
+                typeOf: cinerinoapi.factory.transactionType.PlaceOrder,
                 result: { order: { orderNumbers: [req.params.orderNumber] } }
             });
             if (searchTransactionsResult.totalCount === 0) {
-                throw new ssktsapi.factory.errors.NotFound('Order');
+                throw new cinerinoapi.factory.errors.NotFound('Order');
             }
             const placeOrderTransaction = searchTransactionsResult.data[0];
             const potentialActions = placeOrderTransaction.potentialActions;
             if (potentialActions === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('Transactino potentialActions');
+                throw new cinerinoapi.factory.errors.NotFound('Transactino potentialActions');
             }
             const orderPotentialActions = potentialActions.order.potentialActions;
             if (orderPotentialActions === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('Order potentialActions');
+                throw new cinerinoapi.factory.errors.NotFound('Order potentialActions');
             }
             if (orderPotentialActions.sendOrder === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('SendOrder actionAttributes');
+                throw new cinerinoapi.factory.errors.NotFound('SendOrder actionAttributes');
             }
             const sendOrderPotentialActions = orderPotentialActions.sendOrder.potentialActions;
             if (sendOrderPotentialActions === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('SendOrder potentialActions');
+                throw new cinerinoapi.factory.errors.NotFound('SendOrder potentialActions');
             }
             const sendEmailMessageActionAttributes = sendOrderPotentialActions.sendEmailMessage;
             if (sendEmailMessageActionAttributes === undefined) {
-                throw new ssktsapi.factory.errors.NotFound('SendEmailMessage actionAttributes');
+                throw new cinerinoapi.factory.errors.NotFound('SendEmailMessage actionAttributes');
             }
-            const taskAttributes: ssktsapi.factory.task.IAttributes<ssktsapi.factory.taskName.SendEmailMessage> = {
-                name: ssktsapi.factory.taskName.SendEmailMessage,
-                status: ssktsapi.factory.taskStatus.Ready,
+            const taskAttributes: cinerinoapi.factory.task.IAttributes<cinerinoapi.factory.taskName.SendEmailMessage> = {
+                name: cinerinoapi.factory.taskName.SendEmailMessage,
+                status: cinerinoapi.factory.taskStatus.Ready,
                 runsAt: new Date(),
                 remainingNumberOfTries: 3,
                 lastTriedAt: null,
@@ -445,7 +440,7 @@ ordersRouter.post(
                     actionAttributes: sendEmailMessageActionAttributes
                 }
             };
-            const task = await taskService.create(<any>taskAttributes);
+            const task = await taskService.create(taskAttributes);
             res.status(CREATED).json(task);
         } catch (error) {
             next(error);

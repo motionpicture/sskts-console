@@ -42,7 +42,7 @@
                                     <div class="form-group">
                                         <label for="object[order][orderNumbers]">注文番号</label>
                                         <input type="text" class="form-control" id="object[order][orderNumbers]" name="object[order][orderNumbers]"
-                                            placeholder="注文番号" value="<%= searchConditions.object.order.orderNumbers.join(',') %>">
+                                            placeholder="注文番号" value="<%= (Array.isArray(searchConditions.object.order.orderNumbers)) ? searchConditions.object.order.orderNumbers.join(',') : '' %>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -68,6 +68,18 @@
                                             <option value="<%= transactionStatus %>" <% if (selected) { %> selected
                                                 <% } %>>
                                                 <%= transactionStatus %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>タスクエクスポートステータス</label>
+                                        <select multiple class="form-control" name="tasksExportationStatuses[]">
+                                            <% Object.values(TransactionTasksExportationStatus).forEach(function (status) { %>
+                                            <% var selected = searchConditions.tasksExportationStatuses.indexOf(status) >= 0; %>
+                                            <option value="<%= status %>" <% if (selected) { %> selected
+                                                <% } %>>
+                                                <%= status %>
                                             </option>
                                             <% }) %>
                                         </select>
@@ -114,6 +126,8 @@
                                     <th>ID<br>Status<br>Start<br>End<br>Expires</th>
                                     <th>処理者</th>
                                     <th>販売者</th>
+                                    <th>対象</th>
+                                    <th>タスクエクスポート</th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -121,6 +135,8 @@
                                     <th>ID<br>Status<br>Start<br>End<br>Expires</th>
                                     <th>処理者</th>
                                     <th>販売者</th>
+                                    <th>対象</th>
+                                    <th>タスクエクスポート</th>
                                 </tr>
                             </tfoot>
                         </table>
