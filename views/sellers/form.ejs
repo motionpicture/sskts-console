@@ -1,0 +1,362 @@
+<%
+let coinAccountPayment;
+let pointAccountPayment;
+let creditCardPayment;
+let movieTicketPayment;
+let cashPayment;
+let emoneyPayment;
+let hasPOS = [];
+let areaServed = [];
+if (seller !== undefined) {
+    coinAccountPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.Account && p.accountType === 'Coin');
+    pointAccountPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.Account && p.accountType === 'Point');
+    creditCardPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.CreditCard);
+    movieTicketPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.MovieTicket);
+    cashPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.Cash);
+    emoneyPayment = seller.paymentAccepted.find((p)=>p.paymentMethodType === PaymentMethodType.EMoney);
+    hasPOS = (Array.isArray(seller.hasPOS)) ? seller.hasPOS : [];
+    areaServed = (Array.isArray(seller.areaServed)) ? seller.areaServed : [];
+}
+%>
+<div class="form-group">
+    <label>組織タイプ</label>
+    <select class="form-control" name="typeOf">
+        <% Object.values(OrganizationType).forEach(function (organizationType) { %>
+        <%
+        var selected = false;
+        if (seller !== undefined) {
+            selected = seller.typeOf === organizationType;
+        }
+        %>
+        <option value="<%= organizationType %>" <% if (selected) { %>
+            selected
+            <% } %>>
+            <%= organizationType %>
+        </option>
+        <% }) %>
+    </select>
+</div>
+<div class="form-group">
+    <label for="branchCode">販売イベント供給サービス</label>
+    <select class="form-control" name="makesOffer[offeredThrough][identifier]">
+        <% Object.values(WebAPIIdentifier).forEach(function (identifier) { %>
+        <%
+        var selected = false;
+        if (seller !== undefined && Array.isArray(seller.makesOffer) && seller.makesOffer.length > 0) {
+            selected = seller.makesOffer[0].offeredThrough.identifier === identifier;
+        }
+        %>
+        <option value="<%= identifier %>" <% if (selected) { %>
+            selected
+            <% } %>>
+            <%= identifier %>
+        </option>
+        <% }) %>
+    </select>
+</div>
+<div class="form-group">
+    <label for="branchCode">販売イベント劇場枝番号</label>
+    <input type="text" class="form-control" id="branchCode" name="branchCode" placeholder="販売イベント劇場枝番号" value="<%= (seller !== undefined) ?  seller.location.branchCode : '' %>">
+</div>
+<div class="form-group">
+    <label for="name.ja">name.ja</label>
+    <input disabled type="text" class="form-control" id="name.ja" name="name.ja" placeholder="name.ja" value="<%= (seller !== undefined) ?  seller.name.ja : '' %>">
+</div>
+<div class="form-group">
+    <label for="name.en">name.en</label>
+    <input disabled type="text" class="form-control" id="name.en" name="name.en" placeholder="name.en" value="<%= (seller !== undefined) ?  seller.name.en : '' %>">
+</div>
+<div class="form-group">
+    <label for="telephone">telephone</label>
+    <input disabled type="text" class="form-control" id="telephone" name="telephone" placeholder="telephone" value="<%= (seller !== undefined) ?  seller.telephone : '' %>">
+</div>
+<div class="form-group">
+    <label for="url">URL</label>
+    <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="<%= (seller !== undefined) ?  seller.url : '' %>">
+</div>
+<hr>
+<div class="form-group">
+    <label for="gmoInfo[siteId]">GMOサイトID</label>
+    <input type="text" class="form-control" id="gmoInfo[siteId]" disabled placeholder="GMOサイトID" value="<%= process.env.GMO_SITE_ID %>">
+</div>
+<div class="form-group">
+    <label for="gmoInfo[shopId]">GMOショップID</label>
+    <input type="text" class="form-control" id="gmoInfo[shopId]" name="gmoInfo[shopId]" placeholder="GMOショップID" value="<%= (creditCardPayment !== undefined) ? creditCardPayment.gmoInfo.shopId : '' %>">
+</div>
+<div class="form-group">
+    <label for="gmoInfo[shopPass]">GMOショップPASS</label>
+    <input type="password" class="form-control" id="gmoInfo[shopPass]" name="gmoInfo[shopPass]" placeholder="GMOショップPASS"
+        value="<%= (creditCardPayment !== undefined) ? creditCardPayment.gmoInfo.shopPass : '' %>">
+</div>
+<hr>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="movieTicketPaymentAccepted" name="movieTicketPaymentAccepted"
+        <%=(movieTicketPayment !==　undefined) ? ' checked' : '' %>>
+    <label class="form-check-label" for="movieTicketPaymentAccepted">ムビチケ決済を許可</label>
+</div>
+<div class="form-group">
+    <label for="movieTicketInfo[kgygishCd]">ムビチケ興行会社コード</label>
+    <input type="text" class="form-control" id="movieTicketInfo[kgygishCd]" disabled placeholder="ムビチケ興行会社コード" value="<%= process.env.MVTK_COMPANY_CODE %>">
+    <input type="hidden" name="movieTicketInfo[kgygishCd]" value="<%= process.env.MVTK_COMPANY_CODE %>">
+</div>
+<div class="form-group">
+    <label for="gmoInfo[shopId]">ムビチケサイトコード</label>
+    <input type="text" class="form-control" id="movieTicketInfo[stCd]" name="movieTicketInfo[stCd]" placeholder="ムビチケサイトコード"
+        value="<%= (movieTicketPayment !== undefined) ? movieTicketPayment.movieTicketInfo.stCd : '' %>">
+</div>
+
+<hr>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="coinAccountPaymentAccepted" name="coinAccountPaymentAccepted"
+        <%=(coinAccountPayment !==undefined) ? ' checked' : '' %>>
+    <label class="form-check-label" for="coinAccountPaymentAccepted">コイン口座決済を許可(許可するとコイン口座が開設されます)</label>
+</div>
+<div class="form-group">
+    <label for="coinAccountPayment[accountNumber]"></label>
+    <input type="hidden" class="form-control" id="coinAccountPayment[accountNumber]" name="coinAccountPayment[accountNumber]"
+        placeholder="コイン口座番号" value="<%= (coinAccountPayment !== undefined) ? coinAccountPayment.accountNumber : '' %>">
+    <input disabled type="text" class="form-control" placeholder="コイン口座番号" value="<%= (coinAccountPayment !== undefined) ? coinAccountPayment.accountNumber : '' %>">
+</div>
+
+<hr>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="pointAccountPaymentAccepted" name="pointAccountPaymentAccepted"
+        <%=(pointAccountPayment !==undefined) ? ' checked' : '' %>>
+    <label class="form-check-label" for="pointAccountPaymentAccepted">ポイント口座決済を許可(許可するとポイント口座が開設されます)</label>
+</div>
+<div class="form-group">
+    <label for="pointAccountPayment[accountNumber]"></label>
+    <input type="hidden" class="form-control" id="pointAccountPayment[accountNumber]" name="pointAccountPayment[accountNumber]"
+        placeholder="コイン口座番号" value="<%= (pointAccountPayment !== undefined) ? pointAccountPayment.accountNumber : '' %>">
+    <input disabled type="text" class="form-control" placeholder="ポイント口座番号" value="<%= (pointAccountPayment !== undefined) ? pointAccountPayment.accountNumber : '' %>">
+</div>
+
+<hr>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="cashPaymentAccepted" name="cashPaymentAccepted" <%=(cashPayment
+        !==　undefined) ? ' checked' : '' %>>
+    <label class="form-check-label" for="cashPaymentAccepted">
+        <%= PaymentMethodType.Cash %>決済を許可</label>
+</div>
+
+<hr>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="emoneyPaymentAccepted" name="emoneyPaymentAccepted" <%=(emoneyPayment
+        !==　undefined) ? ' checked' : '' %>>
+    <label class="form-check-label" for="emoneyPaymentAccepted">
+        <%= PaymentMethodType.EMoney %>決済を許可</label>
+</div>
+
+<hr>
+<% hasPOS.forEach((pos, index) => { %>
+<div class="row hasPOS-<%= index %>">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="hasPOS[<%= index %>][id]">POSクライアントID</label>
+            <input type="text" class="form-control" id="hasPOS[<%= index %>][id]" name="hasPOS[<%= index %>][id]"
+                placeholder="POS ID" value="<%= pos.id %>">
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="hasPOS[<%= index %>][name]">POS名</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="hasPOS[<%= index %>][name]" name="hasPOS[<%= index %>][name]"
+                    placeholder="POS Name" value="<%= pos.name %>">
+                <span class="input-group-append">
+                    <button type="button" class="btn btn-danger" onclick="removePOS('<%= index %>');"><i class="fa fa-minus"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<% }) %>
+
+<div id="hasPOS">
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="hasPOS[<%= hasPOS.length %>][id]">POSクライアントID</label>
+            <input type="text" class="form-control" id="hasPOS[<%= hasPOS.length %>][id]" name="hasPOS[<%= hasPOS.length %>][id]"
+                placeholder="POS ID" value="">
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="hasPOS[<%= hasPOS.length %>][name]">POS名</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="hasPOS[<%= hasPOS.length %>][name]" name="hasPOS[<%= hasPOS.length %>][name]"
+                    placeholder="POS Name" value="">
+                <span class="input-group-append">
+                    <button type="button" class="btn btn-info" onclick="addPOS();"><i class="fa fa-plus"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<% areaServed.forEach((area, index) => { %>
+<div class="row areaServed-<%= index %>">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= index %>][typeOf]">店舗タイプ</label>
+            <select class="form-control" name="areaServed[<%= index %>][typeOf]">
+                <option value="<%= PlaceType.Online %>" <% if (area.typeOf===PlaceType.Online) { %> selected
+                    <% } %>>
+                    <%= PlaceType.Online %>
+                </option>
+                <option value="<%= PlaceType.Store %>" <% if (area.typeOf===PlaceType.Store) { %> selected
+                    <% } %>>
+                    <%= PlaceType.Store %>
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= index %>][id]">店舗ID</label>
+            <input type="text" class="form-control" id="areaServed[<%= index %>][id]" name="areaServed[<%= index %>][id]"
+                placeholder="店舗ID" value="<%= area.id %>">
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= index %>][name]">店舗名</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="areaServed[<%= index %>][name]" name="areaServed[<%= index %>][name]"
+                    placeholder="店舗名" value="<%= area.name %>">
+                <span class="input-group-append">
+                    <button type="button" class="btn btn-danger" onclick="removeAreaServed('<%= index %>');"><i class="fa fa-minus"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<% }) %>
+
+<div id="areaServed">
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= areaServed.length %>][typeOf]">店舗タイプ</label>
+            <select class="form-control" name="areaServed[<%= areaServed.length %>][typeOf]">
+                <option value="<%= PlaceType.Online %>">
+                    <%= PlaceType.Online %>
+                </option>
+                <option value="<%= PlaceType.Store %>">
+                    <%= PlaceType.Store %>
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= areaServed.length %>][id]">店舗ID</label>
+            <input type="text" class="form-control" id="areaServed[<%= areaServed.length %>][id]" name="areaServed[<%= areaServed.length %>][id]"
+                placeholder="店舗ID" value="">
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="areaServed[<%= areaServed.length %>][name]">店舗名</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="areaServed[<%= areaServed.length %>][name]" name="areaServed[<%= areaServed.length %>][name]"
+                    placeholder="店舗名" value="">
+                <span class="input-group-append">
+                    <button type="button" class="btn btn-info" onclick="addAreaServed();"><i class="fa fa-plus"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var numPOS = Number('<%= hasPOS.length %>');
+    function addPOS() {
+        numPOS += 1;
+        var objTo = document.getElementById('hasPOS');
+        var divtest = document.createElement("div");
+        divtest.setAttribute("class", "row hasPOS-" + numPOS);
+        var rdiv = 'hasPOS-' + numPOS;
+        divtest.innerHTML = ''
+            + '<div class="col-md-6">'
+            + '<div class="form-group">'
+            + '<label for="hasPOS[' + numPOS + '][id]">POSクライアントID</label>'
+            + '<input type="text" class="form-control" id="hasPOS[' + numPOS + '][id]" name="hasPOS[' + numPOS + '][id]" placeholder="POS ID" value="" >'
+            + '</div>'
+            + '</div>'
+            + '<div class="col-md-6">'
+            + '<div class="form-group">'
+            + '<label for="hasPOS[' + numPOS + '][name]">POS名</label>'
+            + '<div class="input-group">'
+            + '<input type="text" class="form-control" id="hasPOS[' + numPOS + '][name]" name="hasPOS[' + numPOS + '][name]" placeholder="POS Name" value="" >'
+            + '<span class="input-group-append">'
+            + '<button type="button" class="btn btn-danger" onclick="removePOS(' + numPOS + ');"><i class="fa fa-minus"></i></button>'
+            + '</span>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+        objTo.appendChild(divtest)
+    }
+    function removePOS(index) {
+        numPOS -= 1;
+        $('.hasPOS-' + index).remove();
+    }
+
+    var numAreaServed = Number('<%= areaServed.length %>');
+    function addAreaServed() {
+        numAreaServed += 1;
+        var objTo = document.getElementById('areaServed');
+        var divtest = document.createElement("div");
+        divtest.setAttribute("class", "row areaServed-" + numAreaServed);
+        var rdiv = 'areaServed-' + numAreaServed;
+        divtest.innerHTML = ''
+            + '<div class="col-md-4">'
+            + '<div class="form-group">'
+            + '<label for="areaServed[' + numAreaServed + '][typeOf]">店舗タイプ</label>'
+            + '<select class="form-control" name="areaServed[' + numAreaServed + '][typeOf]">'
+            + '<option value="<%= PlaceType.Online %>">'
+            + '<%= PlaceType.Online %>'
+            + '</option>'
+            + '<option value="<%= PlaceType.Store %>">'
+            + '<%= PlaceType.Store %>'
+            + '</option>'
+            + '</select>'
+            + '</div>'
+            + '</div>'
+            + '<div class="col-md-4">'
+            + '<div class="form-group">'
+            + '<label for="areaServed[' + numAreaServed + '][id]">店舗ID</label>'
+            + '<input type="text" class="form-control" id="areaServed[' + numAreaServed + '][id]" name="areaServed[' + numAreaServed + '][id]" placeholder="店舗ID" value="" >'
+            + '</div>'
+            + '</div>'
+            + '<div class="col-md-4">'
+            + '<div class="form-group">'
+            + '<label for="areaServed[' + numAreaServed + '][name]">店舗名</label>'
+            + '<div class="input-group">'
+            + '<input type="text" class="form-control" id="areaServed[' + numAreaServed + '][name]" name="areaServed[' + numAreaServed + '][name]" placeholder="店舗名" value="" >'
+            + '<span class="input-group-append">'
+            + '<button type="button" class="btn btn-danger" onclick="removeAreaServed(' + numAreaServed + ');"><i class="fa fa-minus"></i></button>'
+            + '</span>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+        objTo.appendChild(divtest)
+    }
+    function removeAreaServed(index) {
+        numAreaServed -= 1;
+        $('.areaServed-' + index).remove();
+    }
+</script>

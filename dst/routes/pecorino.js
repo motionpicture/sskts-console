@@ -15,6 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const moment = require("moment");
 const pecorinoRouter = express.Router();
+pecorinoRouter.get('/accounts/coin', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        res.render('pecorino/accounts/coin/index', {
+            moment: moment
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 pecorinoRouter.get('/accounts/point', (_, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         res.render('pecorino/accounts/point/index', {

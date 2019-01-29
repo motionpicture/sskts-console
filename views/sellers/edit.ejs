@@ -1,0 +1,220 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">販売者詳細</h1>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/sellers">販売者検索</a>
+                    </li>
+                    <li class="breadcrumb-item active">販売者詳細</li>
+                </ol>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+
+        <% if (messages.message) { %>
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5>
+                <i class="icon fa fa-check"></i> Congraturations!</h5>
+            <%= messages.message %>
+        </div>
+        <% } %>
+
+        <% if (message) { %>
+        <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <%- message.replace(/\n/g, '<br>') %>
+        </div>
+        <% } %>
+
+        <div class="row">
+            <div class="col-md-3">
+
+                <!-- Profile Image -->
+                <div class="card card-dark card-outline">
+                    <div class="card-body box-profile">
+                        <!-- <div class="text-center">
+                                    <img class="profile-user-img img-fluid img-circle" src="../../dist/img/user4-128x128.jpg"
+                                        alt="User profile picture">
+                                </div> -->
+
+                        <h3 class="profile-username text-center">
+                            <%= seller.name.ja %>
+                        </h3>
+
+                        <p class="text-muted text-center">
+                            <%= seller.name.en %>
+                        </p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Orders</b> <a class="float-right" id="orderCount"></a>
+                            </li>
+                        </ul>
+
+                        <!-- <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a> -->
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+
+                <!-- About Me Box -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">About</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <strong><i class="fa fa-map-marker mr-1"></i> Location</strong>
+                        <p class="text-muted">
+                            <%= seller.location.branchCode %>
+                            <%= seller.location.name.ja %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-phone mr-1"></i> Telephone</strong>
+                        <p class="text-muted">
+                            <%= seller.telephone %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-link mr-1"></i> url</strong>
+                        <p class="text-muted">
+                            <a target="_blank" href="<%= seller.url %>">
+                                <%= seller.url %>
+                            </a>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-shopping-cart mr-1"></i> 対応決済方法</strong>
+                        <p class="text-muted">
+                            <% seller.paymentAccepted.forEach((payment) => { %>
+                            <span class="badge badge-info <%= payment.paymentMethodType %>">
+                                <%= payment.paymentMethodType %>
+                            </span>
+                            <% }) %>
+                        </p>
+                        <hr>
+
+                        <strong><i class="fa fa-piggy-bank mr-1"></i> 口座</strong>
+                        <p class="text-muted">
+                            <% const coinAccounts = seller.paymentAccepted.filter((p) => p.paymentMethodType === 'Account') %>
+                            <% coinAccounts.forEach((account) => { %>
+                            <span class="badge <%= account.accountType %>">
+                                <%= account.accountType %>
+                            </span>
+                            <a target="_blank" href="<%= process.env.PECORINO_CONSOLE_ENDPOINT %>/accounts/<%= account.accountType %>/<%= account.accountNumber %>">
+                                <%= account.accountNumber %>
+                            </a>
+                            <br>
+                            <% }) %>
+                        </p>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#orders" data-toggle="tab">注文履歴</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#jsonViewer" data-toggle="tab">JSON Viewer</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#others" data-toggle="tab">その他の操作</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="active tab-pane" id="orders">
+                                <div class="table-responsive">
+                                    <table class="table m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order Number</th>
+                                                <th>Order Date</th>
+                                                <th>Item</th>
+                                                <th>Payment Method</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.table-responsive -->
+                            </div>
+
+                            <div class="tab-pane" id="jsonViewer">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(seller, null, '\t') %></textarea>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="settings">
+                                <!-- form start -->
+                                <form role="form" method="post">
+                                    <div class="card-body">
+                                        <%- include('./form', {seller: seller, PaymentMethodType: PaymentMethodType}) %>
+                                    </div>
+                                    <!-- /.card-body -->
+
+                                    <div class="card-footer">
+                                        <button type="submit" class="btn btn-primary">更新</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="others">
+                                <!-- general form elements -->
+                                <div class="card card-dark">
+                                    <!-- <div class="card-header">
+                                        <h3 class="card-title">その他の操作</h3>
+                                    </div> -->
+                                    <!-- /.card-header -->
+
+                                    <div class="card-body">
+                                        <button type="button" class="delete btn btn-danger">削除する</button>
+                                    </div>
+                                    <!-- /.card-body -->
+                                    <!-- <div class="card-footer">
+                                        </div> -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<script src="/js/sellers/edit.js"></script>

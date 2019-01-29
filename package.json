@@ -10,7 +10,9 @@
   ],
   "config": {},
   "dependencies": {
-    "@cinerino/api-nodejs-client": "^1.1.0-alpha.39",
+    "@chevre/api-nodejs-client": "^1.0.0-alpha.45",
+    "@cinerino/api-nodejs-client": "^1.1.0-alpha.41",
+    "@motionpicture/coa-service": "^6.0.1",
     "@motionpicture/express-middleware": "^0.1.0",
     "@motionpicture/sskts-api-nodejs-client": "^5.0.0",
     "@motionpicture/sskts-domain": "^27.0.0",

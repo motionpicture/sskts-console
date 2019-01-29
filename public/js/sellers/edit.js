@@ -1,5 +1,4 @@
-
-var userPoolClient = JSON.parse($('#jsonViewer textarea').val());
+var seller = JSON.parse($('#jsonViewer textarea').val());
 var orders = [];
 var searchedAllOrders = false;
 var limit = 100;
@@ -14,7 +13,7 @@ $(function () {
 function searchOrders(cb) {
     page += 1;
     $.getJSON(
-        '/userPools/' + userPoolClient.UserPoolId + '/clients/' + userPoolClient.ClientId + '/orders',
+        '/sellers/' + seller.id + '/orders',
         { limit: limit, page: page }
     ).done(function (data) {
         $('#orderCount').html(data.totalCount.toString());
@@ -45,3 +44,21 @@ function searchOrders(cb) {
         console.error('注文履歴を取得できませんでした')
     });
 }
+
+$(function () {
+    $('button.delete').click(function () {
+        if (window.confirm('元には戻せません。本当に削除しますか？')) {
+            $.ajax({
+                url: '/sellers/' + seller.id,
+                type: 'DELETE'
+            }).done(function () {
+                alert('削除しました');
+                location.href = '/sellers';
+            }).fail(function () {
+                alert('削除できませんでした');
+            }).always(function () {
+            });
+        } else {
+        }
+    });
+});
