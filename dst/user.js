@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const jwt = require("jsonwebtoken");
+const chevreapi = require("./chevreapi");
 const ssktsapi = require("./ssktsapi");
 const debug = createDebug('cinerino-console:user');
 /**
@@ -20,6 +21,13 @@ class User {
         this.host = configurations.host;
         this.session = configurations.session;
         this.authClient = new ssktsapi.auth.OAuth2({
+            domain: process.env.API_AUTHORIZE_SERVER_DOMAIN,
+            clientId: process.env.API_CLIENT_ID,
+            clientSecret: process.env.API_CLIENT_SECRET,
+            redirectUri: `https://${configurations.host}/signIn`,
+            logoutUri: `https://${configurations.host}/logout`
+        });
+        this.chevreAuthClient = new chevreapi.auth.OAuth2({
             domain: process.env.API_AUTHORIZE_SERVER_DOMAIN,
             clientId: process.env.API_CLIENT_ID,
             clientSecret: process.env.API_CLIENT_SECRET,
