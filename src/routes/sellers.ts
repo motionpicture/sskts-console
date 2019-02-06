@@ -26,7 +26,7 @@ sellersRouter.get(
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
-            const searchConditions: cinerinoapi.factory.organization.ISearchConditions<cinerinoapi.factory.organizationType> = {
+            const searchConditions: cinerinoapi.factory.seller.ISearchConditions = {
                 limit: req.query.limit,
                 page: req.query.page,
                 name: req.query.name
@@ -58,7 +58,7 @@ sellersRouter.all(
     async (req, res, next) => {
         try {
             let message;
-            let attributes: cinerinoapi.factory.organization.IAttributes<cinerinoapi.factory.organizationType> | undefined;
+            let attributes: cinerinoapi.factory.seller.IAttributes<cinerinoapi.factory.organizationType> | undefined;
             if (req.method === 'POST') {
                 try {
                     attributes = await createAttributesFromBody({ body: req.body, authClient: req.user.chevreAuthClient });
@@ -100,7 +100,7 @@ sellersRouter.all(
     async (req, res, next) => {
         try {
             let message;
-            let attributes: cinerinoapi.factory.organization.IAttributes<cinerinoapi.factory.organizationType> | undefined;
+            let attributes: cinerinoapi.factory.seller.IAttributes<cinerinoapi.factory.organizationType> | undefined;
             const sellerService = new cinerinoapi.service.Seller({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
@@ -141,7 +141,7 @@ sellersRouter.all(
 async function createAttributesFromBody(params: {
     body: any;
     authClient: any;
-}): Promise<cinerinoapi.factory.organization.IAttributes<cinerinoapi.factory.organizationType>> {
+}): Promise<cinerinoapi.factory.seller.IAttributes<cinerinoapi.factory.organizationType>> {
     let movieTheaterFromChevre: cinerinoapi.factory.chevre.place.movieTheater.IPlace;
     const webAPIIdentifier = params.body.makesOffer.offeredThrough.identifier;
     const branchCode: string = params.body.branchCode;
@@ -179,7 +179,7 @@ async function createAttributesFromBody(params: {
             throw new Error(`Unsupported WebAPI identifier: ${webAPIIdentifier}`);
     }
 
-    const paymentAccepted: cinerinoapi.factory.organization.IPaymentAccepted<cinerinoapi.factory.paymentMethodType>[] = [
+    const paymentAccepted: cinerinoapi.factory.seller.IPaymentAccepted<cinerinoapi.factory.paymentMethodType>[] = [
         {
             paymentMethodType: cinerinoapi.factory.paymentMethodType.CreditCard,
             gmoInfo: {
@@ -267,7 +267,7 @@ async function createAttributesFromBody(params: {
         });
     }
 
-    const hasPOS: cinerinoapi.factory.organization.IPOS[] = [];
+    const hasPOS: cinerinoapi.factory.seller.IPOS[] = [];
     if (Array.isArray(params.body.hasPOS)) {
         params.body.hasPOS.forEach((pos: any) => {
             if (pos.id !== '') {
@@ -280,7 +280,7 @@ async function createAttributesFromBody(params: {
         });
     }
 
-    const areaServed: cinerinoapi.factory.organization.IAreaServed<typeof params.body.typeOf>[] = [];
+    const areaServed: cinerinoapi.factory.seller.IAreaServed[] = [];
     if (Array.isArray(params.body.areaServed)) {
         params.body.areaServed.forEach((area: any) => {
             if (area.id !== '') {

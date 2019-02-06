@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const jwt = require("jsonwebtoken");
 const chevreapi = require("./chevreapi");
-const ssktsapi = require("./ssktsapi");
+const cinerinoapi = require("./cinerinoapi");
 const debug = createDebug('cinerino-console:user');
 /**
  * リクエストユーザー
@@ -20,7 +20,7 @@ class User {
     constructor(configurations) {
         this.host = configurations.host;
         this.session = configurations.session;
-        this.authClient = new ssktsapi.auth.OAuth2({
+        this.authClient = new cinerinoapi.auth.OAuth2({
             domain: process.env.API_AUTHORIZE_SERVER_DOMAIN,
             clientId: process.env.API_CLIENT_ID,
             clientSecret: process.env.API_CLIENT_SECRET,
@@ -35,6 +35,7 @@ class User {
             logoutUri: `https://${configurations.host}/logout`
         });
         this.authClient.setCredentials({ refresh_token: this.getRefreshToken() });
+        this.chevreAuthClient.setCredentials({ refresh_token: this.getRefreshToken() });
     }
     generateAuthUrl() {
         return this.authClient.generateAuthUrl({
@@ -56,7 +57,7 @@ class User {
         return __awaiter(this, void 0, void 0, function* () {
             // 認証情報を取得できればログイン成功
             const credentials = yield this.authClient.getToken(code, process.env.API_CODE_VERIFIER);
-            debug('credentials published', credentials);
+            debug('credentials published');
             if (credentials.access_token === undefined) {
                 throw new Error('Access token is required for credentials.');
             }

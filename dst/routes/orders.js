@@ -436,7 +436,6 @@ ordersRouter.post('/:orderNumber/sendEmailMessage', (req, res, next) => __awaite
             status: cinerinoapi.factory.taskStatus.Ready,
             runsAt: new Date(),
             remainingNumberOfTries: 3,
-            lastTriedAt: null,
             numberOfTried: 0,
             executionResults: [],
             data: {

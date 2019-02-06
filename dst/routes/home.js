@@ -13,30 +13,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 // import * as createDebug from 'debug';
 const express = require("express");
-const ssktsapi = require("../ssktsapi");
+// import * as moment from 'moment';
+const cinerinoapi = require("../cinerinoapi");
 // const debug = createDebug('cinerino-console:routes');
 const homeRouter = express.Router();
 homeRouter.get('/', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const userPoolService = new ssktsapi.service.UserPool({
+        const userPoolService = new cinerinoapi.service.UserPool({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const organizationService = new ssktsapi.service.Organization({
+        const organizationService = new cinerinoapi.service.Organization({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
-        const userPool = yield userPoolService.findById({
-            userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
-        });
-        const searchUserPoolClientsResult = yield userPoolService.searchClients({ userPoolId: userPool.Id });
-        const sellers = yield organizationService.searchMovieTheaters({});
+        let userPool;
+        let userPoolClients = [];
+        let adminUserPool;
+        let adminUserPoolClients = [];
+        try {
+            userPool = yield userPoolService.findById({
+                userPoolId: process.env.DEFAULT_COGNITO_USER_POOL_ID
+            });
+            const searchUserPoolClientsResult = yield userPoolService.searchClients({ userPoolId: userPool.Id });
+            userPoolClients = searchUserPoolClientsResult.data;
+            adminUserPool = yield userPoolService.findById({
+                userPoolId: process.env.ADMIN_COGNITO_USER_POOL_ID
+            });
+            const searchAdminUserPoolClientsResult = yield userPoolService.searchClients({ userPoolId: adminUserPool.Id });
+            adminUserPoolClients = searchAdminUserPoolClientsResult.data;
+        }
+        catch (error) {
+            // no op
+        }
+        const searchMovieTheatersResult = yield organizationService.searchMovieTheaters({});
         res.render('index', {
-            message: 'Welcome to SSKTS Console!',
+            message: 'Welcome to Cinerino Console!',
             userPool: userPool,
-            userPoolClients: searchUserPoolClientsResult.data,
-            PaymentMethodType: ssktsapi.factory.paymentMethodType,
-            sellers: sellers
+            userPoolClients: userPoolClients,
+            adminUserPool: adminUserPool,
+            adminUserPoolClients: adminUserPoolClients,
+            PaymentMethodType: cinerinoapi.factory.paymentMethodType,
+            sellers: searchMovieTheatersResult.data
         });
     }
     catch (error) {

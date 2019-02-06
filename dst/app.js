@@ -3,10 +3,8 @@
  * Expressアプリケーション
  */
 const middlewares = require("@motionpicture/express-middleware");
-const sskts = require("@motionpicture/sskts-domain");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const createDebug = require("debug");
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 // tslint:disable-next-line:no-require-imports no-var-requires
@@ -14,8 +12,6 @@ const flash = require('express-flash');
 const errorHandler_1 = require("./middlewares/errorHandler");
 const notFoundHandler_1 = require("./middlewares/notFoundHandler");
 const session_1 = require("./middlewares/session");
-const mongooseConnectionOptions_1 = require("./mongooseConnectionOptions");
-const debug = createDebug('cinerino-console:*');
 const app = express();
 app.use(middlewares.basicAuth({
     name: process.env.BASIC_AUTH_NAME,
@@ -41,10 +37,6 @@ app.use(cookieParser());
 // 静的ファイル
 app.use(express.static(`${__dirname}/../public`));
 app.use('/node_modules', express.static(`${__dirname}/../node_modules`));
-sskts.mongoose.connect(process.env.MONGOLAB_URI, mongooseConnectionOptions_1.default)
-    .then(() => { debug('MongoDB connected.'); })
-    // tslint:disable-next-line:no-console
-    .catch(console.error);
 // routers
 const router_1 = require("./routes/router");
 app.use('/', router_1.default);

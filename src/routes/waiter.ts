@@ -6,7 +6,7 @@ import * as express from 'express';
 import * as moment from 'moment';
 import * as request from 'request-promise-native';
 
-// import * as ssktsapi from '../ssktsapi';
+// import * as cinerinoapi from '../cinerinoapi';
 
 const waiterRouter = express.Router();
 waiterRouter.get(
@@ -17,7 +17,8 @@ waiterRouter.get(
                 const rules = await request.get(
                     `${process.env.WAITER_ENDPOINT}/projects/${process.env.PROJECT_ID}/rules`,
                     { json: true }
-                ).promise();
+                )
+                    .promise();
                 res.json({
                     draw: req.query.draw,
                     recordsTotal: rules.length,

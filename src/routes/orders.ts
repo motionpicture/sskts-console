@@ -433,7 +433,6 @@ ordersRouter.post(
                 status: cinerinoapi.factory.taskStatus.Ready,
                 runsAt: new Date(),
                 remainingNumberOfTries: 3,
-                lastTriedAt: null,
                 numberOfTried: 0,
                 executionResults: [],
                 data: {

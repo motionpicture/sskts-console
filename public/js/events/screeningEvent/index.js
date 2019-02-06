@@ -29,10 +29,10 @@ $(function () {
                         + '<img src="' + thumbnailImageUrl + '" alt="Product Image" class="img-size-50">'
                         + '</div>'
                         + '<div class="product-info">'
-                        + '<a target="_blank" href="/events/screeningEvent/' + data.identifier + '">' + data.identifier + '</a>'
+                        + '<a target="_blank" href="/events/screeningEvent/' + data.id + '">' + data.id + '</a>'
                         + '</div>'
                         + '</li>'
-                        // + '<li><a target="_blank" href="/events/screeningEvent/' + data.identifier + '">' + data.identifier + '</a></li>'
+                        // + '<li><a target="_blank" href="/events/screeningEvent/' + data.id + '">' + data.id + '</a></li>'
                         + '</ul>';
                 }
             },
@@ -77,7 +77,7 @@ $(function () {
 
     // 上映イベントインポート
     $('button.importScreeningEvents').click(function () {
-        var message = '開催地: ' + $('select[name="superEventLocationIdentifiers[]"]').val().join(',')
+        var message = '開催地: ' + $('select[name="superEventLocationBranchCodes[]"]').val().join(',')
             + '\n開催日: ' + $('input[name="startRange"]').val()
             + '\nの上映イベントをインポートしようとしています。'
             + '\nよろしいですか？';
@@ -97,5 +97,11 @@ $(function () {
             });
         } else {
         }
+    });
+
+    // イベント管理
+    $('button.updateEvents').click(function () {
+        var url = $('input[name="chevreBackendEndpoint"]').val()
+        window.open(url);
     });
 });

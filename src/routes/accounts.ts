@@ -14,7 +14,7 @@ const accountsRouter = express.Router();
 //     '/',
 //     async (req, res, next) => {
 //         try {
-//             const accountService = new ssktsapi.service.Account({
+//             const accountService = new cinerinoapi.service.Account({
 //                 endpoint: <string>process.env.API_ENDPOINT,
 //                 auth: req.user.authClient
 //             });
@@ -45,7 +45,7 @@ const accountsRouter = express.Router();
 //     '/:accountNumber/actions/MoneyTransfer',
 //     async (req, res, next) => {
 //         try {
-//             const accountService = new ssktsapi.service.Account({
+//             const accountService = new cinerinoapi.service.Account({
 //                 endpoint: <string>process.env.API_ENDPOINT,
 //                 auth: req.user.authClient
 //             });

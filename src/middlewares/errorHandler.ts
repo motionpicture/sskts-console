@@ -14,8 +14,8 @@ import {
     UNAUTHORIZED
 } from 'http-status';
 
+import { factory } from '../cinerinoapi';
 import { APIError } from '../error/api';
-import { factory } from '../ssktsapi';
 // import logger from '../logger';
 
 const debug = createDebug('cinerino-api:middlewares');
@@ -45,9 +45,10 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
         }
     }
 
-    res.status(apiError.code).json({
-        error: apiError.toObject()
-    });
+    res.status(apiError.code)
+        .json({
+            error: apiError.toObject()
+        });
 };
 
 /**
