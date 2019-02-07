@@ -1,6 +1,5 @@
 
 var event = JSON.parse($('#jsonViewer textarea').val());
-var screeningRoom = JSON.parse($('#screeningRoomJsonViewer textarea').val());
 var orders = [];
 var searchedAllOrders = false;
 var limit = 100;
@@ -14,9 +13,10 @@ $(function () {
     searchOrders(function () {
         console.log('creating line chart...');
         // 全座席数は
-        // 全座席数は
-        var numberOfSeats = screeningRoom.containsPlace[0].containsPlace.length;
-        // var numberOfSeats = event.maximumAttendeeCapacity;
+        var numberOfSeats = 999;
+        if (Number.isInteger(event.maximumAttendeeCapacity)) {
+            numberOfSeats = event.maximumAttendeeCapacity
+        }
         // 売り出し日時は？
         var reservationStartDate = moment(event.startDate).add(-3, 'days').toDate();
         // var reservationPeriodInMinutes = moment(event.endDate).diff(moment(reservationStartDate), 'hours');
@@ -37,25 +37,32 @@ $(function () {
                 { x: moment(event.endDate).toISOString(), y: null }
             ],
         );
-
         createRemainingAttendeeCapacityChart(datas);
     });
 });
 function searchOrders(cb) {
     page += 1;
     $.getJSON(
-        '/events/screeningEvent/' + event.identifier + '/orders',
+        '/events/screeningEvent/' + event.id + '/orders',
         { limit: limit, page: page }
     ).done(function (data) {
         $('#orderCount').html(data.totalCount.toString());
         searchedAllOrders = (data.data.length < limit);
-        data.data.forEach(function (order) {
+        $.each(data.data, function (_, order) {
             orders.push(order);
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
-                + '<td>' + order.orderDate + '</td>'
-                + '<td>' + order.acceptedOffers.map((o) => o.itemOffered.reservedTicket.ticketedSeat.seatNumber).join(',') + '</td>'
-                + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
+                + '<td>' + moment(order.orderDate).format('lllZ') + '</td>'
+                + '<td>' + order.acceptedOffers.map(function (o) {
+                    if (o.itemOffered.reservedTicket !== undefined) {
+                        return o.itemOffered.reservedTicket.ticketedSeat.seatNumber
+                    }
+                    return o.itemOffered.typeOf;
+                }).join('<br>') + '</td>'
+                + '<td>' + order.paymentMethods.map(function (paymentMethod) {
+                    return '<span class="badge badge-secondary ' + paymentMethod.typeOf + '">' + paymentMethod.typeOf + '</span>';
+                }).join('&nbsp;') + '</td>'
+                + '<td>' + '<span class="badge badge-secondary  ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo("#orders tbody");
         });
         if (!searchedAllOrders) {

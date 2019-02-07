@@ -36,17 +36,18 @@
                     <!-- /.card-header -->
                     <!-- form start -->
                     <form role="form" method="get">
+                        <input type="hidden" class="form-control" id="backendUrl" name="chevreBackendEndpoint" value="<%= process.env.CHEVRE_BACKEND_ENDPOINT %>">
                         <div class="card-body">
-                            <!-- <div class="form-group">
+                            <div class="form-group">
                                 <label for="name">イベント名</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="イベント名" value="<%= searchConditions.name %>">
-                            </div> -->
+                            </div>
                             <div class="form-group">
                                 <label>開催地</label>
-                                <select multiple class="form-control" name="superEventLocationIdentifiers[]">
+                                <select multiple class="form-control" name="superEventLocationBranchCodes[]">
                                     <% movieTheaters.forEach(function (movieTheater) { %>
-                                    <option value="<%= movieTheater.identifier %>" <%=(
-                                        searchConditions.superEventLocationIdentifiers.indexOf(movieTheater.identifier)>=
+                                    <option value="<%= movieTheater.location.branchCode %>" <%=(
+                                        searchConditions.superEvent.locationBranchCodes.indexOf(movieTheater.location.branchCode)>=
                                         0) ? 'selected' : '' %>>
                                         <%= movieTheater.name.ja %>
                                     </option>
@@ -72,7 +73,9 @@
                         <!-- /.card-body -->
                         <div class="card-footer clearfix">
                             <button type="button" class="btn btn-primary importScreeningEvents">
-                                <i class="fa fa-plus"></i> 在庫仕入れ from COA</button>
+                                <i class="fa fa-plus"></i> 在庫仕入れ from Chevre</button>
+                            <button type="button" class="btn btn-success updateEvents">
+                                <i class="fa fa-calendar-alt"></i> 在庫管理 by Chevre</button>
                             <button type="submit" class="btn btn-secondary float-right">検索</button>
                         </div>
                     </form>

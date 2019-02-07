@@ -793,14 +793,17 @@ function searchLatestOrders(cb) {
         $.each(data.data, function (_, order) {
             $('<tr>').html(
                 '<td>' + '<a target="_blank" href="/orders/' + order.orderNumber + '">' + order.orderNumber + '</a>' + '</td>'
-                + '<td>' + order.orderDate + '</td>'
+                + '<td>' + moment(order.orderDate).format('lllZ') + '</td>'
                 + '<td>' + order.acceptedOffers.map(function (o) {
                     if (o.itemOffered.reservedTicket !== undefined) {
                         return o.itemOffered.reservedTicket.ticketedSeat.seatNumber
                     }
                     return o.itemOffered.typeOf;
-                }).join(',') + '</td>'
-                + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
+                }).join('<br>') + '</td>'
+                + '<td>' + order.paymentMethods.map(function (paymentMethod) {
+                    return '<span class="badge badge-secondary ' + paymentMethod.typeOf + '">' + paymentMethod.typeOf + '</span>';
+                }).join('&nbsp;') + '</td>'
+                + '<td>' + '<span class="badge badge-secondary  ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo(".latestOrders tbody");
         });
         cb();

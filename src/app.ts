@@ -2,21 +2,17 @@
  * Expressアプリケーション
  */
 import * as middlewares from '@motionpicture/express-middleware';
-import * as sskts from '@motionpicture/sskts-domain';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
-import * as createDebug from 'debug';
 import * as express from 'express';
 import * as expressLayouts from 'express-ejs-layouts';
+
 // tslint:disable-next-line:no-require-imports no-var-requires
 const flash = require('express-flash');
 import errorHandler from './middlewares/errorHandler';
 import notFoundHandler from './middlewares/notFoundHandler';
 import session from './middlewares/session';
 
-import mongooseConnectionOptions from './mongooseConnectionOptions';
-
-const debug = createDebug('cinerino-console:*');
 const app = express();
 
 app.use(middlewares.basicAuth({ // ベーシック認証
@@ -47,11 +43,6 @@ app.use(cookieParser());
 // 静的ファイル
 app.use(express.static(`${__dirname}/../public`));
 app.use('/node_modules', express.static(`${__dirname}/../node_modules`));
-
-sskts.mongoose.connect(<string>process.env.MONGOLAB_URI, mongooseConnectionOptions)
-    .then(() => { debug('MongoDB connected.'); })
-    // tslint:disable-next-line:no-console
-    .catch(console.error);
 
 // routers
 import router from './routes/router';

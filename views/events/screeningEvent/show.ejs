@@ -167,6 +167,7 @@ const thumbnailImageUrl = (event.workPerformed.thumbnailUrl !== undefined)
                                                 <th>Order Number</th>
                                                 <th>Order Date</th>
                                                 <th>Item</th>
+                                                <th>Payment Method</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -180,13 +181,6 @@ const thumbnailImageUrl = (event.workPerformed.thumbnailUrl !== undefined)
                             <div class="tab-pane" id="jsonViewer">
                                 <div class="form-group">
                                     <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(event, null, '\t') %></textarea>
-                                </div>
-                            </div>
-                            <!-- /.tab-pane -->
-
-                            <div class="tab-pane" id="screeningRoomJsonViewer">
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(screeningRoom, null, '\t') %></textarea>
                                 </div>
                             </div>
                             <!-- /.tab-pane -->

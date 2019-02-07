@@ -5,10 +5,15 @@ import * as createDebug from 'debug';
 import * as express from 'express';
 import * as moment from 'moment';
 
-import * as ssktsapi from '../ssktsapi';
+import * as cinerinoapi from '../cinerinoapi';
 
 const debug = createDebug('cinerino-console:routes');
 const peopleRouter = express.Router();
+
+type IAccountOwnershipInfo =
+    // tslint:disable-next-line:max-line-length
+    cinerinoapi.factory.ownershipInfo.IOwnershipInfo<cinerinoapi.factory.ownershipInfo.IGoodWithDetail<cinerinoapi.factory.ownershipInfo.AccountGoodType.Account>>;
+
 /**
  * 会員検索
  */
@@ -18,7 +23,7 @@ peopleRouter.get(
     async (req, res, next) => {
         try {
             debug('req.query:', req.query);
-            const personService = new ssktsapi.service.Person({
+            const personService = new cinerinoapi.service.Person({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
@@ -51,6 +56,7 @@ peopleRouter.get(
         }
     }
 );
+
 /**
  * 会員詳細
  */
@@ -59,25 +65,52 @@ peopleRouter.get(
     async (req, res, next) => {
         try {
             const message = '';
-            const personService = new ssktsapi.service.Person({
+            const personService = new cinerinoapi.service.Person({
+                endpoint: <string>process.env.API_ENDPOINT,
+                auth: req.user.authClient
+            });
+            const personOwnershipInfoService = new cinerinoapi.service.person.OwnershipInfo({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
             const person = await personService.findById({ id: req.params.id });
-            const creditCards = await personService.findCreditCards({ personId: req.params.id });
-            const pointAccounts = await personService.findAccounts({ personId: req.params.id });
+
+            let creditCards: cinerinoapi.factory.paymentMethod.paymentCard.creditCard.ICheckedCard[] = [];
+            let coinAccounts: IAccountOwnershipInfo[] = [];
+
+            try {
+                creditCards = await personOwnershipInfoService.searchCreditCards({ id: req.params.id });
+            } catch (error) {
+                // no op
+            }
+
+            try {
+                const searchCoinAccountsResult =
+                    await personOwnershipInfoService.search<cinerinoapi.factory.ownershipInfo.AccountGoodType.Account>({
+                        id: req.params.id,
+                        typeOfGood: {
+                            typeOf: cinerinoapi.factory.ownershipInfo.AccountGoodType.Account,
+                            accountType: cinerinoapi.factory.accountType.Coin
+                        }
+                    });
+                coinAccounts = searchCoinAccountsResult.data;
+            } catch (error) {
+                // no op
+            }
+
             res.render('people/show', {
                 message: message,
                 moment: moment,
                 person: person,
                 creditCards: creditCards,
-                pointAccounts: pointAccounts
+                coinAccounts: coinAccounts
             });
         } catch (error) {
             next(error);
         }
     }
 );
+
 /**
  * 会員注文検索
  */
@@ -85,18 +118,20 @@ peopleRouter.get(
     '/:id/orders',
     async (req, res, next) => {
         try {
-            const orderService = new ssktsapi.service.Order({
+            const orderService = new cinerinoapi.service.Order({
                 endpoint: <string>process.env.API_ENDPOINT,
                 auth: req.user.authClient
             });
             const searchOrdersResult = await orderService.search({
                 limit: req.query.limit,
                 page: req.query.page,
-                sort: { orderDate: ssktsapi.factory.sortType.Descending },
-                orderDateFrom: moment().add(-1, 'months').toDate(),
+                sort: { orderDate: cinerinoapi.factory.sortType.Descending },
+                orderDateFrom: moment()
+                    .add(-1, 'months')
+                    .toDate(),
                 orderDateThrough: new Date(),
                 customer: {
-                    typeOf: ssktsapi.factory.personType.Person,
+                    typeOf: cinerinoapi.factory.personType.Person,
                     ids: [req.params.id]
                 }
             });
@@ -107,4 +142,5 @@ peopleRouter.get(
         }
     }
 );
+
 export default peopleRouter;

@@ -11,14 +11,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable-next-line:no-submodule-imports
 const check_1 = require("express-validator/check");
 const http_status_1 = require("http-status");
+const cinerinoapi_1 = require("../cinerinoapi");
 const api_1 = require("../error/api");
-const ssktsapi_1 = require("../ssktsapi");
 exports.default = (req, __, next) => __awaiter(this, void 0, void 0, function* () {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = check_1.validationResult(req);
     if (!errors.isEmpty()) {
-        next(new api_1.APIError(http_status_1.BAD_REQUEST, errors.array().map((mappedRrror) => {
-            return new ssktsapi_1.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
+        next(new api_1.APIError(http_status_1.BAD_REQUEST, errors.array()
+            .map((mappedRrror) => {
+            return new cinerinoapi_1.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
         })));
     }
     else {

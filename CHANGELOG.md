@@ -18,6 +18,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.5.0 - 2019-02-07
+
+### Changed
+
+- イベントページをCinerino化
+- 会員ページをCinerino化
+
 ## v1.4.0 - 2019-02-05
 
 ### Changed

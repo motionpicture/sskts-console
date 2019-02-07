@@ -104,9 +104,10 @@
                         </p>
                         <hr>
 
-                        <strong><i class="fa fa-piggy-bank mr-1"></i> ポイント口座</strong>
+                        <strong><i class="fa fa-piggy-bank mr-1"></i> コイン口座</strong>
                         <p class="text-muted">
-                            <% pointAccounts.forEach((account) => { %>
+                            <% coinAccounts.forEach((ownershipInfo) => { %>
+                            <% const account = ownershipInfo.typeOfGood %>
                             <span class="badge <%= account.accountType %>">
                                 <%= account.accountType %>
                             </span>
@@ -145,6 +146,7 @@
                                                 <th>Order Number</th>
                                                 <th>Order Date</th>
                                                 <th>Item</th>
+                                                <th>Payment Method</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -164,9 +166,9 @@
                                 <div class="form-group">
                                     <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(creditCards, null, '\t') %></textarea>
                                 </div>
-                                <h4>ポイント口座</h4>
+                                <h4>コイン口座</h4>
                                 <div class="form-group">
-                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(pointAccounts, null, '\t') %></textarea>
+                                    <textarea class="form-control" rows="20" placeholder="" disabled=""><%= JSON.stringify(coinAccounts, null, '\t') %></textarea>
                                 </div>
                             </div>
                             <!-- /.tab-pane -->

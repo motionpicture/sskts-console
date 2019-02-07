@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const createDebug = require("debug");
 const express = require("express");
 const moment = require("moment");
-const ssktsapi = require("../ssktsapi");
+const cinerinoapi = require("../cinerinoapi");
 const debug = createDebug('cinerino-console:routes');
 const peopleRouter = express.Router();
 /**
@@ -25,7 +25,7 @@ peopleRouter.get('',
 (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         debug('req.query:', req.query);
-        const personService = new ssktsapi.service.Person({
+        const personService = new cinerinoapi.service.Person({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
@@ -65,19 +65,42 @@ peopleRouter.get('',
 peopleRouter.get('/:id', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
         const message = '';
-        const personService = new ssktsapi.service.Person({
+        const personService = new cinerinoapi.service.Person({
+            endpoint: process.env.API_ENDPOINT,
+            auth: req.user.authClient
+        });
+        const personOwnershipInfoService = new cinerinoapi.service.person.OwnershipInfo({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
         const person = yield personService.findById({ id: req.params.id });
-        const creditCards = yield personService.findCreditCards({ personId: req.params.id });
-        const pointAccounts = yield personService.findAccounts({ personId: req.params.id });
+        let creditCards = [];
+        let coinAccounts = [];
+        try {
+            creditCards = yield personOwnershipInfoService.searchCreditCards({ id: req.params.id });
+        }
+        catch (error) {
+            // no op
+        }
+        try {
+            const searchCoinAccountsResult = yield personOwnershipInfoService.search({
+                id: req.params.id,
+                typeOfGood: {
+                    typeOf: cinerinoapi.factory.ownershipInfo.AccountGoodType.Account,
+                    accountType: cinerinoapi.factory.accountType.Coin
+                }
+            });
+            coinAccounts = searchCoinAccountsResult.data;
+        }
+        catch (error) {
+            // no op
+        }
         res.render('people/show', {
             message: message,
             moment: moment,
             person: person,
             creditCards: creditCards,
-            pointAccounts: pointAccounts
+            coinAccounts: coinAccounts
         });
     }
     catch (error) {
@@ -89,18 +112,20 @@ peopleRouter.get('/:id', (req, res, next) => __awaiter(this, void 0, void 0, fun
  */
 peopleRouter.get('/:id/orders', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const orderService = new ssktsapi.service.Order({
+        const orderService = new cinerinoapi.service.Order({
             endpoint: process.env.API_ENDPOINT,
             auth: req.user.authClient
         });
         const searchOrdersResult = yield orderService.search({
             limit: req.query.limit,
             page: req.query.page,
-            sort: { orderDate: ssktsapi.factory.sortType.Descending },
-            orderDateFrom: moment().add(-1, 'months').toDate(),
+            sort: { orderDate: cinerinoapi.factory.sortType.Descending },
+            orderDateFrom: moment()
+                .add(-1, 'months')
+                .toDate(),
             orderDateThrough: new Date(),
             customer: {
-                typeOf: ssktsapi.factory.personType.Person,
+                typeOf: cinerinoapi.factory.personType.Person,
                 ids: [req.params.id]
             }
         });

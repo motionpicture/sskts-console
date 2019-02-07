@@ -2,7 +2,7 @@ import * as createDebug from 'debug';
 import * as jwt from 'jsonwebtoken';
 
 import * as chevreapi from './chevreapi';
-import * as ssktsapi from './ssktsapi';
+import * as cinerinoapi from './cinerinoapi';
 
 const debug = createDebug('cinerino-console:user');
 
@@ -29,7 +29,7 @@ export default class User {
     public host: string;
     public session: Express.Session;
     public state: string;
-    public authClient: ssktsapi.auth.OAuth2;
+    public authClient: cinerinoapi.auth.OAuth2;
     public chevreAuthClient: chevreapi.auth.OAuth2;
     public profile: IProfile;
 
@@ -37,7 +37,7 @@ export default class User {
         this.host = configurations.host;
         this.session = configurations.session;
 
-        this.authClient = new ssktsapi.auth.OAuth2({
+        this.authClient = new cinerinoapi.auth.OAuth2({
             domain: <string>process.env.API_AUTHORIZE_SERVER_DOMAIN,
             clientId: <string>process.env.API_CLIENT_ID,
             clientSecret: <string>process.env.API_CLIENT_SECRET,
@@ -52,6 +52,7 @@ export default class User {
             logoutUri: `https://${configurations.host}/logout`
         });
         this.authClient.setCredentials({ refresh_token: this.getRefreshToken() });
+        this.chevreAuthClient.setCredentials({ refresh_token: this.getRefreshToken() });
     }
 
     public generateAuthUrl() {
@@ -77,7 +78,7 @@ export default class User {
     public async signIn(code: string) {
         // 認証情報を取得できればログイン成功
         const credentials = await this.authClient.getToken(code, <string>process.env.API_CODE_VERIFIER);
-        debug('credentials published', credentials);
+        debug('credentials published');
 
         if (credentials.access_token === undefined) {
             throw new Error('Access token is required for credentials.');
