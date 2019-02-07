@@ -10,9 +10,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- イベントページをCinerino化
-- 会員ページをCinerino化
-
 ### Deprecated
 
 ### Removed
@@ -20,6 +17,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.5.0 - 2019-02-07
+
+### Changed
+
+- イベントページをCinerino化
+- 会員ページをCinerino化
 
 ## v1.4.0 - 2019-02-05
 
