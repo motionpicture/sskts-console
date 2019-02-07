@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Changed
 
 - イベントページをCinerino化
+- 会員ページをCinerino化
 
 ### Deprecated
 

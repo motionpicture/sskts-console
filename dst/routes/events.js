@@ -117,7 +117,6 @@ eventsRouter.post('/screeningEvent/import', ...[
             .json(tasks);
     }
     catch (error) {
-        console.error(error);
         next(error);
     }
 }));

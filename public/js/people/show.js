@@ -28,7 +28,7 @@ function searchOrders(cb) {
                         return o.itemOffered.reservedTicket.ticketedSeat.seatNumber
                     }
                     return o.itemOffered.typeOf;
-                }).join(',') + '</td>'
+                }).join('<br>') + '</td>'
                 + '<td>' + '<span class="badge ' + order.orderStatus + '">' + order.orderStatus + '</span>' + '</td>'
             ).appendTo("#orders tbody");
         });
